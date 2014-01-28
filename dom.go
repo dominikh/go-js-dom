@@ -97,6 +97,15 @@ func nodeListToElements(o js.Object) []Element {
 	return out
 }
 
+func nodeListToHTMLElements(o js.Object) []HTMLElement {
+	var out []HTMLElement
+	length := o.Get("length").Int()
+	for i := 0; i < length; i++ {
+		out = append(out, wrapHTMLElement(o.Call("item", i)))
+	}
+	return out
+}
+
 func wrapDocument(o js.Object) Document {
 	switch o.Get("constructor").Get("name").String() {
 	case "HTMLDocument":
@@ -200,7 +209,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLLinkElement":
 		return &HTMLLinkElement{el}
 	case "HTMLMapElement":
-		return &HTMLMapElement{el}
+		return &HTMLMapElement{BasicHTMLElement: el}
 	case "HTMLMediaElement":
 		return &HTMLMediaElement{el}
 	case "HTMLMenuElement":
@@ -1840,7 +1849,25 @@ func (e *HTMLLegendElement) Form() *HTMLFormElement {
 }
 
 type HTMLLinkElement struct{ *BasicHTMLElement }
-type HTMLMapElement struct{ *BasicHTMLElement }
+
+type HTMLMapElement struct {
+	*BasicHTMLElement
+	Name string `js:"name"`
+}
+
+func (e *HTMLMapElement) Areas() []*HTMLAreaElement {
+	areas := nodeListToElements(e.Get("areas"))
+	out := make([]*HTMLAreaElement, len(areas))
+	for i, area := range areas {
+		out[i] = area.(*HTMLAreaElement)
+	}
+	return out
+}
+
+func (e *HTMLMapElement) Images() []HTMLElement {
+	return nodeListToHTMLElements(e.Get("areas"))
+}
+
 type HTMLMediaElement struct{ *BasicHTMLElement }
 type HTMLMenuElement struct{ *BasicHTMLElement }
 
