@@ -1650,6 +1650,16 @@ type HTMLDataElement struct {
 }
 
 type HTMLDataListElement struct{ *BasicHTMLElement }
+
+func (e *HTMLDataListElement) Options() []*HTMLOptionElement {
+	options := nodeListToElements(e.Get("options"))
+	out := make([]*HTMLOptionElement, len(options))
+	for i, option := range options {
+		out[i] = option.(*HTMLOptionElement)
+	}
+	return out
+}
+
 type HTMLDirectoryElement struct{ *BasicHTMLElement }
 type HTMLDivElement struct{ *BasicHTMLElement }
 
