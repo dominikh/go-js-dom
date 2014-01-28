@@ -151,47 +151,47 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLAreaElement":
 		return &HTMLAreaElement{BasicHTMLElement: el}
 	case "HTMLAudioElement":
-		return &HTMLAudioElement{el}
+		return &HTMLAudioElement{BasicHTMLElement: el}
 	case "HTMLBaseElement":
-		return &HTMLBaseElement{el}
+		return &HTMLBaseElement{BasicHTMLElement: el}
 	case "HTMLBodyElement":
-		return &HTMLBodyElement{el}
+		return &HTMLBodyElement{BasicHTMLElement: el}
 	case "HTMLBRElement":
-		return &HTMLBRElement{el}
+		return &HTMLBRElement{BasicHTMLElement: el}
 	case "HTMLButtonElement":
 		return &HTMLButtonElement{BasicHTMLElement: el}
 	case "HTMLCanvasElement":
-		return &HTMLCanvasElement{el}
+		return &HTMLCanvasElement{BasicHTMLElement: el}
 	case "HTMLDataElement":
 		return &HTMLDataElement{BasicHTMLElement: el}
 	case "HTMLDataListElement":
-		return &HTMLDataListElement{el}
+		return &HTMLDataListElement{BasicHTMLElement: el}
 	case "HTMLDirectoryElement":
-		return &HTMLDirectoryElement{el}
+		return &HTMLDirectoryElement{BasicHTMLElement: el}
 	case "HTMLDivElement":
-		return &HTMLDivElement{el}
+		return &HTMLDivElement{BasicHTMLElement: el}
 	case "HTMLDListElement":
-		return &HTMLDListElement{el}
+		return &HTMLDListElement{BasicHTMLElement: el}
 	case "HTMLEmbedElement":
 		return &HTMLEmbedElement{BasicHTMLElement: el}
 	case "HTMLFieldSetElement":
-		return &HTMLFieldSetElement{el}
+		return &HTMLFieldSetElement{BasicHTMLElement: el}
 	case "HTMLFontElement":
-		return &HTMLFontElement{el}
+		return &HTMLFontElement{BasicHTMLElement: el}
 	case "HTMLFormElement":
-		return &HTMLFormElement{el}
+		return &HTMLFormElement{BasicHTMLElement: el}
 	case "HTMLFrameElement":
-		return &HTMLFrameElement{el}
+		return &HTMLFrameElement{BasicHTMLElement: el}
 	case "HTMLFrameSetElement":
-		return &HTMLFrameSetElement{el}
+		return &HTMLFrameSetElement{BasicHTMLElement: el}
 	case "HTMLHeadElement":
-		return &HTMLHeadElement{el}
+		return &HTMLHeadElement{BasicHTMLElement: el}
 	case "HTMLHeadingElement":
-		return &HTMLHeadingElement{el}
+		return &HTMLHeadingElement{BasicHTMLElement: el}
 	case "HTMLHtmlElement":
-		return &HTMLHtmlElement{el}
+		return &HTMLHtmlElement{BasicHTMLElement: el}
 	case "HTMLHRElement":
-		return &HTMLHRElement{el}
+		return &HTMLHRElement{BasicHTMLElement: el}
 	case "HTMLIFrameElement":
 		return &HTMLIFrameElement{BasicHTMLElement: el}
 	case "HTMLImageElement":
@@ -199,21 +199,21 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLInputElement":
 		return &HTMLInputElement{BasicHTMLElement: el}
 	case "HTMLKeygenElement":
-		return &HTMLKeygenElement{el}
+		return &HTMLKeygenElement{BasicHTMLElement: el}
 	case "HTMLLabelElement":
 		return &HTMLLabelElement{BasicHTMLElement: el}
 	case "HTMLLegendElement":
-		return &HTMLLegendElement{el}
+		return &HTMLLegendElement{BasicHTMLElement: el}
 	case "HTMLLIElement":
 		return &HTMLLIElement{BasicHTMLElement: el}
 	case "HTMLLinkElement":
-		return &HTMLLinkElement{el}
+		return &HTMLLinkElement{BasicHTMLElement: el}
 	case "HTMLMapElement":
 		return &HTMLMapElement{BasicHTMLElement: el}
 	case "HTMLMediaElement":
-		return &HTMLMediaElement{el}
+		return &HTMLMediaElement{BasicHTMLElement: el}
 	case "HTMLMenuElement":
-		return &HTMLMenuElement{el}
+		return &HTMLMenuElement{BasicHTMLElement: el}
 	case "HTMLMetaElement":
 		return &HTMLMetaElement{BasicHTMLElement: el}
 	case "HTMLMeterElement":
@@ -221,7 +221,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLModElement":
 		return &HTMLModElement{BasicHTMLElement: el}
 	case "HTMLObjectElement":
-		return &HTMLObjectElement{el}
+		return &HTMLObjectElement{BasicHTMLElement: el}
 	case "HTMLOListElement":
 		return &HTMLOListElement{BasicHTMLElement: el}
 	case "HTMLOptGroupElement":
@@ -229,13 +229,13 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLOptionElement":
 		return &HTMLOptionElement{BasicHTMLElement: el}
 	case "HTMLOutputElement":
-		return &HTMLOutputElement{el}
+		return &HTMLOutputElement{BasicHTMLElement: el}
 	case "HTMLParagraphElement":
-		return &HTMLParagraphElement{el}
+		return &HTMLParagraphElement{BasicHTMLElement: el}
 	case "HTMLParamElement":
 		return &HTMLParamElement{BasicHTMLElement: el}
 	case "HTMLPreElement":
-		return &HTMLPreElement{el}
+		return &HTMLPreElement{BasicHTMLElement: el}
 	case "HTMLProgressElement":
 		return &HTMLProgressElement{BasicHTMLElement: el}
 	case "HTMLQuoteElement":
@@ -243,43 +243,43 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLScriptElement":
 		return &HTMLScriptElement{BasicHTMLElement: el}
 	case "HTMLSelectElement":
-		return &HTMLSelectElement{el}
+		return &HTMLSelectElement{BasicHTMLElement: el}
 	case "HTMLSourceElement":
 		return &HTMLSourceElement{BasicHTMLElement: el}
 	case "HTMLSpanElement":
-		return &HTMLSpanElement{el}
+		return &HTMLSpanElement{BasicHTMLElement: el}
 	case "HTMLStyleElement":
-		return &HTMLStyleElement{el}
+		return &HTMLStyleElement{BasicHTMLElement: el}
 	case "HTMLTableElement":
-		return &HTMLTableElement{el}
+		return &HTMLTableElement{BasicHTMLElement: el}
 	case "HTMLTableCaptionElement":
-		return &HTMLTableCaptionElement{el}
+		return &HTMLTableCaptionElement{BasicHTMLElement: el}
 	case "HTMLTableCellElement":
-		return &HTMLTableCellElement{el}
+		return &HTMLTableCellElement{BasicHTMLElement: el}
 	case "HTMLTableDataCellElement":
-		return &HTMLTableDataCellElement{el}
+		return &HTMLTableDataCellElement{BasicHTMLElement: el}
 	case "HTMLTableHeaderCellElement":
 		return &HTMLTableHeaderCellElement{BasicHTMLElement: el}
 	case "HTMLTableColElement":
 		return &HTMLTableColElement{BasicHTMLElement: el}
 	case "HTMLTableRowElement":
-		return &HTMLTableRowElement{el}
+		return &HTMLTableRowElement{BasicHTMLElement: el}
 	case "HTMLTableSectionElement":
-		return &HTMLTableSectionElement{el}
+		return &HTMLTableSectionElement{BasicHTMLElement: el}
 	case "HTMLTextAreaElement":
-		return &HTMLTextAreaElement{el}
+		return &HTMLTextAreaElement{BasicHTMLElement: el}
 	case "HTMLTimeElement":
 		return &HTMLTimeElement{BasicHTMLElement: el}
 	case "HTMLTitleElement":
 		return &HTMLTitleElement{BasicHTMLElement: el}
 	case "HTMLTrackElement":
-		return &HTMLTrackElement{el}
+		return &HTMLTrackElement{BasicHTMLElement: el}
 	case "HTMLUListElement":
-		return &HTMLUListElement{el}
+		return &HTMLUListElement{BasicHTMLElement: el}
 	case "HTMLUnknownElement":
-		return &HTMLUnknownElement{el}
+		return &HTMLUnknownElement{BasicHTMLElement: el}
 	case "HTMLVideoElement":
-		return &HTMLVideoElement{el}
+		return &HTMLVideoElement{BasicHTMLElement: el}
 	default:
 		panic("Unsupported HTML element type: " + name)
 	}
