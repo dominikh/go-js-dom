@@ -186,7 +186,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLIFrameElement":
 		return &HTMLIFrameElement{BasicHTMLElement: el}
 	case "HTMLImageElement":
-		return &HTMLImageElement{el}
+		return &HTMLImageElement{BasicHTMLElement: el}
 	case "HTMLInputElement":
 		return &HTMLInputElement{el}
 	case "HTMLKeygenElement":
@@ -1702,7 +1702,20 @@ func (e *HTMLIFrameElement) ContentWindow() Window {
 	return &window{e.Get("contentWindow")}
 }
 
-type HTMLImageElement struct{ *BasicHTMLElement }
+type HTMLImageElement struct {
+	*BasicHTMLElement
+	Complete      bool   `js:"complete"`
+	CrossOrigin   string `js:"crossOrigin"`
+	Height        int    `js:"height"`
+	IsMap         bool   `js:"isMap"`
+	NaturalHeight int    `js:"naturalHeight"`
+	NaturalWidth  int    `js:"naturalWidth"`
+	Src           string `js:"src"`
+	UseMap        string `js:"useMap"`
+	Width         int    `js:"width"`
+	// TODO constructor
+}
+
 type HTMLInputElement struct{ *BasicHTMLElement }
 type HTMLKeygenElement struct{ *BasicHTMLElement }
 
