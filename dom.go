@@ -373,8 +373,6 @@ func GetWindow() Window {
 	return &window{js.Global("window")}
 }
 
-// TODO document that our lists aren't live
-
 type Document interface {
 	Node
 	ParentNode
@@ -771,7 +769,6 @@ func (w *window) Console() *Console {
 }
 
 func (w *window) Document() Document {
-	// TODO return a HTMLDocument if possible
 	o := w.Get("document")
 	switch o.Get("constructor").Get("name").String() {
 	case "HTMLDocument":
