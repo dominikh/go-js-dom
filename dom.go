@@ -18,6 +18,31 @@
 // might live in a separate package. This might require special care
 // to avoid circular dependencies.
 //
+//
+// Getting started
+//
+// The usual entry point of using the dom package is by using the
+// GetWindow() function which will return a Window, from which you can
+// get things such as the current Document.
+//
+//
+// The Element, HTMLElement and Event interfaces
+//
+// The DOM has a big amount of different element and event types, but
+// they all follow three interfaces. All functions that work on or
+// return generic elements/events will return one of the three
+// interfaces Element, HTMLElement or Event. In these interface values
+// there will be concrete implementations, such as
+// HTMLParagraphElement or FocusEvent. It's also not unusual that
+// values of type Element also implement HTMLElement. In all cases,
+// type assertions can be used.
+//
+// Example:
+//     el := dom.GetWindow().Document().QuerySelector(".some-element")
+//     htmlEl := el.(dom.HTMLElement)
+//     pEl := el.(dom.HTMLParagraphElement)
+//
+//
 // Live collections
 //
 // Several functions in the JavaScript DOM return "live"
@@ -39,8 +64,8 @@
 // example:
 //
 //     d := dom.GetWindow().Document()
-//     e1 := d.GetElementById("my-element")
-//     e2 := d.GetElementById("my-element")
+//     e1 := d.GetElementById("#my-element")
+//     e2 := d.GetElementById("#my-element")
 //
 //     e1.SetClassName("some-class")
 //     println(e1.ClassName() == e2.ClassName())
