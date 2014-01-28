@@ -67,8 +67,8 @@
 //     e1 := d.GetElementById("#my-element")
 //     e2 := d.GetElementById("#my-element")
 //
-//     e1.SetClassName("some-class")
-//     println(e1.ClassName() == e2.ClassName())
+//     e1.SetClass("some-class")
+//     println(e1.Class() == e2.Class())
 //
 // The above example will print `true`.
 package dom
@@ -1286,9 +1286,8 @@ type Element interface {
 
 	// We do not have classList and no DOMTokenList. manipulate
 	// strings yourself
-	// TODO ClassName → Class?
-	ClassName() string
-	SetClassName(string)
+	Class() string
+	SetClass(string)
 	ID() string
 	SetID(string)
 	TagName() string
@@ -1452,11 +1451,11 @@ func (e *BasicElement) NextElementSibling() Element {
 	return wrapElement(e.Get("nextElementSibling"))
 }
 
-func (e *BasicElement) ClassName() string {
+func (e *BasicElement) Class() string {
 	return e.Get("className").String()
 }
 
-func (e *BasicElement) SetClassName(s string) {
+func (e *BasicElement) SetClass(s string) {
 	e.Set("className", s)
 }
 
