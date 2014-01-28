@@ -188,7 +188,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLImageElement":
 		return &HTMLImageElement{BasicHTMLElement: el}
 	case "HTMLInputElement":
-		return &HTMLInputElement{el}
+		return &HTMLInputElement{BasicHTMLElement: el}
 	case "HTMLKeygenElement":
 		return &HTMLKeygenElement{el}
 	case "HTMLLabelElement":
@@ -1716,7 +1716,95 @@ type HTMLImageElement struct {
 	// TODO constructor
 }
 
-type HTMLInputElement struct{ *BasicHTMLElement }
+type HTMLInputElement struct {
+	*BasicHTMLElement
+	Accept             string    `js:"accept"`
+	Alt                string    `js:"alt"`
+	Autocomplete       string    `js:"autocomplete"`
+	Autofocus          bool      `js:"autofocus"`
+	Checked            bool      `js:"checked"`
+	DefaultChecked     bool      `js:"defaultChecked"`
+	DefaultValue       string    `js:"defaultValue"`
+	DirName            string    `js:"dirName"`
+	Disabled           bool      `js:"disabled"`
+	FormAction         string    `js:"formAction"`
+	FormEncType        string    `js:"formEncType"`
+	FormMethod         string    `js:"formMethod"`
+	FormNoValidate     bool      `js:"formNoValidate"`
+	FormTarget         string    `js:"formTarget"`
+	Height             string    `js:"height"`
+	Indeterminate      bool      `js:"indeterminate"`
+	Max                string    `js:"max"`
+	MaxLength          int       `js:"maxLength"`
+	Min                string    `js:"min"`
+	Multiple           bool      `js:"multiple"`
+	Name               string    `js:"name"`
+	Pattern            string    `js:"pattern"`
+	Placeholder        string    `js:"placeholder"`
+	ReadOnly           bool      `js:"readOnly"`
+	Required           bool      `js:"required"`
+	SelectionDirection string    `js:"selectionDirection"`
+	SelectionEnd       int       `js:"selectionEnd"`
+	SelectionStart     int       `js:"selectionStart"`
+	Size               int       `js:"size"`
+	Src                string    `js:"src"`
+	Step               string    `js:"step"`
+	TabIndex           int       `js:"tabIndex"`
+	Type               string    `js:"type"`
+	ValidationMessage  string    `js:"validationMessage"`
+	Value              string    `js:"value"`
+	ValueAsDate        time.Time `js:"valueAsDate"`
+	ValueAsNumber      float64   `js:"valueAsNumber"`
+	Width              string    `js:"width"`
+	WillValidate       bool      `js:"willValidate"`
+}
+
+// File represents files as can be obtained from file choosers or drag
+// and drop. The dom package does not define any methods on File nor
+// does it provide access to the blob or a way to read it.
+type File struct {
+	js.Object
+}
+
+func (e *HTMLInputElement) Files() []*File {
+	files := e.Get("files")
+	out := make([]*File, files.Get("length").Int())
+	for i := range out {
+		out[i] = &File{files.Call("item", i)}
+	}
+	return out
+}
+
+func (e *HTMLInputElement) List() *HTMLDataListElement {
+	list := wrapHTMLElement(e.Get("list"))
+	if list == nil {
+		return nil
+	}
+	return list.(*HTMLDataListElement)
+}
+
+func (e *HTMLInputElement) Labels() []*HTMLLabelElement {
+	labels := nodeListToElements(e.Get("labels"))
+	out := make([]*HTMLLabelElement, len(labels))
+	for i, label := range labels {
+		out[i] = label.(*HTMLLabelElement)
+	}
+	return out
+}
+
+func (e *HTMLInputElement) Form() *HTMLFormElement {
+	form := wrapHTMLElement(e.Get("form"))
+	if form == nil {
+		return nil
+	}
+	return form.(*HTMLFormElement)
+}
+
+func (e *HTMLInputElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
 type HTMLKeygenElement struct{ *BasicHTMLElement }
 
 type HTMLLIElement struct {
