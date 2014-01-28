@@ -40,7 +40,7 @@
 // Example:
 //     el := dom.GetWindow().Document().QuerySelector(".some-element")
 //     htmlEl := el.(dom.HTMLElement)
-//     pEl := el.(dom.HTMLParagraphElement)
+//     pEl := el.(*dom.HTMLParagraphElement)
 //
 //
 // Live collections
