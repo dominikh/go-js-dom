@@ -241,7 +241,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLQuoteElement":
 		return &HTMLQuoteElement{BasicHTMLElement: el}
 	case "HTMLScriptElement":
-		return &HTMLScriptElement{el}
+		return &HTMLScriptElement{BasicHTMLElement: el}
 	case "HTMLSelectElement":
 		return &HTMLSelectElement{el}
 	case "HTMLSourceElement":
