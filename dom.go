@@ -97,6 +97,15 @@ func nodeListToElements(o js.Object) []Element {
 	return out
 }
 
+func wrapDocument(o js.Object) Document {
+	switch o.Get("constructor").Get("name").String() {
+	case "HTMLDocument":
+		return &htmlDocument{&document{&BasicNode{o}}}
+	default:
+		return &document{&BasicNode{o}}
+	}
+}
+
 func wrapNode(o js.Object) Node {
 	if o.IsNull() || o.IsUndefined() {
 		return nil
@@ -175,7 +184,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLHRElement":
 		return &HTMLHRElement{el}
 	case "HTMLIFrameElement":
-		return &HTMLIFrameElement{el}
+		return &HTMLIFrameElement{BasicHTMLElement: el}
 	case "HTMLImageElement":
 		return &HTMLImageElement{el}
 	case "HTMLInputElement":
@@ -769,13 +778,7 @@ func (w *window) Console() *Console {
 }
 
 func (w *window) Document() Document {
-	o := w.Get("document")
-	switch o.Get("constructor").Get("name").String() {
-	case "HTMLDocument":
-		return &htmlDocument{&document{&BasicNode{w.Get("document")}}}
-	default:
-		return &document{&BasicNode{w.Get("document")}}
-	}
+	return wrapDocument(w.Get("document"))
 }
 
 func (w *window) FrameElement() Element {
@@ -1679,7 +1682,26 @@ type HTMLHRElement struct{ *BasicHTMLElement }
 type HTMLHeadElement struct{ *BasicHTMLElement }
 type HTMLHeadingElement struct{ *BasicHTMLElement }
 type HTMLHtmlElement struct{ *BasicHTMLElement }
-type HTMLIFrameElement struct{ *BasicHTMLElement }
+
+type HTMLIFrameElement struct {
+	*BasicHTMLElement
+	Width    string `js:"width"`
+	Height   string `js:"height"`
+	Name     string `js:"name"`
+	Src      string `js:"src"`
+	SrcDoc   string `js:"srcDoc"`
+	Seamless bool   `js:"seamless"`
+	// TODO sandbox attribute
+}
+
+func (e *HTMLIFrameElement) ContentDocument() Document {
+	return wrapDocument(e.Get("contentDocument"))
+}
+
+func (e *HTMLIFrameElement) ContentWindow() Window {
+	return &window{e.Get("contentWindow")}
+}
+
 type HTMLImageElement struct{ *BasicHTMLElement }
 type HTMLInputElement struct{ *BasicHTMLElement }
 type HTMLKeygenElement struct{ *BasicHTMLElement }
