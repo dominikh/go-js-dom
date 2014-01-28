@@ -1682,7 +1682,40 @@ type HTMLEmbedElement struct {
 	Width string `js:"width"`
 }
 
-type HTMLFieldSetElement struct{ *BasicHTMLElement }
+type HTMLFieldSetElement struct {
+	*BasicHTMLElement
+	Disabled          bool   `js:"disabled"`
+	Name              string `js:"name"`
+	Type              string `js:"type"`
+	ValidationMessage string `js:"validationMessage"`
+	WillValidate      bool   `js:"willValidate"`
+}
+
+func (e *HTMLFieldSetElement) Elements() []HTMLElement {
+	return nodeListToHTMLElements(e.Get("elements"))
+}
+
+func (e *HTMLFieldSetElement) Form() *HTMLFormElement {
+	form := wrapHTMLElement(e.Get("form"))
+	if form == nil {
+		return nil
+	}
+	return form.(*HTMLFormElement)
+}
+
+func (e *HTMLFieldSetElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLFieldSetElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLFieldSetElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
 type HTMLFontElement struct{ *BasicHTMLElement }
 type HTMLFormElement struct{ *BasicHTMLElement }
 type HTMLFrameElement struct{ *BasicHTMLElement }
