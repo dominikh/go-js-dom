@@ -1808,7 +1808,16 @@ type HTMLQuoteElement struct {
 	Cite string `js:"cite"`
 }
 
-type HTMLScriptElement struct{ *BasicHTMLElement }
+type HTMLScriptElement struct {
+	*BasicHTMLElement
+	Type    string `js:"type"`
+	Src     string `js:"src"`
+	Charset string `js:"charset"`
+	Async   bool   `js:"async"`
+	Defer   bool   `js:"defer"`
+	Text    string `js:"text"`
+}
+
 type HTMLSelectElement struct{ *BasicHTMLElement }
 
 type HTMLSourceElement struct {
