@@ -1885,7 +1885,47 @@ func (e *HTMLInputElement) Validity() *ValidityState {
 	return &ValidityState{Object: e.Get("validity")}
 }
 
-type HTMLKeygenElement struct{ *BasicHTMLElement }
+type HTMLKeygenElement struct {
+	*BasicHTMLElement
+	Autofocus         bool   `js:"autofocus"`
+	Challenge         string `js:"challenge"`
+	Disabled          bool   `js:"disabled"`
+	Keytype           string `js:"keytype"`
+	Name              string `js:"name"`
+	Type              string `js:"type"`
+	ValidationMessage string `js:"validationMessage"`
+	WillValidate      bool   `js:"willValidate"`
+}
+
+func (e *HTMLKeygenElement) Form() *HTMLFormElement {
+	form := wrapHTMLElement(e.Get("form"))
+	if form == nil {
+		return nil
+	}
+	return form.(*HTMLFormElement)
+}
+
+func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement {
+	labels := nodeListToElements(e.Get("labels"))
+	out := make([]*HTMLLabelElement, len(labels))
+	for i, label := range labels {
+		out[i] = label.(*HTMLLabelElement)
+	}
+	return out
+}
+
+func (e *HTMLKeygenElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLKeygenElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLKeygenElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
 
 type HTMLLIElement struct {
 	*BasicHTMLElement
