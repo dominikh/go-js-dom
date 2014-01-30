@@ -2009,7 +2009,27 @@ func (e *HTMLLegendElement) Form() *HTMLFormElement {
 	return getForm(e)
 }
 
-type HTMLLinkElement struct{ *BasicHTMLElement }
+type HTMLLinkElement struct {
+	*BasicHTMLElement
+	Disabled bool   `js:"disabled"`
+	Href     string `js:"href"`
+	HrefLang string `js:"hrefLang"`
+	Media    string `js:"media"`
+	Type     string `js:"type"`
+}
+
+func (e *HTMLLinkElement) Rel() *TokenList {
+	return &TokenList{dtl: e.Get("relList"), o: e, sa: "rel"}
+}
+
+func (e *HTMLLinkElement) Sizes() *TokenList {
+	return &TokenList{dtl: e.Get("sizes"), o: e}
+}
+
+func (e *HTMLLinkElement) Sheet() StyleSheet {
+	// FIXME implement
+	return nil
+}
 
 type HTMLMapElement struct {
 	*BasicHTMLElement
