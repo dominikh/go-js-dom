@@ -2023,7 +2023,14 @@ type HTMLSourceElement struct {
 type HTMLSpanElement struct{ *BasicHTMLElement }
 type HTMLStyleElement struct{ *BasicHTMLElement }
 type HTMLTableCaptionElement struct{ *BasicHTMLElement }
-type HTMLTableCellElement struct{ *BasicHTMLElement }
+
+type HTMLTableCellElement struct {
+	*BasicHTMLElement
+	ColSpan   int `js:"colSpan"`
+	RowSpan   int `js:"rowSpan"`
+	CellIndex int `js:"cellIndex"`
+	// TODO headers
+}
 
 type HTMLTableColElement struct {
 	*BasicHTMLElement
