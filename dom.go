@@ -2063,6 +2063,24 @@ func (e *HTMLTableRowElement) DeleteCell(index int) {
 }
 
 type HTMLTableSectionElement struct{ *BasicHTMLElement }
+
+func (e *HTMLTableSectionElement) Rows() []*HTMLTableRowElement {
+	rows := nodeListToElements(e.Get("rows"))
+	out := make([]*HTMLTableRowElement, len(rows))
+	for i, row := range rows {
+		out[i] = row.(*HTMLTableRowElement)
+	}
+	return out
+}
+
+func (e *HTMLTableSectionElement) DeleteRow(index int) {
+	e.Call("deleteRow", index)
+}
+
+func (e *HTMLTableSectionElement) InsertRow(index int) *HTMLTableRowElement {
+	return wrapHTMLElement(e.Call("insertRow", index)).(*HTMLTableRowElement)
+}
+
 type HTMLTextAreaElement struct{ *BasicHTMLElement }
 
 type HTMLTimeElement struct {
