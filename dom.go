@@ -398,6 +398,23 @@ func wrapEvent(o js.Object) Event {
 	}
 }
 
+func getForm(o js.Object) *HTMLFormElement {
+	form := wrapHTMLElement(o.Get("form"))
+	if form == nil {
+		return nil
+	}
+	return form.(*HTMLFormElement)
+}
+
+func getLabels(o js.Object) []*HTMLLabelElement {
+	labels := nodeListToElements(o.Get("labels"))
+	out := make([]*HTMLLabelElement, len(labels))
+	for i, label := range labels {
+		out[i] = label.(*HTMLLabelElement)
+	}
+	return out
+}
+
 func GetWindow() Window {
 	return &window{js.Global("window")}
 }
@@ -1623,20 +1640,11 @@ type HTMLButtonElement struct {
 }
 
 func (e *HTMLButtonElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 func (e *HTMLButtonElement) Labels() []*HTMLLabelElement {
-	labels := nodeListToElements(e.Get("labels"))
-	out := make([]*HTMLLabelElement, len(labels))
-	for i, label := range labels {
-		out[i] = label.(*HTMLLabelElement)
-	}
-	return out
+	return getLabels(e)
 }
 
 func (e *HTMLButtonElement) Validity() *ValidityState {
@@ -1687,11 +1695,7 @@ func (e *HTMLFieldSetElement) Elements() []HTMLElement {
 }
 
 func (e *HTMLFieldSetElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 func (e *HTMLFieldSetElement) Validity() *ValidityState {
@@ -1855,20 +1859,11 @@ func (e *HTMLInputElement) List() *HTMLDataListElement {
 }
 
 func (e *HTMLInputElement) Labels() []*HTMLLabelElement {
-	labels := nodeListToElements(e.Get("labels"))
-	out := make([]*HTMLLabelElement, len(labels))
-	for i, label := range labels {
-		out[i] = label.(*HTMLLabelElement)
-	}
-	return out
+	return getLabels(e)
 }
 
 func (e *HTMLInputElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 func (e *HTMLInputElement) Validity() *ValidityState {
@@ -1889,20 +1884,11 @@ type HTMLKeygenElement struct {
 }
 
 func (e *HTMLKeygenElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement {
-	labels := nodeListToElements(e.Get("labels"))
-	out := make([]*HTMLLabelElement, len(labels))
-	for i, label := range labels {
-		out[i] = label.(*HTMLLabelElement)
-	}
-	return out
+	return getLabels(e)
 }
 
 func (e *HTMLKeygenElement) Validity() *ValidityState {
@@ -1933,21 +1919,13 @@ func (e *HTMLLabelElement) Control() HTMLElement {
 }
 
 func (e *HTMLLabelElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 type HTMLLegendElement struct{ *BasicHTMLElement }
 
 func (e *HTMLLegendElement) Form() *HTMLFormElement {
-	form := wrapHTMLElement(e.Get("form"))
-	if form == nil {
-		return nil
-	}
-	return form.(*HTMLFormElement)
+	return getForm(e)
 }
 
 type HTMLLinkElement struct{ *BasicHTMLElement }
@@ -1990,12 +1968,7 @@ type HTMLMeterElement struct {
 }
 
 func (e HTMLMeterElement) Labels() []*HTMLLabelElement {
-	nodes := nodeListToNodes(e.Call("labels"))
-	out := make([]*HTMLLabelElement, len(nodes))
-	for i, node := range nodes {
-		out[i] = node.(*HTMLLabelElement)
-	}
-	return out
+	return getLabels(e)
 }
 
 type HTMLModElement struct {
@@ -2026,11 +1999,7 @@ type HTMLObjectElement struct {
 }
 
 func (e *HTMLObjectElement) Form() *HTMLFormElement {
-	el := wrapHTMLElement(e.Get("form"))
-	if el == nil {
-		return nil
-	}
-	return el.(*HTMLFormElement)
+	return getForm(e)
 }
 
 func (e *HTMLObjectElement) ContentDocument() Document {
@@ -2072,11 +2041,7 @@ type HTMLOptionElement struct {
 }
 
 func (e *HTMLOptionElement) Form() *HTMLFormElement {
-	el := wrapHTMLElement(e.Get("form"))
-	if el == nil {
-		return nil
-	}
-	return el.(*HTMLFormElement)
+	return getForm(e.Object)
 }
 
 type HTMLOutputElement struct{ *BasicHTMLElement }
@@ -2098,12 +2063,7 @@ type HTMLProgressElement struct {
 }
 
 func (e HTMLProgressElement) Labels() []*HTMLLabelElement {
-	nodes := nodeListToNodes(e.Call("labels"))
-	out := make([]*HTMLLabelElement, len(nodes))
-	for i, node := range nodes {
-		out[i] = node.(*HTMLLabelElement)
-	}
-	return out
+	return getLabels(e)
 }
 
 type HTMLQuoteElement struct {
