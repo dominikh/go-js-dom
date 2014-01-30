@@ -320,7 +320,7 @@ func wrapEvent(o js.Object) Event {
 	case "ClipboardEvent":
 		return &ClipboardEvent{ev}
 	case "CloseEvent":
-		return &CloseEvent{ev}
+		return &CloseEvent{BasicEvent: ev}
 	case "CompositionEvent":
 		return &CompositionEvent{ev}
 	case "CSSFontFaceLoadEvent":
@@ -2478,7 +2478,14 @@ type BeforeInputEvent struct{ *BasicEvent }
 type BeforeUnloadEvent struct{ *BasicEvent }
 type BlobEvent struct{ *BasicEvent }
 type ClipboardEvent struct{ *BasicEvent }
-type CloseEvent struct{ *BasicEvent }
+
+type CloseEvent struct {
+	*BasicEvent
+	Code     int    `js:"code"`
+	Reason   string `js:"reason"`
+	WasClean bool   `js:"wasClean"`
+}
+
 type CompositionEvent struct{ *BasicEvent }
 type CSSFontFaceLoadEvent struct{ *BasicEvent }
 type CustomEvent struct{ *BasicEvent }
