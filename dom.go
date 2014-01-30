@@ -2020,7 +2020,48 @@ type HTMLOListElement struct {
 	Type     string `js:"type"`
 }
 
-type HTMLObjectElement struct{ *BasicHTMLElement }
+type HTMLObjectElement struct {
+	*BasicHTMLElement
+	Data              string `js:"data"`
+	Height            string `js:"height"`
+	Name              string `js:"name"`
+	TabIndex          int    `js:"tabIndex"`
+	Type              string `js:"type"`
+	TypeMustMatch     bool   `js:"typeMustMatch"`
+	UseMap            string `js:"useMap"`
+	ValidationMessage string `js:"validationMessage"`
+	With              string `js:"with"`
+	WillValidate      bool   `js:"willValidate"`
+}
+
+func (e *HTMLObjectElement) Form() *HTMLFormElement {
+	el := wrapHTMLElement(e.Get("form"))
+	if el == nil {
+		return nil
+	}
+	return el.(*HTMLFormElement)
+}
+
+func (e *HTMLObjectElement) ContentDocument() Document {
+	return wrapDocument(e.Get("contentDocument"))
+}
+
+func (e *HTMLObjectElement) ContentWindow() Window {
+	return &window{e.Get("contentWindow")}
+}
+
+func (e *HTMLObjectElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLObjectElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLObjectElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
 
 type HTMLOptGroupElement struct {
 	*BasicHTMLElement
