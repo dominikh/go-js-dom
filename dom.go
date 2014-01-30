@@ -2145,7 +2145,41 @@ func (e *HTMLOptionElement) Form() *HTMLFormElement {
 	return getForm(e.Object)
 }
 
-type HTMLOutputElement struct{ *BasicHTMLElement }
+type HTMLOutputElement struct {
+	*BasicHTMLElement
+	DefaultValue      string `js:"defaultValue"`
+	Name              string `js:"name"`
+	Type              string `js:"type"`
+	ValidationMessage string `js:"validationMessage"`
+	Value             string `js:"value"`
+	WillValidate      bool   `js:"willValidate"`
+}
+
+func (e *HTMLOutputElement) Form() *HTMLFormElement {
+	return getForm(e)
+}
+
+func (e *HTMLOutputElement) Labels() []*HTMLLabelElement {
+	return getLabels(e)
+}
+
+func (e *HTMLOutputElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLOutputElement) For() *TokenList {
+	return &TokenList{dtl: e.Get("htmlFor"), o: e}
+}
+
+func (e *HTMLOutputElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLOutputElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
 type HTMLParagraphElement struct{ *BasicHTMLElement }
 
 type HTMLParamElement struct {
