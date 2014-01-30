@@ -1063,7 +1063,7 @@ type Geolocation interface {
 
 type PositionError struct {
 	js.Object
-	Code int `js:code"`
+	Code int `js:"code"`
 }
 
 func (err *PositionError) Error() string {
