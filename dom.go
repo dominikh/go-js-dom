@@ -2039,7 +2039,29 @@ type HTMLTableHeaderCellElement struct {
 	Scope string `js:"scope"`
 }
 
-type HTMLTableRowElement struct{ *BasicHTMLElement }
+type HTMLTableRowElement struct {
+	*BasicHTMLElement
+	RowIndex        int `js:"rowIndex"`
+	SectionRowIndex int `js:"sectionRowIndex"`
+}
+
+func (e *HTMLTableRowElement) Cells() []*HTMLTableCellElement {
+	cells := nodeListToElements(e.Get("cells"))
+	out := make([]*HTMLTableCellElement, len(cells))
+	for i, cell := range cells {
+		out[i] = cell.(*HTMLTableCellElement)
+	}
+	return out
+}
+
+func (e *HTMLTableRowElement) InsertCell(index int) *HTMLTableCellElement {
+	return wrapHTMLElement(e.Call("insertCell", index)).(*HTMLTableCellElement)
+}
+
+func (e *HTMLTableRowElement) DeleteCell(index int) {
+	e.Call("deleteCell", index)
+}
+
 type HTMLTableSectionElement struct{ *BasicHTMLElement }
 type HTMLTextAreaElement struct{ *BasicHTMLElement }
 
