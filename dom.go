@@ -2303,7 +2303,60 @@ func (e *HTMLTableSectionElement) InsertRow(index int) *HTMLTableRowElement {
 	return wrapHTMLElement(e.Call("insertRow", index)).(*HTMLTableRowElement)
 }
 
-type HTMLTextAreaElement struct{ *BasicHTMLElement }
+type HTMLTextAreaElement struct {
+	*BasicHTMLElement
+	Autocomplete       string `js:"autocomplete"`
+	Autofocus          bool   `js:"autofocus"`
+	Cols               int    `js:"cols"`
+	DefaultValue       string `js:"defaultValue"`
+	DirName            string `js:"dirName"`
+	Disabled           bool   `js:"disabled"`
+	MaxLength          int    `js:"maxLength"`
+	Name               string `js:"name"`
+	Placeholder        string `js:"placeholder"`
+	ReadOnly           bool   `js:"readOnly"`
+	Required           bool   `js:"required"`
+	Rows               int    `js:"rows"`
+	SelectionDirection string `js:"selectionDirection"`
+	SelectionStart     int    `js:"selectionStart"`
+	SelectionEnd       int    `js:"selectionEnd"`
+	TabIndex           int    `js:"tabIndex"`
+	TextLength         int    `js:"textLength"`
+	Type               string `js:"type"`
+	ValidationMessage  string `js:"validationMessage"`
+	Value              string `js:"value"`
+	WillValidate       bool   `js:"willValidate"`
+	Wrap               string `js:"wrap"`
+}
+
+func (e *HTMLTextAreaElement) Form() *HTMLFormElement {
+	return getForm(e)
+}
+
+func (e *HTMLTextAreaElement) Labels() []*HTMLLabelElement {
+	return getLabels(e)
+}
+
+func (e *HTMLTextAreaElement) Validity() *ValidityState {
+	// TODO replace with a field once GopherJS supports that
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLTextAreaElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLTextAreaElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
+func (e *HTMLTextAreaElement) Select() {
+	e.Call("select")
+}
+
+func (e *HTMLTextAreaElement) SetSelectionRange(start, end int, direction string) {
+	e.Call("setSelectionRange", start, end, direction)
+}
 
 type HTMLTimeElement struct {
 	*BasicHTMLElement
