@@ -68,23 +68,27 @@
 //     e2 := d.GetElementById("#my-element")
 //
 //     e1.SetClass("some-class")
-//     println(e1.Class() == e2.Class())
+//     println(e1.Class().String() == e2.Class().String())
 //
 // The above example will print `true`.
 //
 //
-// Lack of DOMTokenList
+// DOMTokenList
 //
 // Some objects in the JS API have two versions of attributes, one
 // that returns a string and one that returns a DOMTokenList to ease
-// manipulation of string-delimited lists. To simplify these bindings,
-// only access to the string version is provided. In the near future,
-// convenience methods for manipulating space-delimited lists will be
-// added, thus replicating the behaviour of DOMTokenList without the
-// need for more attributes.
+// manipulation of string-delimited lists. Some other objects only
+// provide DOMTokenList, sometimes DOMSettableTokenList. To simplify
+// these bindings, only the DOMTokenList variant will be made
+// available, by the type TokenList. In cases where the string
+// attribute was the only way to completely replace the value, our
+// TokenList will provide Set([]string) and SetString(string) methods,
+// which will be able to accomplish the same. Additionally, our
+// TokenList will provide methods to convert it to strings and slices.
 package dom
 
 import (
+	"strings"
 	"time"
 
 	"github.com/neelance/gopherjs/js"
@@ -417,6 +421,77 @@ func getLabels(o js.Object) []*HTMLLabelElement {
 
 func GetWindow() Window {
 	return &window{js.Global("window")}
+}
+
+type TokenList struct {
+	dtl js.Object // the underlying DOMTokenList
+	o   js.Object // the object to which the DOMTokenList belongs
+	sa  string    // the name of the corresponding string attribute, empty if there isn't one
+
+	Length int `js:"length"`
+}
+
+func (tl *TokenList) Item(idx int) string {
+	o := tl.dtl.Call("item", idx)
+	if o.IsNull() || o.IsUndefined() {
+		return ""
+	}
+	return o.String()
+}
+
+func (tl *TokenList) Contains(token string) bool {
+	return tl.dtl.Call("contains", token).Bool()
+}
+
+func (tl *TokenList) Add(token string) {
+	tl.dtl.Call("add", token)
+}
+
+func (tl *TokenList) Remove(token string) {
+	tl.dtl.Call("remove", token)
+}
+
+func (tl *TokenList) Toggle(token string) {
+	tl.dtl.Call("toggle", token)
+}
+
+func (tl *TokenList) String() string {
+	if tl.sa != "" {
+		return tl.o.Get(tl.sa).String()
+	}
+	if tl.dtl.Get("constructor").Get("name").String() == "DOMSettableTokenList" {
+		return tl.dtl.Get("value").String()
+	}
+	// We could manually construct the string, but I am not aware of
+	// any case where we have neither a string attribute nor
+	// DOMSettableTokenList.
+	return ""
+}
+
+func (tl *TokenList) Slice() []string {
+	var out []string
+	length := tl.dtl.Get("length").Int()
+	for i := 0; i < length; i++ {
+		out = append(out, tl.dtl.Call("item", i).String())
+	}
+	return out
+}
+
+func (tl *TokenList) SetString(s string) {
+	if tl.sa != "" {
+		tl.o.Set(tl.sa, s)
+		return
+	}
+	if tl.dtl.Get("constructor").Get("name").String() == "DOMSettableTokenList" {
+		tl.dtl.Set("value", s)
+		return
+	}
+	// This shouldn't be possible
+	panic("no way to SetString on this TokenList")
+}
+
+func (tl *TokenList) Set(s []string) {
+	tl.SetString(strings.Join(s, " "))
 }
 
 type Document interface {
@@ -1321,10 +1396,7 @@ type Element interface {
 	ParentNode
 	ChildNode
 
-	// We do not have classList and no DOMTokenList. manipulate
-	// strings yourself
-	Class() string
-	SetClass(string)
+	Class() *TokenList
 	ID() string
 	SetID(string)
 	TagName() string
@@ -1484,8 +1556,8 @@ func (e *BasicElement) NextElementSibling() Element {
 	return wrapElement(e.Get("nextElementSibling"))
 }
 
-func (e *BasicElement) Class() string {
-	return e.Get("className").String()
+func (e *BasicElement) Class() *TokenList {
+	return &TokenList{dtl: e.Get("classList"), o: e, sa: "className"}
 }
 
 func (e *BasicElement) SetClass(s string) {
@@ -1568,11 +1640,14 @@ type HTMLAnchorElement struct {
 	*BasicHTMLElement
 	HrefLang string `js:"hreflang"`
 	Media    string `js:"media"`
-	Rel      string `js:"rel"`
 	TabIndex int    `js:"tabIndex"`
 	Target   string `js:"target"`
 	Text     string `js:"text"`
 	Type     string `js:"type"`
+}
+
+func (e *HTMLAnchorElement) Rel() *TokenList {
+	return &TokenList{dtl: e.Get("relList"), o: e, sa: "rel"}
 }
 
 type HTMLAppletElement struct {
@@ -1581,12 +1656,15 @@ type HTMLAppletElement struct {
 	Coords   string `js:"coords"`
 	HrefLang string `js:"hreflang"`
 	Media    string `js:"media"`
-	Rel      string `js:"rel"`
 	Search   string `js:"search"`
 	Shape    string `js:"shape"`
 	TabIndex int    `js:"tabIndex"`
 	Target   string `js:"target"`
 	Type     string `js:"type"`
+}
+
+func (e *HTMLAppletElement) Rel() *TokenList {
+	return &TokenList{dtl: e.Get("relList"), o: e, sa: "rel"}
 }
 
 type HTMLAreaElement struct {
@@ -1595,12 +1673,15 @@ type HTMLAreaElement struct {
 	Coords   string `js:"coords"`
 	HrefLang string `js:"hreflang"`
 	Media    string `js:"media"`
-	Rel      string `js:"rel"`
 	Search   string `js:"search"`
 	Shape    string `js:"shape"`
 	TabIndex int    `js:"tabIndex"`
 	Target   string `js:"target"`
 	Type     string `js:"type"`
+}
+
+func (e *HTMLAreaElement) Rel() *TokenList {
+	return &TokenList{dtl: e.Get("relList"), o: e, sa: "rel"}
 }
 
 type HTMLAudioElement struct{ *BasicHTMLElement }
@@ -2136,6 +2217,7 @@ func (e *HTMLTableRowElement) InsertCell(index int) *HTMLTableCellElement {
 }
 
 func (e *HTMLTableRowElement) DeleteCell(index int) {
+	// FIXME exception handling/check that index is in bounds
 	e.Call("deleteCell", index)
 }
 
@@ -2151,6 +2233,7 @@ func (e *HTMLTableSectionElement) Rows() []*HTMLTableRowElement {
 }
 
 func (e *HTMLTableSectionElement) DeleteRow(index int) {
+	// FIXME exception handling/check that index is in bounds
 	e.Call("deleteRow", index)
 }
 
