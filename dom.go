@@ -1717,7 +1717,45 @@ func (e *HTMLFieldSetElement) SetCustomValidity(s string) {
 }
 
 type HTMLFontElement struct{ *BasicHTMLElement }
-type HTMLFormElement struct{ *BasicHTMLElement }
+
+type HTMLFormElement struct {
+	*BasicHTMLElement
+	AcceptCharset string `js:"acceptCharset"`
+	Action        string `js:"action"`
+	Autocomplete  string `js:"autocomplete"`
+	Encoding      string `js:"encoding"`
+	Enctype       string `js:"enctype"`
+	Length        int    `js:"length"`
+	Method        string `js:"method"`
+	Name          string `js:"name"`
+	NoValidate    bool   `js:"noValidate"`
+	Target        string `js:"target"`
+}
+
+func (e *HTMLFormElement) Elements() []HTMLElement {
+	return nodeListToHTMLElements(e.Get("elements"))
+}
+
+func (e *HTMLFormElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLFormElement) Submit() {
+	e.Call("submit")
+}
+
+func (e *HTMLFormElement) Reset() {
+	e.Call("reset")
+}
+
+func (e *HTMLFormElement) Item(index int) HTMLElement {
+	return wrapHTMLElement(e.Call("item", index))
+}
+
+func (e *HTMLFormElement) NamedItem(name string) HTMLElement {
+	return wrapHTMLElement(e.Call("namedItem", name))
+}
+
 type HTMLFrameElement struct{ *BasicHTMLElement }
 type HTMLFrameSetElement struct{ *BasicHTMLElement }
 type HTMLHRElement struct{ *BasicHTMLElement }
