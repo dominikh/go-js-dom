@@ -71,6 +71,17 @@
 //     println(e1.Class() == e2.Class())
 //
 // The above example will print `true`.
+//
+//
+// Lack of DOMTokenList
+//
+// Some objects in the JS API have two versions of attributes, one
+// that returns a string and one that returns a DOMTokenList to ease
+// manipulation of string-delimited lists. To simplify these bindings,
+// only access to the string version is provided. In the near future,
+// convenience methods for manipulating space-delimited lists will be
+// added, thus replicating the behaviour of DOMTokenList without the
+// need for more attributes.
 package dom
 
 import (
@@ -1313,10 +1324,6 @@ type Element interface {
 	RemoveAttributeNS(ns string, name string)
 	SetAttribute(name string, value string)
 	SetAttributeNS(ns string, name string, value string)
-	AddClass(string)
-	RemoveClass(string)
-	ToggleClass(string)
-	HasClass(string)
 	InnerHTML() string
 	SetInnerHTML(string)
 }
@@ -1530,22 +1537,6 @@ func (e *BasicElement) SetAttribute(name string, value string) {
 
 func (e *BasicElement) SetAttributeNS(ns string, name string, value string) {
 	e.Call("setAttributeNS", ns, name, value)
-}
-
-func (e *BasicElement) AddClass(string) {
-	// FIXME implement
-}
-
-func (e *BasicElement) RemoveClass(string) {
-	// FIXME implement
-}
-
-func (e *BasicElement) ToggleClass(string) {
-	// FIXME implement
-}
-
-func (e *BasicElement) HasClass(string) {
-	// FIXME implement
 }
 
 func (e *BasicElement) InnerHTML() string {
