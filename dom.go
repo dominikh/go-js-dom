@@ -1733,6 +1733,14 @@ func (e *HTMLButtonElement) Validity() *ValidityState {
 	return &ValidityState{Object: e.Get("validity")}
 }
 
+func (e *HTMLButtonElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLButtonElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
 type HTMLCanvasElement struct{ *BasicHTMLElement }
 type HTMLDListElement struct{ *BasicHTMLElement }
 
