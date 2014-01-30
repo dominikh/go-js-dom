@@ -2307,7 +2307,26 @@ type HTMLTitleElement struct {
 	Text string `js:"text"`
 }
 
-type HTMLTrackElement struct{ *BasicHTMLElement }
+// TextTrack represents text track data for <track> elements. It does
+// not currently provide any methods or attributes and it hasn't been
+// decided yet whether they will be added to this package or a
+// separate package.
+type TextTrack struct{ js.Object }
+
+type HTMLTrackElement struct {
+	*BasicHTMLElement
+	Kind       string `js:"kind"`
+	Src        string `js:"src"`
+	Srclang    string `js:"srclang"`
+	Label      string `js:"label"`
+	Default    bool   `js:"default"`
+	ReadyState int    `js:"readyState"`
+}
+
+func (e *HTMLTrackElement) Track() *TextTrack {
+	return &TextTrack{e.Get("track")}
+}
+
 type HTMLUListElement struct{ *BasicHTMLElement }
 type HTMLUnknownElement struct{ *BasicHTMLElement }
 type HTMLVideoElement struct{ *BasicHTMLElement }
