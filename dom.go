@@ -166,7 +166,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLAreaElement":
 		return &HTMLAreaElement{BasicHTMLElement: el}
 	case "HTMLAudioElement":
-		return &HTMLAudioElement{BasicHTMLElement: el}
+		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
 	case "HTMLBaseElement":
 		return &HTMLBaseElement{BasicHTMLElement: el}
 	case "HTMLBodyElement":
@@ -294,7 +294,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case "HTMLUnknownElement":
 		return &HTMLUnknownElement{BasicHTMLElement: el}
 	case "HTMLVideoElement":
-		return &HTMLVideoElement{BasicHTMLElement: el}
+		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
 	default:
 		panic("Unsupported HTML element type: " + name)
 	}
@@ -1684,7 +1684,7 @@ func (e *HTMLAreaElement) Rel() *TokenList {
 	return &TokenList{dtl: e.Get("relList"), o: e, sa: "rel"}
 }
 
-type HTMLAudioElement struct{ *BasicHTMLElement }
+type HTMLAudioElement struct{ *HTMLMediaElement }
 
 type HTMLBRElement struct{ *BasicHTMLElement }
 type HTMLBaseElement struct{ *BasicHTMLElement }
@@ -2390,7 +2390,8 @@ func (e *HTMLTrackElement) Track() *TextTrack {
 
 type HTMLUListElement struct{ *BasicHTMLElement }
 type HTMLUnknownElement struct{ *BasicHTMLElement }
-type HTMLVideoElement struct{ *BasicHTMLElement }
+
+type HTMLVideoElement struct{ *HTMLMediaElement }
 
 func (e *HTMLBaseElement) Href() string {
 	return e.Get("href").String()
