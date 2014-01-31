@@ -352,7 +352,7 @@ func wrapEvent(o js.Object) Event {
 	case "IDBVersionChangeEvent":
 		return &IDBVersionChangeEvent{ev}
 	case "KeyboardEvent":
-		return &KeyboardEvent{ev}
+		return &KeyboardEvent{BasicEvent: ev}
 	case "MediaStreamEvent":
 		return &MediaStreamEvent{ev}
 	case "MessageEvent":
@@ -2501,7 +2501,31 @@ type FocusEvent struct{ *BasicEvent }
 type GamepadEvent struct{ *BasicEvent }
 type HashChangeEvent struct{ *BasicEvent }
 type IDBVersionChangeEvent struct{ *BasicEvent }
-type KeyboardEvent struct{ *BasicEvent }
+
+const (
+	KeyLocationStandard = 0
+	KeyLocationLeft     = 1
+	KeyLocationRight    = 2
+	KeyLocationNumpad   = 3
+)
+
+type KeyboardEvent struct {
+	*BasicEvent
+	AltKey   bool   `js:"altKey"`
+	CharCode int    `js:"charCode"`
+	CtrlKey  bool   `js:"ctrlKey"`
+	Key      string `js:"key"`
+	Locale   string `js:"locale"`
+	Location int    `js:"location"`
+	MetaKey  bool   `js:"metaKey"`
+	Repeat   bool   `js:"repeat"`
+	ShiftKey bool   `js:"shiftKey"`
+}
+
+func (ev *KeyboardEvent) ModifierState(mod string) bool {
+	return ev.Call("getModifierState", mod).Bool()
+}
+
 type MediaStreamEvent struct{ *BasicEvent }
 type MessageEvent struct{ *BasicEvent }
 type MouseEvent struct{ *BasicEvent }
