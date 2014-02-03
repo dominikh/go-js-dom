@@ -358,7 +358,7 @@ func wrapEvent(o js.Object) Event {
 	case "MessageEvent":
 		return &MessageEvent{ev}
 	case "MouseEvent":
-		return &MouseEvent{ev}
+		return &MouseEvent{UIEvent: &UIEvent{ev}}
 	case "MutationEvent":
 		return &MutationEvent{ev}
 	case "OfflineAudioCompletionEvent":
@@ -2529,7 +2529,30 @@ func (ev *KeyboardEvent) ModifierState(mod string) bool {
 
 type MediaStreamEvent struct{ *BasicEvent }
 type MessageEvent struct{ *BasicEvent }
-type MouseEvent struct{ *BasicEvent }
+
+type MouseEvent struct {
+	*UIEvent
+	altKey    bool
+	button    int
+	clientX   int
+	clientY   int
+	ctrlKey   bool
+	metaKey   bool
+	movementX int
+	movementY int
+	screenX   int
+	screenY   int
+	shiftKey  bool
+}
+
+func (ev *MouseEvent) RelatedTarget() Element {
+	return wrapElement(ev.Get("target"))
+}
+
+func (ev *MouseEvent) ModifierState(mod string) bool {
+	return ev.Call("getModifierState", mod).Bool()
+}
+
 type MutationEvent struct{ *BasicEvent }
 type OfflineAudioCompletionEvent struct{ *BasicEvent }
 type PageTransitionEvent struct{ *BasicEvent }
