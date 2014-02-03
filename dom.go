@@ -396,7 +396,7 @@ func wrapEvent(o js.Object) Event {
 	case "UserProximityEvent":
 		return &UserProximityEvent{ev}
 	case "WheelEvent":
-		return &WheelEvent{ev}
+		return &WheelEvent{BasicEvent: ev}
 	default:
 		return ev
 	}
@@ -2548,7 +2548,21 @@ type TrackEvent struct{ *BasicEvent }
 type TransitionEvent struct{ *BasicEvent }
 type UIEvent struct{ *BasicEvent }
 type UserProximityEvent struct{ *BasicEvent }
-type WheelEvent struct{ *BasicEvent }
+
+const (
+	DeltaPixel = 0
+	DeltaLine  = 1
+	DeltaPage  = 2
+)
+
+type WheelEvent struct {
+	*BasicEvent
+	DeltaX    float64 `js:"deltaX"`
+	DeltaY    float64 `js:"deltaY"`
+	DeltaZ    float64 `js:"deltaZ"`
+	DeltaMode int     `js:"deltaMode"`
+}
+
 type CSSStyleDeclaration struct{ js.Object }
 
 func (css *CSSStyleDeclaration) ToMap() map[string]string {
