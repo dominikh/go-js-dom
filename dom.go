@@ -91,7 +91,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/neelance/gopherjs/js"
+	"github.com/gopherjs/gopherjs/js"
 )
 
 func nodeListToNodes(o js.Object) []Node {
