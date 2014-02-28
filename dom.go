@@ -420,7 +420,7 @@ func getLabels(o js.Object) []*HTMLLabelElement {
 }
 
 func GetWindow() Window {
-	return &window{js.Global("window")}
+	return &window{js.Global}
 }
 
 type TokenList struct {
