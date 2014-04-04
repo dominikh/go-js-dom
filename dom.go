@@ -122,8 +122,8 @@ func nodeListToHTMLElements(o js.Object) []HTMLElement {
 }
 
 func wrapDocument(o js.Object) Document {
-	switch o.Get("constructor").Get("name").String() {
-	case "HTMLDocument":
+	switch o.Get("constructor") {
+	case js.Global.Get("HTMLDocument"):
 		return &htmlDocument{&document{&BasicNode{o}}}
 	default:
 		return &document{&BasicNode{o}}
@@ -134,7 +134,7 @@ func wrapNode(o js.Object) Node {
 	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
-	switch o.Get("constructor").Get("name").String() {
+	switch o.Get("constructor") {
 	// TODO all the non-element cases
 	default:
 		return wrapElement(o)
@@ -145,7 +145,7 @@ func wrapElement(o js.Object) Element {
 	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
-	switch o.Get("constructor").Get("name").String() {
+	switch o.Get("constructor") {
 	// TODO all the non-HTML cases
 	default:
 		return wrapHTMLElement(o)
@@ -157,146 +157,146 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
-	name := o.Get("constructor").Get("name").String()
-	switch name {
-	case "HTMLAnchorElement":
+	c := o.Get("constructor")
+	switch c {
+	case js.Global.Get("HTMLAnchorElement"):
 		return &HTMLAnchorElement{BasicHTMLElement: el}
-	case "HTMLAppletElement":
+	case js.Global.Get("HTMLAppletElement"):
 		return &HTMLAppletElement{BasicHTMLElement: el}
-	case "HTMLAreaElement":
+	case js.Global.Get("HTMLAreaElement"):
 		return &HTMLAreaElement{BasicHTMLElement: el}
-	case "HTMLAudioElement":
+	case js.Global.Get("HTMLAudioElement"):
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case "HTMLBaseElement":
+	case js.Global.Get("HTMLBaseElement"):
 		return &HTMLBaseElement{BasicHTMLElement: el}
-	case "HTMLBodyElement":
+	case js.Global.Get("HTMLBodyElement"):
 		return &HTMLBodyElement{BasicHTMLElement: el}
-	case "HTMLBRElement":
+	case js.Global.Get("HTMLBRElement"):
 		return &HTMLBRElement{BasicHTMLElement: el}
-	case "HTMLButtonElement":
+	case js.Global.Get("HTMLButtonElement"):
 		return &HTMLButtonElement{BasicHTMLElement: el}
-	case "HTMLCanvasElement":
+	case js.Global.Get("HTMLCanvasElement"):
 		return &HTMLCanvasElement{BasicHTMLElement: el}
-	case "HTMLDataElement":
+	case js.Global.Get("HTMLDataElement"):
 		return &HTMLDataElement{BasicHTMLElement: el}
-	case "HTMLDataListElement":
+	case js.Global.Get("HTMLDataListElement"):
 		return &HTMLDataListElement{BasicHTMLElement: el}
-	case "HTMLDirectoryElement":
+	case js.Global.Get("HTMLDirectoryElement"):
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
-	case "HTMLDivElement":
+	case js.Global.Get("HTMLDivElement"):
 		return &HTMLDivElement{BasicHTMLElement: el}
-	case "HTMLDListElement":
+	case js.Global.Get("HTMLDListElement"):
 		return &HTMLDListElement{BasicHTMLElement: el}
-	case "HTMLEmbedElement":
+	case js.Global.Get("HTMLEmbedElement"):
 		return &HTMLEmbedElement{BasicHTMLElement: el}
-	case "HTMLFieldSetElement":
+	case js.Global.Get("HTMLFieldSetElement"):
 		return &HTMLFieldSetElement{BasicHTMLElement: el}
-	case "HTMLFontElement":
+	case js.Global.Get("HTMLFontElement"):
 		return &HTMLFontElement{BasicHTMLElement: el}
-	case "HTMLFormElement":
+	case js.Global.Get("HTMLFormElement"):
 		return &HTMLFormElement{BasicHTMLElement: el}
-	case "HTMLFrameElement":
+	case js.Global.Get("HTMLFrameElement"):
 		return &HTMLFrameElement{BasicHTMLElement: el}
-	case "HTMLFrameSetElement":
+	case js.Global.Get("HTMLFrameSetElement"):
 		return &HTMLFrameSetElement{BasicHTMLElement: el}
-	case "HTMLHeadElement":
+	case js.Global.Get("HTMLHeadElement"):
 		return &HTMLHeadElement{BasicHTMLElement: el}
-	case "HTMLHeadingElement":
+	case js.Global.Get("HTMLHeadingElement"):
 		return &HTMLHeadingElement{BasicHTMLElement: el}
-	case "HTMLHtmlElement":
+	case js.Global.Get("HTMLHtmlElement"):
 		return &HTMLHtmlElement{BasicHTMLElement: el}
-	case "HTMLHRElement":
+	case js.Global.Get("HTMLHRElement"):
 		return &HTMLHRElement{BasicHTMLElement: el}
-	case "HTMLIFrameElement":
+	case js.Global.Get("HTMLIFrameElement"):
 		return &HTMLIFrameElement{BasicHTMLElement: el}
-	case "HTMLImageElement":
+	case js.Global.Get("HTMLImageElement"):
 		return &HTMLImageElement{BasicHTMLElement: el}
-	case "HTMLInputElement":
+	case js.Global.Get("HTMLInputElement"):
 		return &HTMLInputElement{BasicHTMLElement: el}
-	case "HTMLKeygenElement":
+	case js.Global.Get("HTMLKeygenElement"):
 		return &HTMLKeygenElement{BasicHTMLElement: el}
-	case "HTMLLabelElement":
+	case js.Global.Get("HTMLLabelElement"):
 		return &HTMLLabelElement{BasicHTMLElement: el}
-	case "HTMLLegendElement":
+	case js.Global.Get("HTMLLegendElement"):
 		return &HTMLLegendElement{BasicHTMLElement: el}
-	case "HTMLLIElement":
+	case js.Global.Get("HTMLLIElement"):
 		return &HTMLLIElement{BasicHTMLElement: el}
-	case "HTMLLinkElement":
+	case js.Global.Get("HTMLLinkElement"):
 		return &HTMLLinkElement{BasicHTMLElement: el}
-	case "HTMLMapElement":
+	case js.Global.Get("HTMLMapElement"):
 		return &HTMLMapElement{BasicHTMLElement: el}
-	case "HTMLMediaElement":
+	case js.Global.Get("HTMLMediaElement"):
 		return &HTMLMediaElement{BasicHTMLElement: el}
-	case "HTMLMenuElement":
+	case js.Global.Get("HTMLMenuElement"):
 		return &HTMLMenuElement{BasicHTMLElement: el}
-	case "HTMLMetaElement":
+	case js.Global.Get("HTMLMetaElement"):
 		return &HTMLMetaElement{BasicHTMLElement: el}
-	case "HTMLMeterElement":
+	case js.Global.Get("HTMLMeterElement"):
 		return &HTMLMeterElement{BasicHTMLElement: el}
-	case "HTMLModElement":
+	case js.Global.Get("HTMLModElement"):
 		return &HTMLModElement{BasicHTMLElement: el}
-	case "HTMLObjectElement":
+	case js.Global.Get("HTMLObjectElement"):
 		return &HTMLObjectElement{BasicHTMLElement: el}
-	case "HTMLOListElement":
+	case js.Global.Get("HTMLOListElement"):
 		return &HTMLOListElement{BasicHTMLElement: el}
-	case "HTMLOptGroupElement":
+	case js.Global.Get("HTMLOptGroupElement"):
 		return &HTMLOptGroupElement{BasicHTMLElement: el}
-	case "HTMLOptionElement":
+	case js.Global.Get("HTMLOptionElement"):
 		return &HTMLOptionElement{BasicHTMLElement: el}
-	case "HTMLOutputElement":
+	case js.Global.Get("HTMLOutputElement"):
 		return &HTMLOutputElement{BasicHTMLElement: el}
-	case "HTMLParagraphElement":
+	case js.Global.Get("HTMLParagraphElement"):
 		return &HTMLParagraphElement{BasicHTMLElement: el}
-	case "HTMLParamElement":
+	case js.Global.Get("HTMLParamElement"):
 		return &HTMLParamElement{BasicHTMLElement: el}
-	case "HTMLPreElement":
+	case js.Global.Get("HTMLPreElement"):
 		return &HTMLPreElement{BasicHTMLElement: el}
-	case "HTMLProgressElement":
+	case js.Global.Get("HTMLProgressElement"):
 		return &HTMLProgressElement{BasicHTMLElement: el}
-	case "HTMLQuoteElement":
+	case js.Global.Get("HTMLQuoteElement"):
 		return &HTMLQuoteElement{BasicHTMLElement: el}
-	case "HTMLScriptElement":
+	case js.Global.Get("HTMLScriptElement"):
 		return &HTMLScriptElement{BasicHTMLElement: el}
-	case "HTMLSelectElement":
+	case js.Global.Get("HTMLSelectElement"):
 		return &HTMLSelectElement{BasicHTMLElement: el}
-	case "HTMLSourceElement":
+	case js.Global.Get("HTMLSourceElement"):
 		return &HTMLSourceElement{BasicHTMLElement: el}
-	case "HTMLSpanElement":
+	case js.Global.Get("HTMLSpanElement"):
 		return &HTMLSpanElement{BasicHTMLElement: el}
-	case "HTMLStyleElement":
+	case js.Global.Get("HTMLStyleElement"):
 		return &HTMLStyleElement{BasicHTMLElement: el}
-	case "HTMLTableElement":
+	case js.Global.Get("HTMLTableElement"):
 		return &HTMLTableElement{BasicHTMLElement: el}
-	case "HTMLTableCaptionElement":
+	case js.Global.Get("HTMLTableCaptionElement"):
 		return &HTMLTableCaptionElement{BasicHTMLElement: el}
-	case "HTMLTableCellElement":
+	case js.Global.Get("HTMLTableCellElement"):
 		return &HTMLTableCellElement{BasicHTMLElement: el}
-	case "HTMLTableDataCellElement":
+	case js.Global.Get("HTMLTableDataCellElement"):
 		return &HTMLTableDataCellElement{BasicHTMLElement: el}
-	case "HTMLTableHeaderCellElement":
+	case js.Global.Get("HTMLTableHeaderCellElement"):
 		return &HTMLTableHeaderCellElement{BasicHTMLElement: el}
-	case "HTMLTableColElement":
+	case js.Global.Get("HTMLTableColElement"):
 		return &HTMLTableColElement{BasicHTMLElement: el}
-	case "HTMLTableRowElement":
+	case js.Global.Get("HTMLTableRowElement"):
 		return &HTMLTableRowElement{BasicHTMLElement: el}
-	case "HTMLTableSectionElement":
+	case js.Global.Get("HTMLTableSectionElement"):
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
-	case "HTMLTextAreaElement":
+	case js.Global.Get("HTMLTextAreaElement"):
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
-	case "HTMLTimeElement":
+	case js.Global.Get("HTMLTimeElement"):
 		return &HTMLTimeElement{BasicHTMLElement: el}
-	case "HTMLTitleElement":
+	case js.Global.Get("HTMLTitleElement"):
 		return &HTMLTitleElement{BasicHTMLElement: el}
-	case "HTMLTrackElement":
+	case js.Global.Get("HTMLTrackElement"):
 		return &HTMLTrackElement{BasicHTMLElement: el}
-	case "HTMLUListElement":
+	case js.Global.Get("HTMLUListElement"):
 		return &HTMLUListElement{BasicHTMLElement: el}
-	case "HTMLUnknownElement":
+	case js.Global.Get("HTMLUnknownElement"):
 		return &HTMLUnknownElement{BasicHTMLElement: el}
-	case "HTMLVideoElement":
+	case js.Global.Get("HTMLVideoElement"):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
 	default:
-		panic("Unsupported HTML element type: " + name)
+		panic("Unsupported HTML element type: " + o.Call("toString").String())
 	}
 }
 
@@ -305,97 +305,97 @@ func wrapEvent(o js.Object) Event {
 		return nil
 	}
 	ev := &BasicEvent{o}
-	name := o.Get("constructor").Get("name").String()
-	switch name {
-	case "AnimationEvent":
+	c := o.Get("constructor")
+	switch c {
+	case js.Global.Get("AnimationEvent"):
 		return &AnimationEvent{ev}
-	case "AudioProcessingEvent":
+	case js.Global.Get("AudioProcessingEvent"):
 		return &AudioProcessingEvent{ev}
-	case "BeforeInputEvent":
+	case js.Global.Get("BeforeInputEvent"):
 		return &BeforeInputEvent{ev}
-	case "BeforeUnloadEvent":
+	case js.Global.Get("BeforeUnloadEvent"):
 		return &BeforeUnloadEvent{ev}
-	case "BlobEvent":
+	case js.Global.Get("BlobEvent"):
 		return &BlobEvent{ev}
-	case "ClipboardEvent":
+	case js.Global.Get("ClipboardEvent"):
 		return &ClipboardEvent{ev}
-	case "CloseEvent":
+	case js.Global.Get("CloseEvent"):
 		return &CloseEvent{BasicEvent: ev}
-	case "CompositionEvent":
+	case js.Global.Get("CompositionEvent"):
 		return &CompositionEvent{ev}
-	case "CSSFontFaceLoadEvent":
+	case js.Global.Get("CSSFontFaceLoadEvent"):
 		return &CSSFontFaceLoadEvent{ev}
-	case "CustomEvent":
+	case js.Global.Get("CustomEvent"):
 		return &CustomEvent{ev}
-	case "DeviceLightEvent":
+	case js.Global.Get("DeviceLightEvent"):
 		return &DeviceLightEvent{ev}
-	case "DeviceMotionEvent":
+	case js.Global.Get("DeviceMotionEvent"):
 		return &DeviceMotionEvent{ev}
-	case "DeviceOrientationEvent":
+	case js.Global.Get("DeviceOrientationEvent"):
 		return &DeviceOrientationEvent{ev}
-	case "DeviceProximityEvent":
+	case js.Global.Get("DeviceProximityEvent"):
 		return &DeviceProximityEvent{ev}
-	case "DOMTransactionEvent":
+	case js.Global.Get("DOMTransactionEvent"):
 		return &DOMTransactionEvent{ev}
-	case "DragEvent":
+	case js.Global.Get("DragEvent"):
 		return &DragEvent{ev}
-	case "EditingBeforeInputEvent":
+	case js.Global.Get("EditingBeforeInputEvent"):
 		return &EditingBeforeInputEvent{ev}
-	case "ErrorEvent":
+	case js.Global.Get("ErrorEvent"):
 		return &ErrorEvent{ev}
-	case "FocusEvent":
+	case js.Global.Get("FocusEvent"):
 		return &FocusEvent{ev}
-	case "GamepadEvent":
+	case js.Global.Get("GamepadEvent"):
 		return &GamepadEvent{ev}
-	case "HashChangeEvent":
+	case js.Global.Get("HashChangeEvent"):
 		return &HashChangeEvent{ev}
-	case "IDBVersionChangeEvent":
+	case js.Global.Get("IDBVersionChangeEvent"):
 		return &IDBVersionChangeEvent{ev}
-	case "KeyboardEvent":
+	case js.Global.Get("KeyboardEvent"):
 		return &KeyboardEvent{BasicEvent: ev}
-	case "MediaStreamEvent":
+	case js.Global.Get("MediaStreamEvent"):
 		return &MediaStreamEvent{ev}
-	case "MessageEvent":
+	case js.Global.Get("MessageEvent"):
 		return &MessageEvent{ev}
-	case "MouseEvent":
+	case js.Global.Get("MouseEvent"):
 		return &MouseEvent{UIEvent: &UIEvent{ev}}
-	case "MutationEvent":
+	case js.Global.Get("MutationEvent"):
 		return &MutationEvent{ev}
-	case "OfflineAudioCompletionEvent":
+	case js.Global.Get("OfflineAudioCompletionEvent"):
 		return &OfflineAudioCompletionEvent{ev}
-	case "PageTransitionEvent":
+	case js.Global.Get("PageTransitionEvent"):
 		return &PageTransitionEvent{ev}
-	case "PointerEvent":
+	case js.Global.Get("PointerEvent"):
 		return &PointerEvent{ev}
-	case "PopStateEvent":
+	case js.Global.Get("PopStateEvent"):
 		return &PopStateEvent{ev}
-	case "ProgressEvent":
+	case js.Global.Get("ProgressEvent"):
 		return &ProgressEvent{ev}
-	case "RelatedEvent":
+	case js.Global.Get("RelatedEvent"):
 		return &RelatedEvent{ev}
-	case "RTCPeerConnectionIceEvent":
+	case js.Global.Get("RTCPeerConnectionIceEvent"):
 		return &RTCPeerConnectionIceEvent{ev}
-	case "SensorEvent":
+	case js.Global.Get("SensorEvent"):
 		return &SensorEvent{ev}
-	case "StorageEvent":
+	case js.Global.Get("StorageEvent"):
 		return &StorageEvent{ev}
-	case "SVGEvent":
+	case js.Global.Get("SVGEvent"):
 		return &SVGEvent{ev}
-	case "SVGZoomEvent":
+	case js.Global.Get("SVGZoomEvent"):
 		return &SVGZoomEvent{ev}
-	case "TimeEvent":
+	case js.Global.Get("TimeEvent"):
 		return &TimeEvent{ev}
-	case "TouchEvent":
+	case js.Global.Get("TouchEvent"):
 		return &TouchEvent{ev}
-	case "TrackEvent":
+	case js.Global.Get("TrackEvent"):
 		return &TrackEvent{ev}
-	case "TransitionEvent":
+	case js.Global.Get("TransitionEvent"):
 		return &TransitionEvent{ev}
-	case "UIEvent":
+	case js.Global.Get("UIEvent"):
 		return &UIEvent{ev}
-	case "UserProximityEvent":
+	case js.Global.Get("UserProximityEvent"):
 		return &UserProximityEvent{ev}
-	case "WheelEvent":
+	case js.Global.Get("WheelEvent"):
 		return &WheelEvent{BasicEvent: ev}
 	default:
 		return ev
@@ -459,7 +459,7 @@ func (tl *TokenList) String() string {
 	if tl.sa != "" {
 		return tl.o.Get(tl.sa).String()
 	}
-	if tl.dtl.Get("constructor").Get("name").String() == "DOMSettableTokenList" {
+	if tl.dtl.Get("constructor") == js.Global.Get("DOMSettableTokenList") {
 		return tl.dtl.Get("value").String()
 	}
 	// We could manually construct the string, but I am not aware of
@@ -482,7 +482,7 @@ func (tl *TokenList) SetString(s string) {
 		tl.o.Set(tl.sa, s)
 		return
 	}
-	if tl.dtl.Get("constructor").Get("name").String() == "DOMSettableTokenList" {
+	if tl.dtl.Get("constructor") == js.Global.Get("DOMSettableTokenList") {
 		tl.dtl.Set("value", s)
 		return
 	}
