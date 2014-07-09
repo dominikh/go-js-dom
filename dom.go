@@ -121,6 +121,26 @@ func nodeListToHTMLElements(o js.Object) []HTMLElement {
 	return out
 }
 
+func WrapDocument(o js.Object) Document {
+	return wrapDocument(o)
+}
+
+func WrapNode(o js.Object) Node {
+	return wrapNode(o)
+}
+
+func WrapElement(o js.Object) Element {
+	return wrapElement(o)
+}
+
+func WrapHTMLElement(o js.Object) HTMLElement {
+	return wrapHTMLElement(o)
+}
+
+func WrapEvent(o js.Object) Event {
+	return wrapEvent(o)
+}
+
 func wrapDocument(o js.Object) Document {
 	switch o.Get("constructor") {
 	case js.Global.Get("HTMLDocument"):
