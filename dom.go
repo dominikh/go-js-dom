@@ -136,6 +136,8 @@ func wrapNode(o js.Object) Node {
 	}
 	switch o.Get("constructor") {
 	// TODO all the non-element cases
+	case js.Global.Get("Text"):
+		return &Text{&BasicNode{o}}
 	default:
 		return wrapElement(o)
 	}
@@ -2778,4 +2780,8 @@ func (css *CSSStyleDeclaration) Index(idx int) string {
 
 func (css *CSSStyleDeclaration) Length() int {
 	return css.Get("length").Int()
+}
+
+type Text struct {
+	*BasicNode
 }
