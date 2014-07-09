@@ -1247,7 +1247,7 @@ type Node interface {
 	PreviousSibling() Node
 	TextContent() string
 	SetTextContent(string)
-	AppendChild(Element)
+	AppendChild(Node)
 	CloneNode(deep bool) Node
 	CompareDocumentPosition(Node) int
 	Contains(Node) bool
@@ -1341,8 +1341,8 @@ func (n *BasicNode) SetTextContent(s string) {
 	n.Set("textContent", s)
 }
 
-func (n *BasicNode) AppendChild(e Element) {
-	n.Call("appendChild", e.Underlying())
+func (n *BasicNode) AppendChild(newchild Node) {
+	n.Call("appendChild", newchild.Underlying())
 }
 
 func (n *BasicNode) CloneNode(deep bool) Node {
