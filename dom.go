@@ -1119,11 +1119,16 @@ func (w *window) Stop() {
 	w.Call("stop")
 }
 
-func (w *window) AddEventListener(typ string, useCapture bool, listener func(Event)) {
-	w.Call("addEventListener", typ, func(o js.Object) { listener(wrapEvent(o)) }, useCapture)
+// TODO reuse util.EventTarget
+
+func (w *window) AddEventListener(typ string, useCapture bool, listener func(Event)) func(o js.Object) {
+	wrapper := func(o js.Object) { listener(wrapEvent(o)) }
+	w.Call("addEventListener", typ, wrapper, useCapture)
+	return wrapper
 }
-func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(Event)) {
-	w.Call("removeEventListener", typ, func(o js.Object) { listener(wrapEvent(o)) }, useCapture)
+
+func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(js.Object)) {
+	w.Call("removeEventListener", typ, listener, useCapture)
 }
 
 // TODO all the other window methods
@@ -1239,17 +1244,18 @@ type StyleSheet interface{}
 type CSSStyleSheet interface{}
 
 type EventTarget interface {
-	AddEventListener(typ string, useCapture bool, listener func(Event))
-	RemoveEventListener(typ string, useCapture bool, listener func(Event))
+	// AddEventListener adds a new event listener and returns the
+	// wrapper function it generated. If using RemoveEventListener,
+	// that wrapper has to be used.
+	AddEventListener(typ string, useCapture bool, listener func(Event)) func(js.Object)
+	RemoveEventListener(typ string, useCapture bool, listener func(js.Object))
 	// DispatchEvent() // TODO
 }
 
 type Node interface {
 	// Due to issue 7158, we cannot embed EventTarget right now
 
-	// EventTarget // FIXME
-	AddEventListener(typ string, useCapture bool, listener func(Event))    // FIXME
-	RemoveEventListener(typ string, useCapture bool, listener func(Event)) // FIXME
+	EventTarget
 
 	Underlying() js.Object
 	BaseURI() string
@@ -1292,12 +1298,14 @@ func (n *BasicNode) Underlying() js.Object {
 	return n.Object
 }
 
-func (n *BasicNode) AddEventListener(typ string, useCapture bool, listener func(Event)) {
-	n.Call("addEventListener", typ, func(o js.Object) { listener(wrapEvent(o)) }, useCapture)
+func (n *BasicNode) AddEventListener(typ string, useCapture bool, listener func(Event)) func(js.Object) {
+	wrapper := func(o js.Object) { listener(wrapEvent(o)) }
+	n.Call("addEventListener", typ, wrapper, useCapture)
+	return wrapper
 }
 
-func (n *BasicNode) RemoveEventListener(typ string, useCapture bool, listener func(Event)) {
-	n.Call("removeEventListener", typ, func(o js.Object) { listener(wrapEvent(o)) }, useCapture)
+func (n *BasicNode) RemoveEventListener(typ string, useCapture bool, listener func(js.Object)) {
+	n.Call("removeEventListener", typ, listener, useCapture)
 }
 
 func (n *BasicNode) BaseURI() string {
