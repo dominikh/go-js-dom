@@ -320,7 +320,7 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	case js.Global.Get("HTMLElement"):
 		return el
 	default:
-		panic("Unsupported HTML element type: " + o.Call("toString").Str())
+		return el
 	}
 }
 
