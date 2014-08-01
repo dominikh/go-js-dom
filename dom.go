@@ -317,6 +317,8 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 		return &HTMLUnknownElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLVideoElement"):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
+	case js.Global.Get("HTMLElement"):
+		return el
 	default:
 		panic("Unsupported HTML element type: " + o.Call("toString").Str())
 	}
