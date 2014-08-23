@@ -2720,17 +2720,17 @@ type MessageEvent struct{ *BasicEvent }
 
 type MouseEvent struct {
 	*UIEvent
-	altKey    bool
-	button    int
-	clientX   int
-	clientY   int
-	ctrlKey   bool
-	metaKey   bool
-	movementX int
-	movementY int
-	screenX   int
-	screenY   int
-	shiftKey  bool
+	AltKey    bool `js:"altKey"`
+	Button    int  `js:"button"`
+	ClientX   int  `js:"clientX"`
+	ClientY   int  `js:"clientY"`
+	CtrlKey   bool `js:"ctrlKey"`
+	MetaKey   bool `js:"metaKey"`
+	MovementX int  `js:"movementX"`
+	MovementY int  `js:"movementY"`
+	ScreenX   int  `js:"screenX"`
+	ScreenY   int  `js:"screenY"`
+	ShiftKey  bool `js:"shiftKey"`
 }
 
 func (ev *MouseEvent) RelatedTarget() Element {
