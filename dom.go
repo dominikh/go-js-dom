@@ -1773,7 +1773,12 @@ func (e *HTMLButtonElement) SetCustomValidity(s string) {
 	e.Call("setCustomValidity", s)
 }
 
-type HTMLCanvasElement struct{ *BasicHTMLElement }
+type HTMLCanvasElement struct {
+	*BasicHTMLElement
+	Height int `js:"height"`
+	Width  int `js:"width"`
+}
+
 type CanvasRenderingContext2D struct {
 	js.Object
 
