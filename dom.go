@@ -26,7 +26,7 @@
 // get things such as the current Document.
 //
 //
-// The Element, HTMLElement and Event interfaces
+// Interfaces
 //
 // The DOM has a big amount of different element and event types, but
 // they all follow three interfaces. All functions that work on or
@@ -1434,6 +1434,7 @@ type Element interface {
 	TagName() string
 	GetAttribute(string) string                   // TODO can attributes only be strings?
 	GetAttributeNS(ns string, name string) string // can attributes only be strings?
+	GetBoundingClientRect() ClientRect
 	GetElementsByClassName(string) []Element
 	GetElementsByTagName(string) []Element
 	GetElementsByTagNameNS(ns string, name string) []Element
@@ -1447,6 +1448,16 @@ type Element interface {
 	SetAttributeNS(ns string, name string, value string)
 	InnerHTML() string
 	SetInnerHTML(string)
+}
+
+type ClientRect struct {
+	js.Object
+	Height int `js:"height"`
+	Width  int `js:"width"`
+	Left   int `js:"left"`
+	Right  int `js:"right"`
+	Top    int `js:"top"`
+	Bottom int `js:"bottom"`
 }
 
 type ParentNode interface {
@@ -1578,6 +1589,11 @@ func (e *BasicHTMLElement) Focus() {
 // by concrete element types and HTML element types.
 type BasicElement struct {
 	*BasicNode
+}
+
+func (e *BasicElement) GetBoundingClientRect() ClientRect {
+	obj := e.Call("getBoundingClientRect")
+	return ClientRect{Object: obj}
 }
 
 func (e *BasicElement) PreviousElementSibling() Element {
