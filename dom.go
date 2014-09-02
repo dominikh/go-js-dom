@@ -2169,8 +2169,20 @@ func (e *HTMLInputElement) Validity() *ValidityState {
 	return &ValidityState{Object: e.Get("validity")}
 }
 
+func (e *HTMLInputElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLInputElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
 func (e *HTMLInputElement) Select() {
 	e.Call("select")
+}
+
+func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
+	e.Call("setSelectionRange", start, end, direction)
 }
 
 type HTMLKeygenElement struct {
