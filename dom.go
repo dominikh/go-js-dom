@@ -1741,14 +1741,14 @@ type HTMLBodyElement struct{ *BasicHTMLElement }
 type ValidityState struct {
 	js.Object
 	CustomError     bool `js:"customError"`
-	PatternMismatch bool `js:"	patternMismatch"`
-	RangeOverflow   bool `js:"	rangeOverflow"`
-	RangeUnderflow  bool `js:"	rangeUnderflow"`
-	StepMismatch    bool `js:"	stepMismatch"`
-	TooLong         bool `js:"	tooLong"`
-	TypeMismatch    bool `js:"	typeMismatch"`
-	Valid           bool `js:"	valid"`
-	ValueMissing    bool `js:"	valueMissing"`
+	PatternMismatch bool `js:"patternMismatch"`
+	RangeOverflow   bool `js:"rangeOverflow"`
+	RangeUnderflow  bool `js:"rangeUnderflow"`
+	StepMismatch    bool `js:"stepMismatch"`
+	TooLong         bool `js:"tooLong"`
+	TypeMismatch    bool `js:"typeMismatch"`
+	Valid           bool `js:"valid"`
+	ValueMissing    bool `js:"valueMissing"`
 }
 
 type HTMLButtonElement struct {
