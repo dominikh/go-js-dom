@@ -2211,6 +2211,7 @@ func (e *HTMLInputElement) StepDown(n int) (err error) {
 		}
 	}()
 	e.Call("stepDown", n)
+	return nil
 }
 
 func (e *HTMLInputElement) StepUp(n int) (err error) {
@@ -2226,6 +2227,7 @@ func (e *HTMLInputElement) StepUp(n int) (err error) {
 		}
 	}()
 	e.Call("stepUp", n)
+	return nil
 }
 
 type HTMLKeygenElement struct {
