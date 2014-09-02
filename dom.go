@@ -2185,6 +2185,36 @@ func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
 }
 
+func (e *HTMLInputElement) StepDown(n int) (err error) {
+	defer func() {
+		e := recover()
+		if e == nil {
+			return
+		}
+		if panicErr, ok := e.(error); ok && panicErr != nil {
+			err = panicErr
+		} else {
+			panic(e)
+		}
+	}()
+	e.Call("stepDown", n)
+}
+
+func (e *HTMLInputElement) StepUp(n int) (err error) {
+	defer func() {
+		e := recover()
+		if e == nil {
+			return
+		}
+		if panicErr, ok := e.(error); ok && panicErr != nil {
+			err = panicErr
+		} else {
+			panic(e)
+		}
+	}()
+	e.Call("stepUp", n)
+}
+
 type HTMLKeygenElement struct {
 	*BasicHTMLElement
 	Autofocus         bool   `js:"autofocus"`
