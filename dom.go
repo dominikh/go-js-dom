@@ -94,6 +94,22 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+func callRecover(o js.Object, fn string, args ...interface{}) (err error) {
+	defer func() {
+		e := recover()
+		if e == nil {
+			return
+		}
+		if panicErr, ok := e.(error); ok && panicErr != nil {
+			err = panicErr
+		} else {
+			panic(e)
+		}
+	}()
+	o.Call(fn, args...)
+	return nil
+}
+
 func nodeListToNodes(o js.Object) []Node {
 	var out []Node
 	length := o.Get("length").Int()
@@ -2185,36 +2201,12 @@ func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
 }
 
-func (e *HTMLInputElement) StepDown(n int) (err error) {
-	defer func() {
-		e := recover()
-		if e == nil {
-			return
-		}
-		if panicErr, ok := e.(error); ok && panicErr != nil {
-			err = panicErr
-		} else {
-			panic(e)
-		}
-	}()
-	e.Call("stepDown", n)
-	return nil
+func (e *HTMLInputElement) StepDown(n int) error {
+	return callRecover(e, "stepDown", n)
 }
 
-func (e *HTMLInputElement) StepUp(n int) (err error) {
-	defer func() {
-		e := recover()
-		if e == nil {
-			return
-		}
-		if panicErr, ok := e.(error); ok && panicErr != nil {
-			err = panicErr
-		} else {
-			panic(e)
-		}
-	}()
-	e.Call("stepUp", n)
-	return nil
+func (e *HTMLInputElement) StepUp(n int) error {
+	return callRecover(e, "stepUp", n)
 }
 
 type HTMLKeygenElement struct {
