@@ -2169,6 +2169,10 @@ func (e *HTMLInputElement) Validity() *ValidityState {
 	return &ValidityState{Object: e.Get("validity")}
 }
 
+func (e *HTMLInputElement) Select() {
+	e.Call("select")
+}
+
 type HTMLKeygenElement struct {
 	*BasicHTMLElement
 	Autofocus         bool   `js:"autofocus"`
