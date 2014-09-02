@@ -2185,6 +2185,19 @@ func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
 }
 
+type SelectionMode int
+
+const (
+	Select SelectionMode = 0
+	Start                = 1
+	End                  = 2
+	Preserve             = 3
+)
+
+func (e *HTMLInputElement) SetRangeText(replacement string, start, end int, selectMode SelectionMode) {
+	e.Call("setRangeText", replacement, start, end, selectMode)
+}
+
 func (e *HTMLInputElement) StepDown(n int) (err error) {
 	defer func() {
 		e := recover()
@@ -2611,6 +2624,10 @@ func (e *HTMLTextAreaElement) Select() {
 
 func (e *HTMLTextAreaElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
+}
+
+func (e *HTMLTextAreaElement) SetRangeText(replacement string, start, end int, selectMode SelectionMode) {
+	e.Call("setRangeText", replacement, start, end, selectMode)
 }
 
 type HTMLTimeElement struct {
