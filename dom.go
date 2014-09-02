@@ -2169,6 +2169,67 @@ func (e *HTMLInputElement) Validity() *ValidityState {
 	return &ValidityState{Object: e.Get("validity")}
 }
 
+func (e *HTMLInputElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLInputElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
+
+func (e *HTMLInputElement) Select() {
+	e.Call("select")
+}
+
+func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
+	e.Call("setSelectionRange", start, end, direction)
+}
+
+type SelectionMode int
+
+const (
+	Select SelectionMode = 0
+	Start                = 1
+	End                  = 2
+	Preserve             = 3
+)
+
+func (e *HTMLInputElement) SetRangeText(replacement string, start, end int, selectMode SelectionMode) {
+	e.Call("setRangeText", replacement, start, end, selectMode)
+}
+
+func (e *HTMLInputElement) StepDown(n int) (err error) {
+	defer func() {
+		e := recover()
+		if e == nil {
+			return
+		}
+		if panicErr, ok := e.(error); ok && panicErr != nil {
+			err = panicErr
+		} else {
+			panic(e)
+		}
+	}()
+	e.Call("stepDown", n)
+	return nil
+}
+
+func (e *HTMLInputElement) StepUp(n int) (err error) {
+	defer func() {
+		e := recover()
+		if e == nil {
+			return
+		}
+		if panicErr, ok := e.(error); ok && panicErr != nil {
+			err = panicErr
+		} else {
+			panic(e)
+		}
+	}()
+	e.Call("stepUp", n)
+	return nil
+}
+
 type HTMLKeygenElement struct {
 	*BasicHTMLElement
 	Autofocus         bool   `js:"autofocus"`
@@ -2565,6 +2626,10 @@ func (e *HTMLTextAreaElement) Select() {
 
 func (e *HTMLTextAreaElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
+}
+
+func (e *HTMLTextAreaElement) SetRangeText(replacement string, start, end int, selectMode SelectionMode) {
+	e.Call("setRangeText", replacement, start, end, selectMode)
 }
 
 type HTMLTimeElement struct {
