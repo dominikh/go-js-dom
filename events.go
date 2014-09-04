@@ -66,7 +66,7 @@ func wrapEvent(o js.Object) Event {
 	case js.Global.Get("MediaStreamEvent"):
 		return &MediaStreamEvent{ev}
 	case js.Global.Get("MessageEvent"):
-		return &MessageEvent{ev}
+		return &MessageEvent{BasicEvent: ev}
 	case js.Global.Get("MouseEvent"):
 		return &MouseEvent{UIEvent: &UIEvent{ev}}
 	case js.Global.Get("MutationEvent"):
@@ -239,7 +239,11 @@ func (ev *KeyboardEvent) ModifierState(mod string) bool {
 }
 
 type MediaStreamEvent struct{ *BasicEvent }
-type MessageEvent struct{ *BasicEvent }
+
+type MessageEvent struct {
+	*BasicEvent
+	Data js.Object `js:"data"`
+}
 
 type MouseEvent struct {
 	*UIEvent
