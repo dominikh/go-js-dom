@@ -223,15 +223,18 @@ const (
 
 type KeyboardEvent struct {
 	*BasicEvent
-	AltKey   bool   `js:"altKey"`
-	CharCode int    `js:"charCode"`
-	CtrlKey  bool   `js:"ctrlKey"`
-	Key      string `js:"key"`
-	Locale   string `js:"locale"`
-	Location int    `js:"location"`
-	MetaKey  bool   `js:"metaKey"`
-	Repeat   bool   `js:"repeat"`
-	ShiftKey bool   `js:"shiftKey"`
+	AltKey        bool   `js:"altKey"`
+	CharCode      int    `js:"charCode"`
+	CtrlKey       bool   `js:"ctrlKey"`
+	Key           string `js:"key"`
+	KeyIdentifier string `js:"keyIdentifier"`
+	KeyCode       int    `js:"keyCode"`
+	Locale        string `js:"locale"`
+	Location      int    `js:"location"`
+	KeyLocation   int    `js:"keyLocation"`
+	MetaKey       bool   `js:"metaKey"`
+	Repeat        bool   `js:"repeat"`
+	ShiftKey      bool   `js:"shiftKey"`
 }
 
 func (ev *KeyboardEvent) ModifierState(mod string) bool {
