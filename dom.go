@@ -194,11 +194,11 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	c := o.Get("constructor")
 	switch c {
 	case js.Global.Get("HTMLAnchorElement"):
-		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: URLUtils{Object: o}}
+		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Object: o}}
 	case js.Global.Get("HTMLAppletElement"):
 		return &HTMLAppletElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLAreaElement"):
-		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: URLUtils{Object: o}}
+		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: &URLUtils{Object: o}}
 	case js.Global.Get("HTMLAudioElement"):
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
 	case js.Global.Get("HTMLBaseElement"):
@@ -581,7 +581,7 @@ func (d *htmlDocument) Links() []HTMLElement {
 
 func (d *htmlDocument) Location() Location {
 	o := d.Get("location")
-	return Location{Object: o, URLUtils: URLUtils{Object: o}}
+	return Location{Object: o, URLUtils: &URLUtils{Object: o}}
 }
 
 func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
@@ -736,7 +736,7 @@ type URLUtils struct {
 
 type Location struct {
 	js.Object
-	URLUtils
+	*URLUtils
 }
 
 type HTMLElement interface {
@@ -853,7 +853,7 @@ func (w *window) FrameElement() Element {
 
 func (w *window) Location() *Location {
 	o := w.Get("location")
-	return &Location{Object: o, URLUtils: URLUtils{Object: o}}
+	return &Location{Object: o, URLUtils: &URLUtils{Object: o}}
 }
 
 func (w *window) Name() string {
@@ -1606,7 +1606,7 @@ func (e *BasicElement) SetInnerHTML(s string) {
 
 type HTMLAnchorElement struct {
 	*BasicHTMLElement
-	URLUtils
+	*URLUtils
 	HrefLang string `js:"hreflang"`
 	Media    string `js:"media"`
 	TabIndex int    `js:"tabIndex"`
@@ -1638,7 +1638,7 @@ func (e *HTMLAppletElement) Rel() *TokenList {
 
 type HTMLAreaElement struct {
 	*BasicHTMLElement
-	URLUtils
+	*URLUtils
 	Alt      string `js:"alt"`
 	Coords   string `js:"coords"`
 	HrefLang string `js:"hreflang"`
