@@ -852,7 +852,8 @@ func (w *window) FrameElement() Element {
 }
 
 func (w *window) Location() *Location {
-	return &Location{w.Get("location")}
+	o := w.Get("location")
+	return &Location{Object: o, URLUtils: URLUtils{Object: o}}
 }
 
 func (w *window) Name() string {
