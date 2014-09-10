@@ -194,11 +194,11 @@ func wrapHTMLElement(o js.Object) HTMLElement {
 	c := o.Get("constructor")
 	switch c {
 	case js.Global.Get("HTMLAnchorElement"):
-		return &HTMLAnchorElement{BasicHTMLElement: el}
+		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: URLUtils{Object: o}}
 	case js.Global.Get("HTMLAppletElement"):
 		return &HTMLAppletElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLAreaElement"):
-		return &HTMLAreaElement{BasicHTMLElement: el}
+		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: URLUtils{Object: o}}
 	case js.Global.Get("HTMLAudioElement"):
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
 	case js.Global.Get("HTMLBaseElement"):
@@ -580,7 +580,8 @@ func (d *htmlDocument) Links() []HTMLElement {
 }
 
 func (d *htmlDocument) Location() Location {
-	return Location{d.Get("location")}
+	o := d.Get("location")
+	return Location{Object: o, URLUtils: URLUtils{Object: o}}
 }
 
 func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
@@ -715,9 +716,28 @@ func (d document) QuerySelectorAll(sel string) []Element {
 	return (&BasicElement{&BasicNode{d.Object}}).QuerySelectorAll(sel)
 }
 
-type Location struct{ js.Object }
+type URLUtils struct {
+	js.Object
+
+	Href     string `js:"href"`
+	Protocol string `js:"protocol"`
+	Host     string `js:"host"`
+	Hostname string `js:"hostname"`
+	Port     string `js:"port"`
+	Pathname string `js:"pathname"`
+	Search   string `js:"search"`
+	Hash     string `js:"hash"`
+	Username string `js:"username"`
+	Password string `js:"password"`
+	Origin   string `js:"origin"`
+}
 
 // TODO Location methods
+
+type Location struct {
+	js.Object
+	URLUtils
+}
 
 type HTMLElement interface {
 	Element
@@ -1585,6 +1605,7 @@ func (e *BasicElement) SetInnerHTML(s string) {
 
 type HTMLAnchorElement struct {
 	*BasicHTMLElement
+	URLUtils
 	HrefLang string `js:"hreflang"`
 	Media    string `js:"media"`
 	TabIndex int    `js:"tabIndex"`
@@ -1616,6 +1637,7 @@ func (e *HTMLAppletElement) Rel() *TokenList {
 
 type HTMLAreaElement struct {
 	*BasicHTMLElement
+	URLUtils
 	Alt      string `js:"alt"`
 	Coords   string `js:"coords"`
 	HrefLang string `js:"hreflang"`
