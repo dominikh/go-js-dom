@@ -473,7 +473,7 @@ type HTMLDocument interface {
 	Images() []*HTMLImageElement
 	LastModified() time.Time
 	Links() []HTMLElement
-	Location() Location
+	Location() *Location
 	Plugins() []*HTMLEmbedElement
 	ReadyState() string
 	Referrer() string
@@ -579,9 +579,9 @@ func (d *htmlDocument) Links() []HTMLElement {
 	return els
 }
 
-func (d *htmlDocument) Location() Location {
+func (d *htmlDocument) Location() *Location {
 	o := d.Get("location")
-	return Location{Object: o, URLUtils: &URLUtils{Object: o}}
+	return &Location{Object: o, URLUtils: &URLUtils{Object: o}}
 }
 
 func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
