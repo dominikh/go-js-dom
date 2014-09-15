@@ -1321,7 +1321,11 @@ func (n *BasicNode) HasChildNodes() bool {
 }
 
 func (n *BasicNode) InsertBefore(which Node, before Node) {
-	n.Call("insertBefore", which.Underlying(), before.Underlying())
+	var o interface{}
+	if before != nil {
+		o = before.Underlying()
+	}
+	n.Call("insertBefore", which.Underlying(), o)
 }
 
 func (n *BasicNode) IsDefaultNamespace(s string) bool {
