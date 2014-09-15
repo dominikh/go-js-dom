@@ -1299,6 +1299,15 @@ func (n *BasicNode) CloneNode(deep bool) Node {
 	return wrapNode(n.Call("cloneNode", deep))
 }
 
+const (
+	DocumentPositionDisconnected           = 1
+	DocumentPositionPreceding              = 2
+	DocumentPositionFollowing              = 4
+	DocumentPositionContains               = 8
+	DocumentPositionContainedBy            = 16
+	DocumentPositionImplementationSpecific = 32
+)
+
 func (n *BasicNode) CompareDocumentPosition(other Node) int {
 	return n.Call("compareDocumentPosition", other.Underlying()).Int()
 }
