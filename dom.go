@@ -971,8 +971,7 @@ func (w *window) Forward() {
 }
 
 func (w *window) GetComputedStyle(el Element) *CSSStyleDeclaration {
-	// FIXME implement
-	return &CSSStyleDeclaration{}
+	return &CSSStyleDeclaration{w.Call("getComputedStyle", el.Underlying())}
 }
 
 func (w *window) GetSelection() Selection {
