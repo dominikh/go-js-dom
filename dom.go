@@ -791,7 +791,12 @@ type Window interface {
 	Confirm(string) bool
 	Focus()
 	Forward()
-	GetComputedStyle(el Element) *CSSStyleDeclaration
+	// GetComputedStyle gives the values of all CSS properties of an
+	// element after applying the active stylesheets. You must pass an
+	// empty string when el is a regular element.
+	//
+	// See: https://developer.mozilla.org/en/docs/Web/API/window.getComputedStyle
+	GetComputedStyle(el Element, pseudoElt string) *CSSStyleDeclaration
 	GetSelection() Selection
 	Home()
 	MoveBy(dx, dy int)
@@ -949,8 +954,12 @@ func (w *window) Forward() {
 	w.Call("forward")
 }
 
-func (w *window) GetComputedStyle(el Element) *CSSStyleDeclaration {
-	return &CSSStyleDeclaration{w.Call("getComputedStyle", el.Underlying())}
+func (w *window) GetComputedStyle(el Element, pseudoElt string) *CSSStyleDeclaration {
+	var optArg interface{}
+	if pseudoElt != "" {
+		optArg = pseudoElt
+	}
+	return &CSSStyleDeclaration{w.Call("getComputedStyle", el.Underlying(), optArg)}
 }
 
 func (w *window) GetSelection() Selection {
