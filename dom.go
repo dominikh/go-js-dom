@@ -811,7 +811,7 @@ type Window interface {
 	Confirm(string) bool
 	Focus()
 	Forward()
-	GetComputedStyle(el Element) *CSSStyleDeclaration
+	GetComputedStyle(el Element, pseudoElt string) *CSSStyleDeclaration
 	GetSelection() Selection
 	Home()
 	MoveBy(dx, dy int)
@@ -970,8 +970,16 @@ func (w *window) Forward() {
 	w.Call("forward")
 }
 
-func (w *window) GetComputedStyle(el Element) *CSSStyleDeclaration {
-	return &CSSStyleDeclaration{w.Call("getComputedStyle", el.Underlying())}
+// GetComputedStyle returns the values of all CSS properties of an
+// element after applying the active stylesheets. pseudoElt specifies
+// the pseudo-element to match. For normal elements, it must be the
+// empty string.
+func (w *window) GetComputedStyle(el Element, pseudoElt string) *CSSStyleDeclaration {
+	var optArg interface{}
+	if pseudoElt != "" {
+		optArg = pseudoElt
+	}
+	return &CSSStyleDeclaration{w.Call("getComputedStyle", el.Underlying(), optArg)}
 }
 
 func (w *window) GetSelection() Selection {
