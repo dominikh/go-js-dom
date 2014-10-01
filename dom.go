@@ -1997,7 +1997,7 @@ type HTMLIFrameElement struct {
 	Height   string `js:"height"`
 	Name     string `js:"name"`
 	Src      string `js:"src"`
-	SrcDoc   string `js:"srcDoc"`
+	SrcDoc   string `js:"srcdoc"`
 	Seamless bool   `js:"seamless"`
 	// TODO sandbox attribute
 }
