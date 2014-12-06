@@ -2404,7 +2404,23 @@ type HTMLScriptElement struct {
 	Text    string `js:"text"`
 }
 
-type HTMLSelectElement struct{ *BasicHTMLElement }
+type HTMLSelectElement struct {
+	*BasicHTMLElement
+	Autofocus         bool   `js:"autofocus"`
+	Disabled          bool   `js:"disabled"`
+	Length            int    `js:"length"`
+	Multiple          bool   `js:"multiple"`
+	Name              string `js:"name"`
+	Required          bool   `js:"required"`
+	SelectedIndex     int    `js:"selectedIndex"`
+	Size              int    `js:"size"`
+	Type              string `js:"type"`
+	ValidationMessage string `js:"validationMessage"`
+	Value             string `js:"value"`
+	WillValidate      bool   `js:"willValidate"`
+}
+
+// TODO add HTMLSelectElement methods
 
 type HTMLSourceElement struct {
 	*BasicHTMLElement
