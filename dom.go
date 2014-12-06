@@ -446,6 +446,7 @@ type Document interface {
 	AdoptNode(node Node) Node
 	CreateElement(name string) Element
 	CreateElementNS(namespace, name string) Element
+	CreateTextNode(s string) *Text
 	ElementFromPoint(x, y int) Element
 	EnableStyleSheetsForSet(name string)
 	GetElementsByClassName(name string) []Element
@@ -682,6 +683,10 @@ func (d document) CreateElement(name string) Element {
 
 func (d document) CreateElementNS(ns string, name string) Element {
 	return wrapElement(d.Call("createElement", ns, name))
+}
+
+func (d document) CreateTextNode(s string) *Text {
+	return wrapNode(d.Call("createTextNode", s)).(*Text)
 }
 
 func (d document) ElementFromPoint(x, y int) Element {
