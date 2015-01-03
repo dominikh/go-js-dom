@@ -11,7 +11,7 @@ func WrapEvent(o js.Object) Event {
 }
 
 func wrapEvent(o js.Object) Event {
-	if o.IsNull() || o.IsUndefined() {
+	if o == nil || o == js.Undefined {
 		return nil
 	}
 	ev := &BasicEvent{o}
