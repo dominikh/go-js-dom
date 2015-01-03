@@ -163,7 +163,7 @@ func wrapDocument(o js.Object) Document {
 }
 
 func wrapNode(o js.Object) Node {
-	if o.IsNull() || o.IsUndefined() {
+	if o == nil || o == js.Undefined {
 		return nil
 	}
 	switch o.Get("constructor") {
@@ -176,7 +176,7 @@ func wrapNode(o js.Object) Node {
 }
 
 func wrapElement(o js.Object) Element {
-	if o.IsNull() || o.IsUndefined() {
+	if o == nil || o == js.Undefined {
 		return nil
 	}
 	switch o.Get("constructor") {
@@ -187,7 +187,7 @@ func wrapElement(o js.Object) Element {
 }
 
 func wrapHTMLElement(o js.Object) HTMLElement {
-	if o.IsNull() || o.IsUndefined() {
+	if o == nil || o == js.Undefined {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
@@ -367,7 +367,7 @@ type TokenList struct {
 
 func (tl *TokenList) Item(idx int) string {
 	o := tl.dtl.Call("item", idx)
-	if o.IsNull() || o.IsUndefined() {
+	if o == nil || o == js.Undefined {
 		return ""
 	}
 	return o.Str()
