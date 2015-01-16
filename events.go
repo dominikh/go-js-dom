@@ -169,7 +169,7 @@ func (ev *BasicEvent) Timestamp() time.Time {
 }
 
 func (ev *BasicEvent) Type() string {
-	return ev.Get("type").Str()
+	return ev.Get("type").String()
 }
 
 func (ev *BasicEvent) PreventDefault() {

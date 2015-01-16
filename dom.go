@@ -94,7 +94,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func callRecover(o js.Object, fn string, args ...interface{}) (err error) {
+func callRecover(o js.Object, fn string, args ...js.Any) (err error) {
 	defer func() {
 		e := recover()
 		if e == nil {
@@ -370,7 +370,7 @@ func (tl *TokenList) Item(idx int) string {
 	if o == nil || o == js.Undefined {
 		return ""
 	}
-	return o.Str()
+	return o.String()
 }
 
 func (tl *TokenList) Contains(token string) bool {
@@ -391,10 +391,10 @@ func (tl *TokenList) Toggle(token string) {
 
 func (tl *TokenList) String() string {
 	if tl.sa != "" {
-		return tl.o.Get(tl.sa).Str()
+		return tl.o.Get(tl.sa).String()
 	}
 	if tl.dtl.Get("constructor") == js.Global.Get("DOMSettableTokenList") {
-		return tl.dtl.Get("value").Str()
+		return tl.dtl.Get("value").String()
 	}
 	// We could manually construct the string, but I am not aware of
 	// any case where we have neither a string attribute nor
@@ -406,7 +406,7 @@ func (tl *TokenList) Slice() []string {
 	var out []string
 	length := tl.dtl.Get("length").Int()
 	for i := 0; i < length; i++ {
-		out = append(out, tl.dtl.Call("item", i).Str())
+		out = append(out, tl.dtl.Call("item", i).String())
 	}
 	return out
 }
@@ -503,7 +503,7 @@ func (d *htmlDocument) Body() HTMLElement {
 }
 
 func (d *htmlDocument) Cookie() string {
-	return d.Get("cookie").Str()
+	return d.Get("cookie").String()
 }
 
 func (d *htmlDocument) SetCookie(s string) {
@@ -515,7 +515,7 @@ func (d *htmlDocument) DefaultView() Window {
 }
 
 func (d *htmlDocument) DesignMode() bool {
-	s := d.Get("designMode").Str()
+	s := d.Get("designMode").String()
 	if s == "off" {
 		return false
 	}
@@ -531,7 +531,7 @@ func (d *htmlDocument) SetDesignMode(b bool) {
 }
 
 func (d *htmlDocument) Domain() string {
-	return d.Get("domain").Str()
+	return d.Get("domain").String()
 }
 
 func (d *htmlDocument) SetDomain(s string) {
@@ -596,11 +596,11 @@ func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
 }
 
 func (d *htmlDocument) ReadyState() string {
-	return d.Get("readyState").Str()
+	return d.Get("readyState").String()
 }
 
 func (d *htmlDocument) Referrer() string {
-	return d.Get("referrer").Str()
+	return d.Get("referrer").String()
 }
 
 func (d *htmlDocument) Scripts() []*HTMLScriptElement {
@@ -614,7 +614,7 @@ func (d *htmlDocument) Scripts() []*HTMLScriptElement {
 }
 
 func (d *htmlDocument) Title() string {
-	return d.Get("title").Str()
+	return d.Get("title").String()
 }
 
 func (d *htmlDocument) SetTitle(s string) {
@@ -622,7 +622,7 @@ func (d *htmlDocument) SetTitle(s string) {
 }
 
 func (d *htmlDocument) URL() string {
-	return d.Get("url").Str()
+	return d.Get("url").String()
 }
 
 func (d document) Async() bool {
@@ -643,7 +643,7 @@ func (d document) DocumentElement() Element {
 }
 
 func (d document) DocumentURI() string {
-	return d.Get("documentURI").Str()
+	return d.Get("documentURI").String()
 }
 
 func (d document) Implementation() DOMImplementation {
@@ -652,15 +652,15 @@ func (d document) Implementation() DOMImplementation {
 }
 
 func (d document) LastStyleSheetSet() string {
-	return d.Get("lastStyleSheetSet").Str()
+	return d.Get("lastStyleSheetSet").String()
 }
 
 func (d document) PreferredStyleSheetSet() string {
-	return d.Get("preferredStyleSheetSet").Str()
+	return d.Get("preferredStyleSheetSet").String()
 }
 
 func (d document) SelectedStyleSheetSet() string {
-	return d.Get("selectedStyleSheetSet").Str()
+	return d.Get("selectedStyleSheetSet").String()
 }
 
 func (d document) StyleSheets() []StyleSheet {
@@ -822,8 +822,8 @@ type Window interface {
 	MoveBy(dx, dy int)
 	MoveTo(x, y int)
 	Open(url, name, features string) Window
-	OpenDialog(url, name, features string, args []interface{}) Window
-	PostMessage(message string, target string, transfer []interface{})
+	OpenDialog(url, name, features string, args []js.Any) Window
+	PostMessage(message string, target string, transfer []js.Any)
 	Print()
 	Prompt(prompt string, initial string) string
 	ResizeBy(dw, dh int)
@@ -862,7 +862,7 @@ func (w *window) Location() *Location {
 }
 
 func (w *window) Name() string {
-	return w.Get("name").Str()
+	return w.Get("name").String()
 }
 
 func (w *window) SetName(s string) {
@@ -1008,11 +1008,11 @@ func (w *window) Open(url, name, features string) Window {
 	return &window{w.Call("open", url, name, features)}
 }
 
-func (w *window) OpenDialog(url, name, features string, args []interface{}) Window {
+func (w *window) OpenDialog(url, name, features string, args []js.Any) Window {
 	return &window{w.Call("openDialog", url, name, features, args)}
 }
 
-func (w *window) PostMessage(message string, target string, transfer []interface{}) {
+func (w *window) PostMessage(message string, target string, transfer []js.Any) {
 	w.Call("postMessage", message, target, transfer)
 }
 
@@ -1021,7 +1021,7 @@ func (w *window) Print() {
 }
 
 func (w *window) Prompt(prompt string, initial string) string {
-	return w.Call("prompt", prompt, initial).Str()
+	return w.Call("prompt", prompt, initial).String()
 }
 
 func (w *window) ResizeBy(dw, dh int) {
@@ -1142,7 +1142,7 @@ type PositionError struct {
 }
 
 func (err *PositionError) Error() string {
-	return err.Call("message").Str()
+	return err.Call("message").String()
 }
 
 type PositionOptions struct {
@@ -1243,7 +1243,7 @@ func (n *BasicNode) RemoveEventListener(typ string, useCapture bool, listener fu
 }
 
 func (n *BasicNode) BaseURI() string {
-	return n.Get("baseURI").Str()
+	return n.Get("baseURI").String()
 }
 
 func (n *BasicNode) ChildNodes() []Node {
@@ -1263,7 +1263,7 @@ func (n *BasicNode) NextSibling() Node {
 }
 
 func (n *BasicNode) NodeName() string {
-	return n.Get("nodeName").Str()
+	return n.Get("nodeName").String()
 }
 
 func (n *BasicNode) NodeType() int {
@@ -1271,7 +1271,7 @@ func (n *BasicNode) NodeType() int {
 }
 
 func (n *BasicNode) NodeValue() string {
-	return n.Get("nodeValue").Str()
+	return n.Get("nodeValue").String()
 }
 
 func (n *BasicNode) SetNodeValue(s string) {
@@ -1296,7 +1296,7 @@ func (n *BasicNode) PreviousSibling() Node {
 }
 
 func (n *BasicNode) TextContent() string {
-	return n.Get("textContent").Str()
+	return n.Get("textContent").String()
 }
 
 func (n *BasicNode) SetTextContent(s string) {
@@ -1333,7 +1333,7 @@ func (n *BasicNode) HasChildNodes() bool {
 }
 
 func (n *BasicNode) InsertBefore(which Node, before Node) {
-	var o interface{}
+	var o js.Any
 	if before != nil {
 		o = before.Underlying()
 	}
@@ -1349,11 +1349,11 @@ func (n *BasicNode) IsEqualNode(other Node) bool {
 }
 
 func (n *BasicNode) LookupPrefix() string {
-	return n.Call("lookupPrefix").Str()
+	return n.Call("lookupPrefix").String()
 }
 
 func (n *BasicNode) LookupNamespaceURI(s string) string {
-	return n.Call("lookupNamespaceURI", s).Str()
+	return n.Call("lookupNamespaceURI", s).String()
 }
 
 func (n *BasicNode) Normalize() {
@@ -1422,7 +1422,7 @@ type BasicHTMLElement struct {
 }
 
 func (e *BasicHTMLElement) AccessKey() string {
-	return e.Get("accessKey").Str()
+	return e.Get("accessKey").String()
 }
 
 func (e *BasicHTMLElement) SetAccessKey(s string) {
@@ -1430,7 +1430,7 @@ func (e *BasicHTMLElement) SetAccessKey(s string) {
 }
 
 func (e *BasicHTMLElement) AccessKeyLabel() string {
-	return e.Get("accessKeyLabel").Str()
+	return e.Get("accessKeyLabel").String()
 }
 
 func (e *BasicHTMLElement) SetAccessKeyLabel(s string) {
@@ -1438,7 +1438,7 @@ func (e *BasicHTMLElement) SetAccessKeyLabel(s string) {
 }
 
 func (e *BasicHTMLElement) ContentEditable() string {
-	return e.Get("contentEditable").Str()
+	return e.Get("contentEditable").String()
 }
 
 func (e *BasicHTMLElement) SetContentEditable(s string) {
@@ -1455,7 +1455,7 @@ func (e *BasicHTMLElement) Dataset() {
 }
 
 func (e *BasicHTMLElement) Dir() string {
-	return e.Get("dir").Str()
+	return e.Get("dir").String()
 }
 
 func (e *BasicHTMLElement) SetDir(s string) {
@@ -1471,7 +1471,7 @@ func (e *BasicHTMLElement) SetDraggable(b bool) {
 }
 
 func (e *BasicHTMLElement) Lang() string {
-	return e.Get("lang").Str()
+	return e.Get("lang").String()
 }
 
 func (e *BasicHTMLElement) SetLang(s string) {
@@ -1511,7 +1511,7 @@ func (e *BasicHTMLElement) SetTabIndex(i int) {
 }
 
 func (e *BasicHTMLElement) Title() string {
-	return e.Get("title").Str()
+	return e.Get("title").String()
 }
 
 func (e *BasicHTMLElement) SetTitle(s string) {
@@ -1558,7 +1558,7 @@ func (e *BasicElement) SetClass(s string) {
 }
 
 func (e *BasicElement) ID() string {
-	return e.Get("id").Str()
+	return e.Get("id").String()
 }
 
 func (e *BasicElement) SetID(s string) {
@@ -1566,15 +1566,15 @@ func (e *BasicElement) SetID(s string) {
 }
 
 func (e *BasicElement) TagName() string {
-	return e.Get("tagName").Str()
+	return e.Get("tagName").String()
 }
 
 func (e *BasicElement) GetAttribute(name string) string {
-	return e.Call("getAttribute", name).Str()
+	return e.Call("getAttribute", name).String()
 }
 
 func (e *BasicElement) GetAttributeNS(ns string, name string) string {
-	return e.Call("getAttributeNS", ns, name).Str()
+	return e.Call("getAttributeNS", ns, name).String()
 }
 
 func (e *BasicElement) GetElementsByClassName(s string) []Element {
@@ -1622,7 +1622,7 @@ func (e *BasicElement) SetAttributeNS(ns string, name string, value string) {
 }
 
 func (e *BasicElement) InnerHTML() string {
-	return e.Get("innerHTML").Str()
+	return e.Get("innerHTML").String()
 }
 
 func (e *BasicElement) SetInnerHTML(s string) {
@@ -2590,11 +2590,11 @@ type HTMLUnknownElement struct{ *BasicHTMLElement }
 type HTMLVideoElement struct{ *HTMLMediaElement }
 
 func (e *HTMLBaseElement) Href() string {
-	return e.Get("href").Str()
+	return e.Get("href").String()
 }
 
 func (e *HTMLBaseElement) Target() string {
-	return e.Get("target").Str()
+	return e.Get("target").String()
 }
 
 type CSSStyleDeclaration struct{ js.Object }
@@ -2603,8 +2603,8 @@ func (css *CSSStyleDeclaration) ToMap() map[string]string {
 	m := make(map[string]string)
 	N := css.Get("length").Int()
 	for i := 0; i < N; i++ {
-		name := css.Call("index", i).Str()
-		value := css.Call("getPropertyValue").Str()
+		name := css.Call("index", i).String()
+		value := css.Call("getPropertyValue").String()
 		m[name] = value
 	}
 
@@ -2616,11 +2616,11 @@ func (css *CSSStyleDeclaration) RemoveProperty(name string) {
 }
 
 func (css *CSSStyleDeclaration) GetPropertyValue(name string) string {
-	return css.Call("getPropertyValue", name).Str()
+	return css.Call("getPropertyValue", name).String()
 }
 
 func (css *CSSStyleDeclaration) GetPropertyPriority(name string) string {
-	return css.Call("getPropertyPriority", name).Str()
+	return css.Call("getPropertyPriority", name).String()
 }
 
 func (css *CSSStyleDeclaration) SetProperty(name, value, priority string) {
@@ -2628,7 +2628,7 @@ func (css *CSSStyleDeclaration) SetProperty(name, value, priority string) {
 }
 
 func (css *CSSStyleDeclaration) Index(idx int) string {
-	return css.Call("index", idx).Str()
+	return css.Call("index", idx).String()
 }
 
 func (css *CSSStyleDeclaration) Length() int {
