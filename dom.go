@@ -94,7 +94,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func callRecover(o js.Object, fn string, args ...js.Any) (err error) {
+func callRecover(o js.Object, fn string, args ...interface{}) (err error) {
 	defer func() {
 		e := recover()
 		if e == nil {
@@ -822,8 +822,8 @@ type Window interface {
 	MoveBy(dx, dy int)
 	MoveTo(x, y int)
 	Open(url, name, features string) Window
-	OpenDialog(url, name, features string, args []js.Any) Window
-	PostMessage(message string, target string, transfer []js.Any)
+	OpenDialog(url, name, features string, args []interface{}) Window
+	PostMessage(message string, target string, transfer []interface{})
 	Print()
 	Prompt(prompt string, initial string) string
 	ResizeBy(dw, dh int)
@@ -1008,11 +1008,11 @@ func (w *window) Open(url, name, features string) Window {
 	return &window{w.Call("open", url, name, features)}
 }
 
-func (w *window) OpenDialog(url, name, features string, args []js.Any) Window {
+func (w *window) OpenDialog(url, name, features string, args []interface{}) Window {
 	return &window{w.Call("openDialog", url, name, features, args)}
 }
 
-func (w *window) PostMessage(message string, target string, transfer []js.Any) {
+func (w *window) PostMessage(message string, target string, transfer []interface{}) {
 	w.Call("postMessage", message, target, transfer)
 }
 
@@ -1333,7 +1333,7 @@ func (n *BasicNode) HasChildNodes() bool {
 }
 
 func (n *BasicNode) InsertBefore(which Node, before Node) {
-	var o js.Any
+	var o interface{}
 	if before != nil {
 		o = before.Underlying()
 	}
