@@ -6,11 +6,11 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-func WrapEvent(o js.Object) Event {
+func WrapEvent(o *js.Object) Event {
 	return wrapEvent(o)
 }
 
-func wrapEvent(o js.Object) Event {
+func wrapEvent(o *js.Object) Event {
 	if o == nil || o == js.Undefined {
 		return nil
 	}
@@ -135,7 +135,7 @@ type Event interface {
 
 // Type BasicEvent implements the Event interface and is embedded by
 // concrete event types.
-type BasicEvent struct{ js.Object }
+type BasicEvent struct{ *js.Object }
 
 func (ev *BasicEvent) Bubbles() bool {
 	return ev.Get("bubbles").Bool()
@@ -245,7 +245,7 @@ type MediaStreamEvent struct{ *BasicEvent }
 
 type MessageEvent struct {
 	*BasicEvent
-	Data js.Object `js:"data"`
+	Data *js.Object `js:"data"`
 }
 
 type MouseEvent struct {
@@ -308,7 +308,7 @@ type EventTarget interface {
 	// AddEventListener adds a new event listener and returns the
 	// wrapper function it generated. If using RemoveEventListener,
 	// that wrapper has to be used.
-	AddEventListener(typ string, useCapture bool, listener func(Event)) func(js.Object)
-	RemoveEventListener(typ string, useCapture bool, listener func(js.Object))
+	AddEventListener(typ string, useCapture bool, listener func(Event)) func(*js.Object)
+	RemoveEventListener(typ string, useCapture bool, listener func(*js.Object))
 	// DispatchEvent() // TODO
 }
