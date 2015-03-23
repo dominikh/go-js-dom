@@ -1553,6 +1553,8 @@ func (e *BasicElement) Class() *TokenList {
 	return &TokenList{dtl: e.Get("classList"), o: e.Object, sa: "className"}
 }
 
+// SetClass sets the element's className attribute to s. Consider
+// using the Class method instead.
 func (e *BasicElement) SetClass(s string) {
 	e.Set("className", s)
 }
