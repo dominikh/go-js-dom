@@ -64,10 +64,10 @@
 // example:
 //
 //     d := dom.GetWindow().Document()
-//     e1 := d.GetElementByID("#my-element")
-//     e2 := d.GetElementByID("#my-element")
+//     e1 := d.GetElementByID("my-element")
+//     e2 := d.GetElementByID("my-element")
 //
-//     e1.SetClass("some-class")
+//     e1.Class().SetString("some-class")
 //     println(e1.Class().String() == e2.Class().String())
 //
 // The above example will print `true`.
