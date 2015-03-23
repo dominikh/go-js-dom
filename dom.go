@@ -411,6 +411,8 @@ func (tl *TokenList) Slice() []string {
 	return out
 }
 
+// SetString sets the TokenList's value to the space-separated list of
+// tokens in s.
 func (tl *TokenList) SetString(s string) {
 	if tl.sa != "" {
 		tl.o.Set(tl.sa, s)
@@ -424,6 +426,9 @@ func (tl *TokenList) SetString(s string) {
 	panic("no way to SetString on this TokenList")
 }
 
+// Set sets the TokenList's value to the list of tokens in s.
+//
+// Individual tokens in s shouldn't countain spaces.
 func (tl *TokenList) Set(s []string) {
 	tl.SetString(strings.Join(s, " "))
 }
