@@ -353,6 +353,15 @@ func getLabels(o *js.Object) []*HTMLLabelElement {
 	return out
 }
 
+func getOptions(o *js.Object, attr string) []*HTMLOptionElement {
+	options := nodeListToElements(o.Get(attr))
+	out := make([]*HTMLOptionElement, len(options))
+	for i, option := range options {
+		out[i] = option.(*HTMLOptionElement)
+	}
+	return out
+}
+
 func GetWindow() Window {
 	return &window{js.Global}
 }
@@ -1915,12 +1924,7 @@ type HTMLDataElement struct {
 type HTMLDataListElement struct{ *BasicHTMLElement }
 
 func (e *HTMLDataListElement) Options() []*HTMLOptionElement {
-	options := nodeListToElements(e.Get("options"))
-	out := make([]*HTMLOptionElement, len(options))
-	for i, option := range options {
-		out[i] = option.(*HTMLOptionElement)
-	}
-	return out
+	return getOptions(e.Object, "options")
 }
 
 type HTMLDirectoryElement struct{ *BasicHTMLElement }
@@ -2427,7 +2431,54 @@ type HTMLSelectElement struct {
 	WillValidate      bool   `js:"willValidate"`
 }
 
-// TODO add HTMLSelectElement methods
+func (e *HTMLSelectElement) Labels() []*HTMLLabelElement {
+	return getLabels(e.Object)
+}
+
+func (e *HTMLSelectElement) Form() *HTMLFormElement {
+	return getForm(e.Object)
+}
+
+func (e *HTMLSelectElement) Options() []*HTMLOptionElement {
+	return getOptions(e.Object, "options")
+}
+
+func (e *HTMLSelectElement) SelectedOptions() []*HTMLOptionElement {
+	return getOptions(e.Object, "selectedOptions")
+}
+
+func (e *HTMLSelectElement) Item(index int) *HTMLOptionElement {
+	el := wrapHTMLElement(e.Call("item", index))
+	if el == nil {
+		return nil
+	}
+	return el.(*HTMLOptionElement)
+}
+
+func (e *HTMLSelectElement) NamedItem(name string) *HTMLOptionElement {
+	el := wrapHTMLElement(e.Call("namedItem", name))
+	if el == nil {
+		return nil
+	}
+	return el.(*HTMLOptionElement)
+}
+
+// TODO(dominikh): Not implementing Add or Remove for now. For one,
+// Add with "before" behaves weird when dealing with optgroups. Also,
+// there's already InsertBefore and RemoveChild which can be used
+// instead.
+
+func (e *HTMLSelectElement) Validity() *ValidityState {
+	return &ValidityState{Object: e.Get("validity")}
+}
+
+func (e *HTMLSelectElement) CheckValidity() bool {
+	return e.Call("checkValidity").Bool()
+}
+
+func (e *HTMLSelectElement) SetCustomValidity(s string) {
+	e.Call("setCustomValidity", s)
+}
 
 type HTMLSourceElement struct {
 	*BasicHTMLElement
