@@ -2670,7 +2670,7 @@ func (css *CSSStyleDeclaration) ToMap() map[string]string {
 }
 
 func (css *CSSStyleDeclaration) RemoveProperty(name string) {
-	css.Call("remoteProperty", name)
+	css.Call("removeProperty", name)
 }
 
 func (css *CSSStyleDeclaration) GetPropertyValue(name string) string {
