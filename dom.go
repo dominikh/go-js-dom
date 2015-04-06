@@ -846,7 +846,7 @@ type Window interface {
 	PostMessage(message string, target string, transfer []interface{})
 	Print()
 	Prompt(prompt string, initial string) string
-	RequestAnimationFrame(callback func(time.Time)) int
+	RequestAnimationFrame(callback func(time.Duration)) int
 	ResizeBy(dw, dh int)
 	ResizeTo(w, h int)
 	Scroll(x, y int)
@@ -1097,12 +1097,11 @@ func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(
 	w.Call("removeEventListener", typ, listener, useCapture)
 }
 
-func wrapDOMHighResTimeStamp(o *js.Object) time.Time {
-	ns := o.Float() * 1e6
-	return time.Unix(0, int64(ns))
+func wrapDOMHighResTimeStamp(o *js.Object) time.Duration {
+	return time.Duration(o.Float() * float64(time.Millisecond))
 }
 
-func (w *window) RequestAnimationFrame(callback func(time.Time)) int {
+func (w *window) RequestAnimationFrame(callback func(time.Duration)) int {
 	wrapper := func(o *js.Object) { callback(wrapDOMHighResTimeStamp(o)) }
 	return w.Call("requestAnimationFrame", wrapper).Int()
 }
