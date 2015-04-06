@@ -829,6 +829,7 @@ type Window interface {
 	Alert(string)
 	Back()
 	Blur()
+	CancelAnimationFrame(int)
 	ClearInterval(int)
 	ClearTimeout(int)
 	Close()
@@ -845,6 +846,7 @@ type Window interface {
 	PostMessage(message string, target string, transfer []interface{})
 	Print()
 	Prompt(prompt string, initial string) string
+	RequestAnimationFrame(callback func(time.Time)) int
 	ResizeBy(dw, dh int)
 	ResizeTo(w, h int)
 	Scroll(x, y int)
@@ -1093,6 +1095,20 @@ func (w *window) AddEventListener(typ string, useCapture bool, listener func(Eve
 
 func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(*js.Object)) {
 	w.Call("removeEventListener", typ, listener, useCapture)
+}
+
+func wrapDOMHighResTimeStamp(o *js.Object) time.Time {
+	ns := o.Float() * 1e6
+	return time.Unix(0, int64(ns))
+}
+
+func (w *window) RequestAnimationFrame(callback func(time.Time)) int {
+	wrapper := func(o *js.Object) { callback(wrapDOMHighResTimeStamp(o)) }
+	return w.Call("requestAnimationFrame", wrapper).Int()
+}
+
+func (w *window) CancelAnimationFrame(requestID int) {
+	w.Call("cancelAnimationFrame", requestID)
 }
 
 // TODO all the other window methods
