@@ -458,6 +458,7 @@ type Document interface {
 	StyleSheets() []StyleSheet      // TODO s/StyleSheet/Stylesheet/ ?
 	StyleSheetSets() []StyleSheet   // TODO correct type?
 	AdoptNode(node Node) Node
+	ImportNode(node Node, deep bool) Node
 	CreateElement(name string) Element
 	CreateElementNS(namespace, name string) Element
 	CreateTextNode(s string) *Text
@@ -689,6 +690,10 @@ func (d document) StyleSheetSets() []StyleSheet {
 
 func (d document) AdoptNode(node Node) Node {
 	return wrapNode(d.Call("adoptNode", node.Underlying()))
+}
+
+func (d document) ImportNode(node Node, deep bool) Node {
+	return wrapNode(d.Call("importNode", node.Underlying(), deep))
 }
 
 func (d document) CreateElement(name string) Element {
