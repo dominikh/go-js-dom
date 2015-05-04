@@ -688,7 +688,7 @@ func (d document) SetAsync(b bool) {
 
 func (d document) Doctype() DocumentType {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (d document) DocumentElement() Element {
@@ -701,7 +701,7 @@ func (d document) DocumentURI() string {
 
 func (d document) Implementation() DOMImplementation {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (d document) LastStyleSheetSet() string {
@@ -718,12 +718,12 @@ func (d document) SelectedStyleSheetSet() string {
 
 func (d document) StyleSheets() []StyleSheet {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (d document) StyleSheetSets() []StyleSheet {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (d document) AdoptNode(node Node) Node {
@@ -995,7 +995,7 @@ func (w *window) History() History {
 
 func (w *window) Navigator() Navigator {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (w *window) Screen() *Screen {
@@ -1052,7 +1052,7 @@ func (w *window) GetComputedStyle(el Element, pseudoElt string) *CSSStyleDeclara
 
 func (w *window) GetSelection() Selection {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (w *window) Home() {
@@ -1356,7 +1356,7 @@ func (n *BasicNode) SetNodeValue(s string) {
 
 func (n *BasicNode) OwnerDocument() Document {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 func (n *BasicNode) ParentNode() Node {
@@ -2306,7 +2306,7 @@ func (e *HTMLLinkElement) Sizes() *TokenList {
 
 func (e *HTMLLinkElement) Sheet() StyleSheet {
 	// FIXME implement
-	return nil
+	panic("not implemented")
 }
 
 type HTMLMapElement struct {
