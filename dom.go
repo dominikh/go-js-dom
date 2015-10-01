@@ -1431,12 +1431,12 @@ type Element interface {
 
 type ClientRect struct {
 	*js.Object
-	Height int `js:"height"`
-	Width  int `js:"width"`
-	Left   int `js:"left"`
-	Right  int `js:"right"`
-	Top    int `js:"top"`
-	Bottom int `js:"bottom"`
+	Height float64 `js:"height"`
+	Width  float64 `js:"width"`
+	Left   float64 `js:"left"`
+	Right  float64 `js:"right"`
+	Top    float64 `js:"top"`
+	Bottom float64 `js:"bottom"`
 }
 
 type ParentNode interface {
