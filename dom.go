@@ -141,6 +141,10 @@ func WrapDocument(o *js.Object) Document {
 	return wrapDocument(o)
 }
 
+func WrapDocumentFragment(o *js.Object) DocumentFragment {
+	return wrapDocumentFragment(o)
+}
+
 func WrapNode(o *js.Object) Node {
 	return wrapNode(o)
 }
@@ -159,6 +163,14 @@ func wrapDocument(o *js.Object) Document {
 		return &htmlDocument{&document{&BasicNode{o}}}
 	default:
 		return &document{&BasicNode{o}}
+	}
+}
+
+func wrapDocumentFragment(o *js.Object) DocumentFragment {
+	switch o.Get("constructor") {
+	// TODO: do we have any other stuff we want to check
+	default:
+		return &documentFragment{&BasicNode{o}}
 	}
 }
 
@@ -470,6 +482,16 @@ type Document interface {
 	GetElementByID(id string) Element
 	QuerySelector(sel string) Element
 	QuerySelectorAll(sel string) []Element
+
+	CreateDocumentFragment() DocumentFragment
+}
+
+type DocumentFragment interface {
+	Node
+	ParentNode
+	QuerySelector(sel string) Element
+	QuerySelectorAll(sel string) []Element
+	GetElementByID(id string) Element
 }
 
 type HTMLDocument interface {
@@ -499,6 +521,22 @@ type HTMLDocument interface {
 	URL() string
 
 	// TODO HTMLDocument methods
+}
+
+type documentFragment struct {
+	*BasicNode
+}
+
+func (d documentFragment) GetElementByID(id string) Element {
+	return wrapElement(d.Call("getElementById", id))
+}
+
+func (d documentFragment) QuerySelector(sel string) Element {
+	return (&BasicElement{&BasicNode{d.Object}}).QuerySelector(sel)
+}
+
+func (d documentFragment) QuerySelectorAll(sel string) []Element {
+	return (&BasicElement{&BasicNode{d.Object}}).QuerySelectorAll(sel)
 }
 
 type document struct {
@@ -694,6 +732,10 @@ func (d document) AdoptNode(node Node) Node {
 
 func (d document) ImportNode(node Node, deep bool) Node {
 	return wrapNode(d.Call("importNode", node.Underlying(), deep))
+}
+
+func (d document) CreateDocumentFragment() DocumentFragment {
+	return wrapDocumentFragment(d.Call("createDocumentFragment"))
 }
 
 func (d document) CreateElement(name string) Element {
