@@ -137,6 +137,27 @@ func nodeListToHTMLElements(o *js.Object) []HTMLElement {
 	return out
 }
 
+func attrSetToMap(o *js.Object) map[string]string {
+	attrs := map[string]string{}
+	length := o.Get("length").Int()
+
+	for i := 0; i < length; i++ {
+		item := o.Call("item", i)
+		attrs[item.Get("name").String()] = item.Get("value").String()
+	}
+
+	return attrs
+}
+
+func dataSetToMap(o *js.Object) map[string]string {
+	data := map[string]string{}
+	keys := js.Keys(o)
+	for _, key := range keys {
+		data[key] = o.Get(key).String()
+	}
+	return data
+}
+
 func WrapDocument(o *js.Object) Document {
 	return wrapDocument(o)
 }
@@ -816,7 +837,6 @@ type HTMLElement interface {
 	ContentEditable() string
 	SetContentEditable(string)
 	IsContentEditable() bool
-	Dataset() // FIXME type
 	Dir() string
 	SetDir(string)
 	Draggable() bool
@@ -1449,7 +1469,9 @@ type Element interface {
 	ParentNode
 	ChildNode
 
+	Attributes() map[string]string
 	Class() *TokenList
+	Dataset() map[string]string
 	ID() string
 	SetID(string)
 	TagName() string
@@ -1523,11 +1545,6 @@ func (e *BasicHTMLElement) SetContentEditable(s string) {
 
 func (e *BasicHTMLElement) IsContentEditable() bool {
 	return e.Get("isContentEditable").Bool()
-}
-
-func (e *BasicHTMLElement) Dataset() {
-	// FIXME type
-	// FIXME implement
 }
 
 func (e *BasicHTMLElement) Dir() string {
@@ -1610,6 +1627,14 @@ func (e *BasicHTMLElement) Focus() {
 // by concrete element types and HTML element types.
 type BasicElement struct {
 	*BasicNode
+}
+
+func (e *BasicElement) Attributes() map[string]string {
+	return attrSetToMap(e.Get("attributes"))
+}
+
+func (e *BasicElement) Dataset() map[string]string {
+	return dataSetToMap(e.Get("dataset"))
 }
 
 func (e *BasicElement) GetBoundingClientRect() ClientRect {
