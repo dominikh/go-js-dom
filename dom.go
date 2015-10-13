@@ -137,27 +137,6 @@ func nodeListToHTMLElements(o *js.Object) []HTMLElement {
 	return out
 }
 
-func attrSetToMap(o *js.Object) map[string]string {
-	attrs := map[string]string{}
-	length := o.Get("length").Int()
-
-	for i := 0; i < length; i++ {
-		item := o.Call("item", i)
-		attrs[item.Get("name").String()] = item.Get("value").String()
-	}
-
-	return attrs
-}
-
-func dataSetToMap(o *js.Object) map[string]string {
-	data := map[string]string{}
-	keys := js.Keys(o)
-	for _, key := range keys {
-		data[key] = o.Get(key).String()
-	}
-	return data
-}
-
 func WrapDocument(o *js.Object) Document {
 	return wrapDocument(o)
 }
@@ -1524,7 +1503,13 @@ func (e *BasicHTMLElement) AccessKey() string {
 }
 
 func (e *BasicHTMLElement) Dataset() map[string]string {
-	return dataSetToMap(e.Get("dataset"))
+	o := e.Get("dataset")
+	data := map[string]string{}
+	keys := js.Keys(o)
+	for _, key := range keys {
+		data[key] = o.Get(key).String()
+	}
+	return data
 }
 
 func (e *BasicHTMLElement) SetAccessKey(s string) {
@@ -1634,7 +1619,14 @@ type BasicElement struct {
 }
 
 func (e *BasicElement) Attributes() map[string]string {
-	return attrSetToMap(e.Get("attributes"))
+	o := e.Get("attributes")
+	attrs := map[string]string{}
+	length := o.Get("length").Int()
+	for i := 0; i < length; i++ {
+		item := o.Call("item", i)
+		attrs[item.Get("name").String()] = item.Get("value").String()
+	}
+	return attrs
 }
 
 func (e *BasicElement) GetBoundingClientRect() ClientRect {
