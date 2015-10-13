@@ -831,6 +831,7 @@ type HTMLElement interface {
 	GlobalEventHandlers
 
 	AccessKey() string
+	Dataset() map[string]string
 	SetAccessKey(string)
 	AccessKeyLabel() string
 	SetAccessKeyLabel(string)
@@ -1471,7 +1472,6 @@ type Element interface {
 
 	Attributes() map[string]string
 	Class() *TokenList
-	Dataset() map[string]string
 	ID() string
 	SetID(string)
 	TagName() string
@@ -1521,6 +1521,10 @@ type BasicHTMLElement struct {
 
 func (e *BasicHTMLElement) AccessKey() string {
 	return e.Get("accessKey").String()
+}
+
+func (e *BasicHTMLElement) Dataset() map[string]string {
+	return dataSetToMap(e.Get("dataset"))
 }
 
 func (e *BasicHTMLElement) SetAccessKey(s string) {
@@ -1631,10 +1635,6 @@ type BasicElement struct {
 
 func (e *BasicElement) Attributes() map[string]string {
 	return attrSetToMap(e.Get("attributes"))
-}
-
-func (e *BasicElement) Dataset() map[string]string {
-	return dataSetToMap(e.Get("dataset"))
 }
 
 func (e *BasicElement) GetBoundingClientRect() ClientRect {
