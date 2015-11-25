@@ -2740,8 +2740,8 @@ func (css *CSSStyleDeclaration) ToMap() map[string]string {
 	m := make(map[string]string)
 	N := css.Get("length").Int()
 	for i := 0; i < N; i++ {
-		name := css.Call("index", i).String()
-		value := css.Call("getPropertyValue").String()
+		name := css.Call("item", i).String()
+		value := css.Call("getPropertyValue", name).String()
 		m[name] = value
 	}
 
