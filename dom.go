@@ -110,29 +110,48 @@ func callRecover(o *js.Object, fn string, args ...interface{}) (err error) {
 	return nil
 }
 
-func nodeListToNodes(o *js.Object) []Node {
-	var out []Node
+func arrayToObjects(o *js.Object) []*js.Object {
+	var out []*js.Object
+	for i := 0; i < o.Length(); i++ {
+		out = append(out, o.Index(i))
+	}
+	return out
+}
+
+func nodeListToObjects(o *js.Object) []*js.Object {
+	if o.Get("constructor") == js.Global.Get("Array") {
+		// Support Polymer's DOM APIs, which uses Arrays instead of
+		// NodeLists
+		return arrayToObjects(o)
+	}
+	var out []*js.Object
 	length := o.Get("length").Int()
 	for i := 0; i < length; i++ {
-		out = append(out, wrapNode(o.Call("item", i)))
+		out = append(out, o.Call("item", i))
+	}
+	return out
+}
+
+func nodeListToNodes(o *js.Object) []Node {
+	var out []Node
+	for _, obj := range nodeListToObjects(o) {
+		out = append(out, wrapNode(obj))
 	}
 	return out
 }
 
 func nodeListToElements(o *js.Object) []Element {
 	var out []Element
-	length := o.Get("length").Int()
-	for i := 0; i < length; i++ {
-		out = append(out, wrapElement(o.Call("item", i)))
+	for _, obj := range nodeListToObjects(o) {
+		out = append(out, wrapElement(obj))
 	}
 	return out
 }
 
 func nodeListToHTMLElements(o *js.Object) []HTMLElement {
 	var out []HTMLElement
-	length := o.Get("length").Int()
-	for i := 0; i < length; i++ {
-		out = append(out, wrapHTMLElement(o.Call("item", i)))
+	for _, obj := range nodeListToObjects(o) {
+		out = append(out, wrapHTMLElement(obj))
 	}
 	return out
 }
