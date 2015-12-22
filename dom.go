@@ -110,6 +110,14 @@ func callRecover(o *js.Object, fn string, args ...interface{}) (err error) {
 	return nil
 }
 
+func elementConstructor(o *js.Object) *js.Object {
+	if n := o.Get("node"); n != js.Undefined {
+		// Support elements wrapped in Polymer's DOM APIs.
+		return n.Get("constructor")
+	}
+	return o.Get("constructor")
+}
+
 func arrayToObjects(o *js.Object) []*js.Object {
 	var out []*js.Object
 	for i := 0; i < o.Length(); i++ {
@@ -177,7 +185,7 @@ func WrapHTMLElement(o *js.Object) HTMLElement {
 }
 
 func wrapDocument(o *js.Object) Document {
-	switch o.Get("constructor") {
+	switch elementConstructor(o) {
 	case js.Global.Get("HTMLDocument"):
 		return &htmlDocument{&document{&BasicNode{o}}}
 	default:
@@ -186,7 +194,7 @@ func wrapDocument(o *js.Object) Document {
 }
 
 func wrapDocumentFragment(o *js.Object) DocumentFragment {
-	switch o.Get("constructor") {
+	switch elementConstructor(o) {
 	// TODO: do we have any other stuff we want to check
 	default:
 		return &documentFragment{&BasicNode{o}}
@@ -197,7 +205,7 @@ func wrapNode(o *js.Object) Node {
 	if o == nil || o == js.Undefined {
 		return nil
 	}
-	switch o.Get("constructor") {
+	switch elementConstructor(o) {
 	// TODO all the non-element cases
 	case js.Global.Get("Text"):
 		return &Text{&BasicNode{o}}
@@ -210,7 +218,7 @@ func wrapElement(o *js.Object) Element {
 	if o == nil || o == js.Undefined {
 		return nil
 	}
-	switch o.Get("constructor") {
+	switch elementConstructor(o) {
 	// TODO all the non-HTML cases
 	default:
 		return wrapHTMLElement(o)
@@ -222,7 +230,7 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
-	c := o.Get("constructor")
+	c := elementConstructor(o)
 	switch c {
 	case js.Global.Get("HTMLAnchorElement"):
 		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Object: o}}
