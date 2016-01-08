@@ -138,6 +138,19 @@ type Event interface {
 // concrete event types.
 type BasicEvent struct{ *js.Object }
 
+type EventOptions struct {
+	Bubbles    bool
+	Cancelable bool
+}
+
+func CreateEvent(typ string, opts EventOptions) *BasicEvent {
+	var event = js.Global.Get("Event").New(typ, js.M{
+		"bubbles":    opts.Bubbles,
+		"cancelable": opts.Cancelable,
+	})
+	return &BasicEvent{event}
+}
+
 func (ev *BasicEvent) Bubbles() bool {
 	return ev.Get("bubbles").Bool()
 }
@@ -315,5 +328,5 @@ type EventTarget interface {
 	// that wrapper has to be used.
 	AddEventListener(typ string, useCapture bool, listener func(Event)) func(*js.Object)
 	RemoveEventListener(typ string, useCapture bool, listener func(*js.Object))
-	// DispatchEvent() // TODO
+	DispatchEvent(event Event) bool
 }
