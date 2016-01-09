@@ -137,14 +137,14 @@ type Event interface {
 // concrete event types.
 type BasicEvent struct{ *js.Object }
 
-type EventInit struct {
+type EventOptions struct {
 	Bubbles    bool
 	Cancelable bool
 }
 
-func CreateEvent(typeArg string, opts *EventInit) *BasicEvent {
+func CreateEvent(typeArg string, opts *EventOptions) *BasicEvent {
 	if opts == nil {
-		opts = &EventInit{Bubbles: false, Cancelable: false}
+		opts = &EventOptions{Bubbles: false, Cancelable: false}
 	}
 	var event = js.Global.Get("Event").New(typeArg, js.M{
 		"bubbles":    opts.Bubbles,
