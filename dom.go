@@ -94,6 +94,15 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+// toString returns the string representation of o. If o is nil or
+// undefined, the empty string will be returned instead.
+func toString(o *js.Object) string {
+	if o == nil || o == js.Undefined {
+		return ""
+	}
+	return o.String()
+}
+
 func callRecover(o *js.Object, fn string, args ...interface{}) (err error) {
 	defer func() {
 		e := recover()
@@ -415,10 +424,7 @@ type TokenList struct {
 
 func (tl *TokenList) Item(idx int) string {
 	o := tl.dtl.Call("item", idx)
-	if o == nil || o == js.Undefined {
-		return ""
-	}
-	return o.String()
+	return toString(o)
 }
 
 func (tl *TokenList) Contains(token string) bool {
@@ -1374,7 +1380,7 @@ func (n *BasicNode) NodeType() int {
 }
 
 func (n *BasicNode) NodeValue() string {
-	return n.Get("nodeValue").String()
+	return toString(n.Get("nodeValue"))
 }
 
 func (n *BasicNode) SetNodeValue(s string) {
@@ -1399,7 +1405,7 @@ func (n *BasicNode) PreviousSibling() Node {
 }
 
 func (n *BasicNode) TextContent() string {
-	return n.Get("textContent").String()
+	return toString(n.Get("textContent"))
 }
 
 func (n *BasicNode) SetTextContent(s string) {
@@ -1456,7 +1462,7 @@ func (n *BasicNode) LookupPrefix() string {
 }
 
 func (n *BasicNode) LookupNamespaceURI(s string) string {
-	return n.Call("lookupNamespaceURI", s).String()
+	return toString(n.Call("lookupNamespaceURI", s))
 }
 
 func (n *BasicNode) Normalize() {
@@ -1692,11 +1698,11 @@ func (e *BasicElement) TagName() string {
 }
 
 func (e *BasicElement) GetAttribute(name string) string {
-	return e.Call("getAttribute", name).String()
+	return toString(e.Call("getAttribute", name))
 }
 
 func (e *BasicElement) GetAttributeNS(ns string, name string) string {
-	return e.Call("getAttributeNS", ns, name).String()
+	return toString(e.Call("getAttributeNS", ns, name))
 }
 
 func (e *BasicElement) GetElementsByClassName(s string) []Element {
@@ -2780,11 +2786,11 @@ func (css *CSSStyleDeclaration) RemoveProperty(name string) {
 }
 
 func (css *CSSStyleDeclaration) GetPropertyValue(name string) string {
-	return css.Call("getPropertyValue", name).String()
+	return toString(css.Call("getPropertyValue", name))
 }
 
 func (css *CSSStyleDeclaration) GetPropertyPriority(name string) string {
-	return css.Call("getPropertyPriority", name).String()
+	return toString(css.Call("getPropertyPriority", name))
 }
 
 func (css *CSSStyleDeclaration) SetProperty(name, value, priority string) {
