@@ -702,7 +702,7 @@ func (d *htmlDocument) SetTitle(s string) {
 }
 
 func (d *htmlDocument) URL() string {
-	return d.Get("url").String()
+	return d.Get("URL").String()
 }
 
 func (d document) Async() bool {
