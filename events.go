@@ -142,7 +142,7 @@ type EventOptions struct {
 	Cancelable bool
 }
 
-func CreateEvent(typeArg string, opts *EventOptions) *BasicEvent {
+func CreateEvent(typ string, opts *EventOptions) *BasicEvent {
 	if opts == nil {
 		opts = &EventOptions{Bubbles: false, Cancelable: false}
 	}
