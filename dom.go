@@ -2360,7 +2360,19 @@ func (e *HTMLMapElement) Images() []HTMLElement {
 	return nodeListToHTMLElements(e.Get("areas"))
 }
 
-type HTMLMediaElement struct{ *BasicHTMLElement }
+type HTMLMediaElement struct{
+	*BasicHTMLElement
+	Paused	bool	`js:"paused"`
+}
+
+func (e *HTMLMediaElement) Play() {
+	e.Call("play")
+}
+
+func (e *HTMLMediaElement) Pause() {
+	e.Call("pause")
+}
+
 type HTMLMenuElement struct{ *BasicHTMLElement }
 
 type HTMLMetaElement struct {
