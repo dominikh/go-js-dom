@@ -142,11 +142,8 @@ type EventOptions struct {
 	Cancelable bool
 }
 
-func CreateEvent(typ string, opts *EventOptions) *BasicEvent {
-	if opts == nil {
-		opts = &EventOptions{Bubbles: false, Cancelable: false}
-	}
-	var event = js.Global.Get("Event").New(typeArg, js.M{
+func CreateEvent(typ string, opts EventOptions) *BasicEvent {
+	var event = js.Global.Get("Event").New(typ, js.M{
 		"bubbles":    opts.Bubbles,
 		"cancelable": opts.Cancelable,
 	})
