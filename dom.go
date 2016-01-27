@@ -1503,6 +1503,8 @@ type Element interface {
 	SetAttributeNS(ns string, name string, value string)
 	InnerHTML() string
 	SetInnerHTML(string)
+	OuterHTML() string
+	SetOuterHTML(string)
 }
 
 type ClientRect struct {
@@ -1755,6 +1757,14 @@ func (e *BasicElement) InnerHTML() string {
 
 func (e *BasicElement) SetInnerHTML(s string) {
 	e.Set("innerHTML", s)
+}
+
+func (e *BasicElement) OuterHTML() string {
+	return e.Get("outerHTML").String()
+}
+
+func (e *BasicElement) SetOuterHTML(s string) {
+	e.Set("outerHTML", s)
 }
 
 type HTMLAnchorElement struct {
