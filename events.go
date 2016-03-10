@@ -131,6 +131,7 @@ type Event interface {
 	PreventDefault()
 	StopImmediatePropagation()
 	StopPropagation()
+	Underlying() *js.Object
 }
 
 // Type BasicEvent implements the Event interface and is embedded by
@@ -182,6 +183,10 @@ func (ev *BasicEvent) StopImmediatePropagation() {
 
 func (ev *BasicEvent) StopPropagation() {
 	ev.Call("stopPropagation")
+}
+
+func (ev *BasicEvent) Underlying() *js.Object {
+	return ev.Object
 }
 
 type AnimationEvent struct{ *BasicEvent }
