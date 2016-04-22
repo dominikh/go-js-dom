@@ -623,10 +623,7 @@ func (d *htmlDocument) DefaultView() Window {
 
 func (d *htmlDocument) DesignMode() bool {
 	s := d.Get("designMode").String()
-	if s == "off" {
-		return false
-	}
-	return true
+	return s != "off"
 }
 
 func (d *htmlDocument) SetDesignMode(b bool) {
