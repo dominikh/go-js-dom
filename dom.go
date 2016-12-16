@@ -113,7 +113,6 @@ import (
 	"time"
 
 	"github.com/gopherjs/gopherjs/js"
-	"honnef.co/go/js/console"
 )
 
 // toString returns the string representation of o. If o is nil or
@@ -2857,7 +2856,7 @@ type history struct {
 }
 
 func (h *history) Length() int {
-	return h.Get("state")
+	return h.Get("state").Int()
 }
 
 func (h *history) State() interface{} {
