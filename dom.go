@@ -113,6 +113,7 @@ import (
 	"time"
 
 	"github.com/gopherjs/gopherjs/js"
+	"honnef.co/go/js/console"
 )
 
 // toString returns the string representation of o. If o is nil or
@@ -1043,8 +1044,7 @@ func (w *window) Top() Window {
 }
 
 func (w *window) History() History {
-	// FIXME implement
-	return nil
+	return &history{w.Get("history")}
 }
 
 func (w *window) Navigator() Navigator {
@@ -2850,4 +2850,36 @@ func (css *CSSStyleDeclaration) Length() int {
 
 type Text struct {
 	*BasicNode
+}
+
+type history struct {
+	*js.Object
+}
+
+func (h *history) Length() int {
+	return h.Get("state")
+}
+
+func (h *history) State() interface{} {
+	return h.Get("state")
+}
+
+func (h *history) Back() {
+	h.Object.Call("forward")
+}
+
+func (h *history) Forward() {
+	h.Object.Call("forward")
+}
+
+func (h *history) Go(offset int) {
+	h.Object.Call("go", offset)
+}
+
+func (h *history) PushState(state interface{}, title string, url string) {
+	h.Object.Call("pushState", state, title, url)
+}
+
+func (h *history) ReplaceState(state interface{}, title string, url string) {
+	h.Object.Call("replaceState", state, title, url)
 }
