@@ -917,7 +917,7 @@ type Window interface {
 	ScrollMaxY() int
 	Top() Window
 	History() History
-	Navigator() Navigator
+	Navigator() *Navigator
 	Screen() *Screen
 	Alert(string)
 	Back()
@@ -1044,9 +1044,8 @@ func (w *window) History() History {
 	return nil
 }
 
-func (w *window) Navigator() Navigator {
-	// FIXME implement
-	panic("not implemented")
+func (w *window) Navigator() *Navigator {
+	return &Navigator{Object: w.Get("navigator")}
 }
 
 func (w *window) Screen() *Screen {
@@ -1227,16 +1226,18 @@ type Screen struct {
 	Width       int `js:"width"`
 }
 
-type Navigator interface {
-	NavigatorID
-	NavigatorLanguage
-	NavigatorOnLine
-	NavigatorGeolocation
+type Navigator struct {
+	*js.Object
+	Language  string `js:"language"`
+	Languages string `js:"languages"`
+	OnLine    bool   `js:"onLine"`
+	// NavigatorID
+	// NavigatorGeolocation
 	// NavigatorPlugins
 	// NetworkInformation
-	CookieEnabled() bool
-	DoNotTrack() string
-	RegisterProtocolHandler(protocol, uri, title string)
+	// CookieEnabled() bool
+	// DoNotTrack() string
+	// RegisterProtocolHandler(protocol, uri, title string)
 }
 
 type NavigatorID interface {
@@ -1245,14 +1246,6 @@ type NavigatorID interface {
 	Platform() string
 	Product() string
 	UserAgent() string
-}
-
-type NavigatorLanguage interface {
-	Language() string
-}
-
-type NavigatorOnLine interface {
-	Online() bool
 }
 
 type NavigatorGeolocation interface {
