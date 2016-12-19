@@ -2864,21 +2864,21 @@ func (h *history) State() interface{} {
 }
 
 func (h *history) Back() {
-	h.Object.Call("forward")
+	h.Call("forward")
 }
 
 func (h *history) Forward() {
-	h.Object.Call("forward")
+	h.Call("forward")
 }
 
 func (h *history) Go(offset int) {
-	h.Object.Call("go", offset)
+	h.Call("go", offset)
 }
 
 func (h *history) PushState(state interface{}, title string, url string) {
-	h.Object.Call("pushState", state, title, url)
+	h.Call("pushState", state, title, url)
 }
 
 func (h *history) ReplaceState(state interface{}, title string, url string) {
-	h.Object.Call("replaceState", state, title, url)
+	h.Call("replaceState", state, title, url)
 }
