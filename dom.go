@@ -2856,7 +2856,7 @@ type history struct {
 }
 
 func (h *history) Length() int {
-	return h.Get("state").Int()
+	return h.Get("length").Int()
 }
 
 func (h *history) State() interface{} {
@@ -2864,7 +2864,7 @@ func (h *history) State() interface{} {
 }
 
 func (h *history) Back() {
-	h.Call("forward")
+	h.Call("back")
 }
 
 func (h *history) Forward() {
