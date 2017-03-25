@@ -2062,6 +2062,16 @@ func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth int)
 	ctx.Call("strokeText", text, x, y, maxWidth)
 }
 
+// State
+
+func (ctx *CanvasRenderingContext2D) Save() {
+	ctx.Call("save")
+}
+
+func (ctx *CanvasRenderingContext2D) Restore() {
+	ctx.Call("restore")
+}
+
 type HTMLDListElement struct{ *BasicHTMLElement }
 
 type HTMLDataElement struct {
