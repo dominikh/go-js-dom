@@ -530,6 +530,7 @@ type Document interface {
 	CreateTextNode(s string) *Text
 	ElementFromPoint(x, y int) Element
 	EnableStyleSheetsForSet(name string)
+	ExecCommand(name string, showDefaultUI bool, valueArgument string) bool
 	GetElementsByClassName(name string) []Element
 	GetElementsByTagName(name string) []Element
 	GetElementsByTagNameNS(ns, name string) []Element
@@ -748,6 +749,10 @@ func (d document) DocumentElement() Element {
 
 func (d document) DocumentURI() string {
 	return d.Get("documentURI").String()
+}
+
+func (d document) ExecCommand(name string, showDefaultUI bool, valueArgument string) bool {
+	return d.Call("execCommand", name, showDefaultUI, valueArgument).Bool()
 }
 
 func (d document) Implementation() DOMImplementation {
