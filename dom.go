@@ -794,7 +794,7 @@ func (d document) CreateElement(name string) Element {
 }
 
 func (d document) CreateElementNS(ns string, name string) Element {
-	return wrapElement(d.Call("createElement", ns, name))
+	return wrapElement(d.Call("createElementNS", ns, name))
 }
 
 func (d document) CreateTextNode(s string) *Text {
