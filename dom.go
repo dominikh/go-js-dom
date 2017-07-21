@@ -2008,7 +2008,7 @@ func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y 
 	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) Arc(x, y, r, sAngle, eAngle int, counterclockwise bool) {
+func (ctx *CanvasRenderingContext2D) Arc(x, y, r int, sAngle, eAngle float64, counterclockwise bool) {
 	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
 }
 
