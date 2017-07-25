@@ -2026,7 +2026,7 @@ func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight int) {
 	ctx.Call("scale", scaleWidth, scaleHeight)
 }
 
-func (ctx *CanvasRenderingContext2D) Rotate(angle int) {
+func (ctx *CanvasRenderingContext2D) Rotate(angle float64) {
 	ctx.Call("rotate", angle)
 }
 
