@@ -1937,6 +1937,33 @@ type CanvasRenderingContext2D struct {
 	GlobalCompositeOperation string  `js:"globalCompositeOperation"`
 }
 
+type ImageData struct {
+	*js.Object
+
+	Width  uint32   `js:"width"`
+	Height uint32   `js:"height"`
+	Data   []uint8  `js:"data"`
+}
+
+type TextMetrics struct {
+	*js.Object
+
+	Width                    float64 `js:"width"`
+	ActualBoundingBoxLeft    float64 `js:"actualBoundingBoxLeft"`
+	ActualBoundingBoxRight   float64 `js:"actualBoundingBoxRight"`
+	FontBoundingBoxAscent    float64 `js:"fontBoundingBoxAscent"`
+	FontBoundingBoxDescent   float64 `js:"fontBoundingBoxDescent"`
+	ActualBoundingBoxAscent  float64 `js:"actualBoundingBoxAscent"`
+	ActualBoundingBoxDescent float64 `js:"actualBoundingBoxDescent"`
+	EmHeightAscent           float64 `js:"emHeightAscent"`
+	EmHeightDescent          float64 `js:"emHeightDescent"`
+	HangingBaseline          float64 `js:"hangingBaseline"`
+	AlphabeticBaseline       float64 `js:"alphabeticBaseline"`
+	IdeographicBaseline      float64 `js:"ideographicBaseline"`
+}
+
+// Creating canvas 2d context
+
 func (e *HTMLCanvasElement) GetContext2d() *CanvasRenderingContext2D {
 	ctx := e.GetContext("2d")
 	return &CanvasRenderingContext2D{Object: ctx}
@@ -1946,16 +1973,10 @@ func (e *HTMLCanvasElement) GetContext(param string) *js.Object {
 	return e.Call("getContext", param)
 }
 
-// Colors, Styles, and Shadows
+// Drawing Rectangles
 
-func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 int) {
-	ctx.Call("createLinearGradient", x0, y0, x1, y1)
-}
-
-// Rectangles
-
-func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height int) {
-	ctx.Call("rect", x, y, width, height)
+func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height int) {
+	ctx.Call("clearRect", x, y, width, height)
 }
 
 func (ctx *CanvasRenderingContext2D) FillRect(x, y, width, height int) {
@@ -1966,83 +1987,7 @@ func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height int) {
 	ctx.Call("strokeRect", x, y, width, height)
 }
 
-func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height int) {
-	ctx.Call("clearRect", x, y, width, height)
-}
-
-// Paths
-
-func (ctx *CanvasRenderingContext2D) Fill() {
-	ctx.Call("fill")
-}
-
-func (ctx *CanvasRenderingContext2D) Stroke() {
-	ctx.Call("stroke")
-}
-
-func (ctx *CanvasRenderingContext2D) BeginPath() {
-	ctx.Call("beginPath")
-}
-
-func (ctx *CanvasRenderingContext2D) MoveTo(x, y int) {
-	ctx.Call("moveTo", x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) ClosePath() {
-	ctx.Call("closePath")
-}
-
-func (ctx *CanvasRenderingContext2D) LineTo(x, y int) {
-	ctx.Call("lineTo", x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) Clip() {
-	ctx.Call("clip")
-}
-
-func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y int) {
-	ctx.Call("quadraticCurveTo", cpx, cpy, x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y int) {
-	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) Arc(x, y, r int, sAngle, eAngle float64, counterclockwise bool) {
-	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
-}
-
-func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r int) {
-	ctx.Call("arcTo", x1, y1, x2, y2, r)
-}
-
-func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y int) bool {
-	return ctx.Call("isPointInPath", x, y).Bool()
-}
-
-// Transformations
-
-func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight int) {
-	ctx.Call("scale", scaleWidth, scaleHeight)
-}
-
-func (ctx *CanvasRenderingContext2D) Rotate(angle float64) {
-	ctx.Call("rotate", angle)
-}
-
-func (ctx *CanvasRenderingContext2D) Translate(x, y int) {
-	ctx.Call("translate", x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f int) {
-	ctx.Call("transform", a, b, c, d, e, f)
-}
-
-func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
-	ctx.Call("setTransform", a, b, c, d, e, f)
-}
-
-// Text
+// Drawing Text
 
 func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth int) {
 	if maxWidth == -1 {
@@ -2061,6 +2006,189 @@ func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth int)
 
 	ctx.Call("strokeText", text, x, y, maxWidth)
 }
+func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
+	textMetrics := ctx.Call("measureText", text)
+	return &TextMetrics{Object: textMetrics}
+}
+
+// Line styles
+
+func (ctx *CanvasRenderingContext2D) GetLineDash() interface{} {
+	 return ctx.Call("getLineDash")
+}
+//
+func (ctx *CanvasRenderingContext2D) SetLineDash(arr interface{}) {
+	 ctx.Call("setLineDash", arr)
+	 return
+}
+
+// Gradients and patterns
+
+func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 int) {
+	ctx.Call("createLinearGradient", x0, y0, x1, y1)
+}
+
+func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1, int) {
+	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
+}
+
+func (ctx *CanvasRenderingContext2D) CreatePattern(image interface{}, repetition string) {
+  switch image.(type) {
+	case HTMLImageElement:
+		var img = image.(HTMLImageElement)
+		ctx.Call("createPattern", image, repetition)
+	case HTMLVideoElement:
+		var img = image.(HTMLVideoElement)
+		ctx.Call("createPattern", image, repetition)
+	case HTMLCanvasElement:
+		var img = image.(HTMLCanvasElement)
+		ctx.Call("createPattern", image, repetition)
+	case CanvasRenderingContext2D:
+		var img = image.(CanvasRenderingContext2D)
+		ctx.Call("createPattern", image, repetition)
+	case ImageData:
+		var img = image.(ImageData)
+		ctx.Call("createPattern", image, repetition) //Missing ImageBitmap, Blob
+	default: *js.Object:
+	  var img = image.(*js.Object)
+	  ctx.Call("createPattern", image, repetition)
+	}
+}
+
+// Paths
+
+func (ctx *CanvasRenderingContext2D) BeginPath() {
+	ctx.Call("beginPath")
+}
+
+func (ctx *CanvasRenderingContext2D) ClosePath() {
+	ctx.Call("closePath")
+}
+
+func (ctx *CanvasRenderingContext2D) MoveTo(x, y int) {
+	ctx.Call("moveTo", x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) LineTo(x, y int) {
+	ctx.Call("lineTo", x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y int) {
+	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y int) {
+	ctx.Call("quadraticCurveTo", cpx, cpy, x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) Arc(x, y, r int, sAngle, eAngle float64, counterclockwise bool) {
+	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
+}
+
+func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r int) {
+	ctx.Call("arcTo", x1, y1, x2, y2, r)
+}
+
+func (ctx *CanvasRenderingContext2D) Ellipse(x, y int, radiusX, radiusY , introtation, startAngle, endAngle float64, anticlockwise bool) {
+	ctx.Call("ellipse", x, y, width, height)
+}
+
+func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height int) {
+	ctx.Call("rect", x, y, width, height)
+}
+
+//Drawing paths
+
+func (ctx *CanvasRenderingContext2D) Fill() {
+	ctx.Call("fill")
+}
+
+func (ctx *CanvasRenderingContext2D) Stroke() {
+	ctx.Call("stroke")
+}
+
+func (ctx *CanvasRenderingContext2D) DrawFocusIfNeeded(element HTMLElement, path *js.Object) {
+	ctx.Call("drawFocusIfNeeded", element, path)
+}
+
+func (ctx *CanvasRenderingContext2D) ScrollPathIntoView(path *js.Object) {
+	ctx.Call("scrollPathIntoView", path)
+}
+
+func (ctx *CanvasRenderingContext2D) Clip() {
+	ctx.Call("clip")
+}
+
+func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y int) bool {
+	return ctx.Call("isPointInPath", x, y).Bool()
+}
+
+func (ctx *CanvasRenderingContext2D) IsPointInStroke(path *js.Object, x, y int) bool {
+	return ctx.Call("isPointInStroke", path, x, y).Bool()
+}
+
+// Transformations
+
+func (ctx *CanvasRenderingContext2D) Rotate(angle float64) {
+	ctx.Call("rotate", angle)
+}
+
+func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight int) {
+	ctx.Call("scale", scaleWidth, scaleHeight)
+}
+
+func (ctx *CanvasRenderingContext2D) Translate(x, y int) {
+	ctx.Call("translate", x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f int) {
+	ctx.Call("transform", a, b, c, d, e, f)
+}
+
+func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
+	ctx.Call("setTransform", a, b, c, d, e, f)
+}
+
+//resetTransform
+
+// Drawing images
+
+func (ctx *CanvasRenderingContext2D) DrawImage(image interface{}, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight int) {
+  switch image.(type) {
+	case HTMLImageElement:
+		var img = image.(HTMLImageElement)
+		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	case HTMLVideoElement:
+		var img = image.(HTMLVideoElement)
+		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	case HTMLCanvasElement:
+		var img = image.(HTMLCanvasElement)
+		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	case CanvasRenderingContext2D:
+		var img = image.(CanvasRenderingContext2D)
+		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	case ImageData:
+		var img = image.(ImageData)
+		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) //Missing ImageBitmap, Blob
+	default: *js.Object:
+	  var img = image.(*js.Object)
+	  ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	}
+}
+
+// Pixel manipulation
+
+func (ctx *CanvasRenderingContext2D) CreateImageData() *ImageData {
+	return &ImageData{Object: ctx.Call("createImageData", width, height)}
+}
+
+func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData {
+	return &ImageData{Object: ctx.Call("getImageData", sx, sy, sw, sh)}
+}
+
+func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
+	if ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
+}
 
 // State
 
@@ -2071,6 +2199,11 @@ func (ctx *CanvasRenderingContext2D) Save() {
 func (ctx *CanvasRenderingContext2D) Restore() {
 	ctx.Call("restore")
 }
+
+//Hit regions
+//addHitRegion
+//removeHitRegion
+//clearHitRegions
 
 type HTMLDListElement struct{ *BasicHTMLElement }
 
