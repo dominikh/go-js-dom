@@ -1940,9 +1940,9 @@ type CanvasRenderingContext2D struct {
 type ImageData struct {
 	*js.Object
 
-	Width  uint32   `js:"width"`
-	Height uint32   `js:"height"`
-	Data   []uint8  `js:"data"`
+	Width  uint32  `js:"width"`
+	Height uint32  `js:"height"`
+	Data   []uint8 `js:"data"`
 }
 
 type TextMetrics struct {
@@ -2014,12 +2014,13 @@ func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
 // Line styles
 
 func (ctx *CanvasRenderingContext2D) GetLineDash() interface{} {
-	 return ctx.Call("getLineDash")
+	return ctx.Call("getLineDash")
 }
+
 //
 func (ctx *CanvasRenderingContext2D) SetLineDash(arr interface{}) {
-	 ctx.Call("setLineDash", arr)
-	 return
+	ctx.Call("setLineDash", arr)
+	return
 }
 
 // Gradients and patterns
@@ -2028,30 +2029,30 @@ func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 int) {
 	ctx.Call("createLinearGradient", x0, y0, x1, y1)
 }
 
-func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1, int) {
+func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 int) {
 	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
 }
 
 func (ctx *CanvasRenderingContext2D) CreatePattern(image interface{}, repetition string) {
-  switch image.(type) {
+	switch image.(type) {
 	case HTMLImageElement:
 		var img = image.(HTMLImageElement)
-		ctx.Call("createPattern", image, repetition)
+		ctx.Call("createPattern", img, repetition)
 	case HTMLVideoElement:
 		var img = image.(HTMLVideoElement)
-		ctx.Call("createPattern", image, repetition)
+		ctx.Call("createPattern", img, repetition)
 	case HTMLCanvasElement:
 		var img = image.(HTMLCanvasElement)
-		ctx.Call("createPattern", image, repetition)
+		ctx.Call("createPattern", img, repetition)
 	case CanvasRenderingContext2D:
 		var img = image.(CanvasRenderingContext2D)
-		ctx.Call("createPattern", image, repetition)
+		ctx.Call("createPattern", img, repetition)
 	case ImageData:
 		var img = image.(ImageData)
-		ctx.Call("createPattern", image, repetition) //Missing ImageBitmap, Blob
-	default: *js.Object:
-	  var img = image.(*js.Object)
-	  ctx.Call("createPattern", image, repetition)
+		ctx.Call("createPattern", img, repetition) //Missing ImageBitmap, Blob
+	default: //We assume it's a *js.Object
+		var img = image.(*js.Object)
+		ctx.Call("createPattern", img, repetition)
 	}
 }
 
@@ -2089,8 +2090,8 @@ func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r int) {
 	ctx.Call("arcTo", x1, y1, x2, y2, r)
 }
 
-func (ctx *CanvasRenderingContext2D) Ellipse(x, y int, radiusX, radiusY , introtation, startAngle, endAngle float64, anticlockwise bool) {
-	ctx.Call("ellipse", x, y, width, height)
+func (ctx *CanvasRenderingContext2D) Ellipse(x, y int, radiusX, radiusY, introtation, startAngle, endAngle float64, anticlockwise bool) {
+	ctx.Call("ellipse", x, y, radiusX, radiusY, introtation, startAngle, endAngle)
 }
 
 func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height int) {
@@ -2154,31 +2155,31 @@ func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
 // Drawing images
 
 func (ctx *CanvasRenderingContext2D) DrawImage(image interface{}, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight int) {
-  switch image.(type) {
+	switch image.(type) {
 	case HTMLImageElement:
 		var img = image.(HTMLImageElement)
-		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	case HTMLVideoElement:
 		var img = image.(HTMLVideoElement)
-		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	case HTMLCanvasElement:
 		var img = image.(HTMLCanvasElement)
-		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	case CanvasRenderingContext2D:
 		var img = image.(CanvasRenderingContext2D)
-		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	case ImageData:
 		var img = image.(ImageData)
-		ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) //Missing ImageBitmap, Blob
-	default: *js.Object:
-	  var img = image.(*js.Object)
-	  ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) //Missing ImageBitmap, Blob
+	default: //We assume it's a *js.Object
+		var img = image.(*js.Object)
+		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 	}
 }
 
 // Pixel manipulation
 
-func (ctx *CanvasRenderingContext2D) CreateImageData() *ImageData {
+func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageData {
 	return &ImageData{Object: ctx.Call("createImageData", width, height)}
 }
 
@@ -2187,7 +2188,7 @@ func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData
 }
 
 func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
-	if ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
+	ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
 }
 
 // State
