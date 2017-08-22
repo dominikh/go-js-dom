@@ -2158,7 +2158,7 @@ func (ctx *CanvasRenderingContext2D) DrawImage(image *Element, dx, dy float64) {
 	ctx.Call("drawImage", image, dx, dy)
 }
 
-func (ctx *CanvasRenderingContext2D) DrawImageWithDestination(image *Element, dx, dy, dWidth, dHeight float64) {
+func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image *Element, dx, dy, dWidth, dHeight float64) {
 	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
 }
 
