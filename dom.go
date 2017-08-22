@@ -109,6 +109,7 @@
 package dom // import "honnef.co/go/js/dom"
 
 import (
+	"image/color"
 	"strings"
 	"time"
 
@@ -1940,9 +1941,27 @@ type CanvasRenderingContext2D struct {
 type ImageData struct {
 	*js.Object
 
-	Width  uint32  `js:"width"`
-	Height uint32  `js:"height"`
-	Data   []uint8 `js:"data"`
+	Width  int        `js:"width"`
+	Height int        `js:"height"`
+	Data   *js.Object `js:"data"`
+}
+
+func (imd *ImageData) At(x, y int) *color.RGBA {
+	var index = 4 * (x + y*imd.Width)
+	return &color.RGBA{
+		R: uint8(imd.Data.Index(index).Int()),
+		G: uint8(imd.Data.Index(index + 1).Int()),
+		B: uint8(imd.Data.Index(index + 2).Int()),
+		A: uint8(imd.Data.Index(index + 3).Int()),
+	}
+}
+
+func (imd *ImageData) Set(x, y int, c color.RGBA) {
+	var index = 4 * (x + y*imd.Width)
+	imd.Data.SetIndex(index, c.R)
+	imd.Data.SetIndex(index+1, c.G)
+	imd.Data.SetIndex(index+2, c.B)
+	imd.Data.SetIndex(index+3, c.A)
 }
 
 type TextMetrics struct {
@@ -1975,21 +1994,21 @@ func (e *HTMLCanvasElement) GetContext(param string) *js.Object {
 
 // Drawing Rectangles
 
-func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height int) {
+func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height float64) {
 	ctx.Call("clearRect", x, y, width, height)
 }
 
-func (ctx *CanvasRenderingContext2D) FillRect(x, y, width, height int) {
+func (ctx *CanvasRenderingContext2D) FillRect(x, y, width, height float64) {
 	ctx.Call("fillRect", x, y, width, height)
 }
 
-func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height int) {
+func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height float64) {
 	ctx.Call("strokeRect", x, y, width, height)
 }
 
 // Drawing Text
 
-func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth int) {
+func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth float64) {
 	if maxWidth == -1 {
 		ctx.Call("fillText", text, x, y)
 		return
@@ -1998,7 +2017,7 @@ func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth int) {
 	ctx.Call("fillText", text, x, y, maxWidth)
 }
 
-func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth int) {
+func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth float64) {
 	if maxWidth == -1 {
 		ctx.Call("strokeText", text, x, y)
 		return
@@ -2025,35 +2044,16 @@ func (ctx *CanvasRenderingContext2D) SetLineDash(arr interface{}) {
 
 // Gradients and patterns
 
-func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 int) {
+func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64) {
 	ctx.Call("createLinearGradient", x0, y0, x1, y1)
 }
 
-func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 int) {
+func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 float64) {
 	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
 }
 
-func (ctx *CanvasRenderingContext2D) CreatePattern(image interface{}, repetition string) {
-	switch image.(type) {
-	case HTMLImageElement:
-		var img = image.(HTMLImageElement)
-		ctx.Call("createPattern", img, repetition)
-	case HTMLVideoElement:
-		var img = image.(HTMLVideoElement)
-		ctx.Call("createPattern", img, repetition)
-	case HTMLCanvasElement:
-		var img = image.(HTMLCanvasElement)
-		ctx.Call("createPattern", img, repetition)
-	case CanvasRenderingContext2D:
-		var img = image.(CanvasRenderingContext2D)
-		ctx.Call("createPattern", img, repetition)
-	case ImageData:
-		var img = image.(ImageData)
-		ctx.Call("createPattern", img, repetition) //Missing ImageBitmap, Blob
-	default: //We assume it's a *js.Object
-		var img = image.(*js.Object)
-		ctx.Call("createPattern", img, repetition)
-	}
+func (ctx *CanvasRenderingContext2D) CreatePattern(image *Element, repetition string) {
+	ctx.Call("createPattern", image, repetition)
 }
 
 // Paths
@@ -2078,23 +2078,23 @@ func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y 
 	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y int) {
+func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y float64) {
 	ctx.Call("quadraticCurveTo", cpx, cpy, x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) Arc(x, y, r int, sAngle, eAngle float64, counterclockwise bool) {
+func (ctx *CanvasRenderingContext2D) Arc(x, y, r, sAngle, eAngle float64, counterclockwise bool) {
 	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
 }
 
-func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r int) {
+func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r float64) {
 	ctx.Call("arcTo", x1, y1, x2, y2, r)
 }
 
-func (ctx *CanvasRenderingContext2D) Ellipse(x, y int, radiusX, radiusY, introtation, startAngle, endAngle float64, anticlockwise bool) {
+func (ctx *CanvasRenderingContext2D) Ellipse(x, y, radiusX, radiusY, introtation, startAngle, endAngle float64, anticlockwise bool) {
 	ctx.Call("ellipse", x, y, radiusX, radiusY, introtation, startAngle, endAngle)
 }
 
-func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height int) {
+func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height float64) {
 	ctx.Call("rect", x, y, width, height)
 }
 
@@ -2120,11 +2120,11 @@ func (ctx *CanvasRenderingContext2D) Clip() {
 	ctx.Call("clip")
 }
 
-func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y int) bool {
+func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y float64) bool {
 	return ctx.Call("isPointInPath", x, y).Bool()
 }
 
-func (ctx *CanvasRenderingContext2D) IsPointInStroke(path *js.Object, x, y int) bool {
+func (ctx *CanvasRenderingContext2D) IsPointInStroke(path *js.Object, x, y float64) bool {
 	return ctx.Call("isPointInStroke", path, x, y).Bool()
 }
 
@@ -2134,19 +2134,19 @@ func (ctx *CanvasRenderingContext2D) Rotate(angle float64) {
 	ctx.Call("rotate", angle)
 }
 
-func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight int) {
+func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight float64) {
 	ctx.Call("scale", scaleWidth, scaleHeight)
 }
 
-func (ctx *CanvasRenderingContext2D) Translate(x, y int) {
+func (ctx *CanvasRenderingContext2D) Translate(x, y float64) {
 	ctx.Call("translate", x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f int) {
+func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f float64) {
 	ctx.Call("transform", a, b, c, d, e, f)
 }
 
-func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
+func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f float64) {
 	ctx.Call("setTransform", a, b, c, d, e, f)
 }
 
@@ -2154,40 +2154,33 @@ func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
 
 // Drawing images
 
-func (ctx *CanvasRenderingContext2D) DrawImage(image interface{}, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight int) {
-	switch image.(type) {
-	case HTMLImageElement:
-		var img = image.(HTMLImageElement)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-	case HTMLVideoElement:
-		var img = image.(HTMLVideoElement)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-	case HTMLCanvasElement:
-		var img = image.(HTMLCanvasElement)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-	case CanvasRenderingContext2D:
-		var img = image.(CanvasRenderingContext2D)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-	case ImageData:
-		var img = image.(ImageData)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) //Missing ImageBitmap, Blob
-	default: //We assume it's a *js.Object
-		var img = image.(*js.Object)
-		ctx.Call("drawImage", img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-	}
+func (ctx *CanvasRenderingContext2D) DrawImage(image *Element, dx, dy float64) {
+	ctx.Call("drawImage", image, dx, dy)
+}
+
+func (ctx *CanvasRenderingContext2D) DrawImageWithDestination(image *Element, dx, dy, dWidth, dHeight float64) {
+	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
+}
+
+func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image *Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
+	ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 }
 
 // Pixel manipulation
 
-func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageData {
+func (ctx *CanvasRenderingContext2D) CreateImageData(width, height float64) *ImageData {
 	return &ImageData{Object: ctx.Call("createImageData", width, height)}
 }
 
-func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData {
+func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh float64) *ImageData {
 	return &ImageData{Object: ctx.Call("getImageData", sx, sy, sw, sh)}
 }
 
-func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
+func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy float64) {
+	ctx.Call("putImageData", imageData, dx, dy)
+}
+
+func (ctx *CanvasRenderingContext2D) PutImageDataDirty(imageData *ImageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight float64) {
 	ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
 }
 
