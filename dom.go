@@ -2032,14 +2032,12 @@ func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
 
 // Line styles
 
-func (ctx *CanvasRenderingContext2D) GetLineDash() interface{} {
+func (ctx *CanvasRenderingContext2D) GetLineDash() []float64 {
 	return ctx.Call("getLineDash")
 }
 
-//
-func (ctx *CanvasRenderingContext2D) SetLineDash(arr interface{}) {
-	ctx.Call("setLineDash", arr)
-	return
+func (ctx *CanvasRenderingContext2D) SetLineDash(dashes []float64) {
+	ctx.Call("setLineDash", dashes)
 }
 
 // Gradients and patterns
@@ -2150,7 +2148,9 @@ func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f float64) {
 	ctx.Call("setTransform", a, b, c, d, e, f)
 }
 
-//resetTransform
+func (ctx *CanvasRenderingContext2D) ResetTransform() {
+	ctx.Call("setTransform")
+}
 
 // Drawing images
 
@@ -2168,7 +2168,7 @@ func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image *Element, sx, 
 
 // Pixel manipulation
 
-func (ctx *CanvasRenderingContext2D) CreateImageData(width, height float64) *ImageData {
+func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageData {
 	return &ImageData{Object: ctx.Call("createImageData", width, height)}
 }
 
@@ -2194,10 +2194,10 @@ func (ctx *CanvasRenderingContext2D) Restore() {
 	ctx.Call("restore")
 }
 
-//Hit regions
-//addHitRegion
-//removeHitRegion
-//clearHitRegions
+// TODO Hit regions:
+// addHitRegion
+// removeHitRegion
+// clearHitRegions
 
 type HTMLDListElement struct{ *BasicHTMLElement }
 
