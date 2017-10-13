@@ -2096,7 +2096,7 @@ func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height float64) {
 	ctx.Call("rect", x, y, width, height)
 }
 
-//Drawing paths
+// Drawing paths
 
 func (ctx *CanvasRenderingContext2D) Fill() {
 	ctx.Call("fill")
