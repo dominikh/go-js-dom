@@ -2008,6 +2008,9 @@ func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height float64) {
 
 // Drawing Text
 
+// FillText fills a given text at the given (x, y) position.
+// If the optional maxWidth parameter is not -1,
+// the text will be scaled to fit that width.
 func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth float64) {
 	if maxWidth == -1 {
 		ctx.Call("fillText", text, x, y)
@@ -2017,6 +2020,9 @@ func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth float6
 	ctx.Call("fillText", text, x, y, maxWidth)
 }
 
+// StrokeText strokes a given text at the given (x, y) position.
+// If the optional maxWidth parameter is not -1,
+// the text will be scaled to fit that width.
 func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth float64) {
 	if maxWidth == -1 {
 		ctx.Call("strokeText", text, x, y)
