@@ -2176,7 +2176,7 @@ func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageDa
 	return &ImageData{Object: ctx.Call("createImageData", width, height)}
 }
 
-func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh float64) *ImageData {
+func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData {
 	return &ImageData{Object: ctx.Call("getImageData", sx, sy, sw, sh)}
 }
 
@@ -2184,7 +2184,7 @@ func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy f
 	ctx.Call("putImageData", imageData, dx, dy)
 }
 
-func (ctx *CanvasRenderingContext2D) PutImageDataDirty(imageData *ImageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight float64) {
+func (ctx *CanvasRenderingContext2D) PutImageDataDirty(imageData *ImageData, dx, dy float64, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
 	ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
 }
 
