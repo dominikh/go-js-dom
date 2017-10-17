@@ -2099,7 +2099,7 @@ func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r float64) {
 }
 
 func (ctx *CanvasRenderingContext2D) Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64, anticlockwise bool) {
-	ctx.Call("ellipse", x, y, radiusX, radiusY, rotation, startAngle, endAngle)
+	ctx.Call("ellipse", x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
 }
 
 func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height float64) {
