@@ -2159,7 +2159,7 @@ func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f float64) {
 }
 
 func (ctx *CanvasRenderingContext2D) ResetTransform() {
-	ctx.Call("setTransform")
+	ctx.Call("resetTransform")
 }
 
 // Drawing images
