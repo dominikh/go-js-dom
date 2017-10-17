@@ -2033,7 +2033,11 @@ func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
 // Line styles
 
 func (ctx *CanvasRenderingContext2D) GetLineDash() []float64 {
-	return ctx.Call("getLineDash")
+	var dashes []float64
+	for _, dash := range ctx.Call("getLineDash").Interface().([]interface{}) {
+		dashes = append(dashes, dash.(float64))
+	}
+	return dashes
 }
 
 func (ctx *CanvasRenderingContext2D) SetLineDash(dashes []float64) {
