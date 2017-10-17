@@ -2064,15 +2064,15 @@ func (ctx *CanvasRenderingContext2D) ClosePath() {
 	ctx.Call("closePath")
 }
 
-func (ctx *CanvasRenderingContext2D) MoveTo(x, y int) {
+func (ctx *CanvasRenderingContext2D) MoveTo(x, y float64) {
 	ctx.Call("moveTo", x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) LineTo(x, y int) {
+func (ctx *CanvasRenderingContext2D) LineTo(x, y float64) {
 	ctx.Call("lineTo", x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y int) {
+func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y float64) {
 	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
 }
 
