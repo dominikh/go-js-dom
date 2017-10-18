@@ -109,6 +109,7 @@
 package dom // import "honnef.co/go/js/dom"
 
 import (
+	"image/color"
 	"strings"
 	"time"
 
@@ -1937,6 +1938,51 @@ type CanvasRenderingContext2D struct {
 	GlobalCompositeOperation string  `js:"globalCompositeOperation"`
 }
 
+type ImageData struct {
+	*js.Object
+
+	Width  int        `js:"width"`
+	Height int        `js:"height"`
+	Data   *js.Object `js:"data"`
+}
+
+func (imd *ImageData) At(x, y int) *color.RGBA {
+	var index = 4 * (x + y*imd.Width)
+	return &color.RGBA{
+		R: uint8(imd.Data.Index(index).Int()),
+		G: uint8(imd.Data.Index(index + 1).Int()),
+		B: uint8(imd.Data.Index(index + 2).Int()),
+		A: uint8(imd.Data.Index(index + 3).Int()),
+	}
+}
+
+func (imd *ImageData) Set(x, y int, c color.RGBA) {
+	var index = 4 * (x + y*imd.Width)
+	imd.Data.SetIndex(index, c.R)
+	imd.Data.SetIndex(index+1, c.G)
+	imd.Data.SetIndex(index+2, c.B)
+	imd.Data.SetIndex(index+3, c.A)
+}
+
+type TextMetrics struct {
+	*js.Object
+
+	Width                    float64 `js:"width"`
+	ActualBoundingBoxLeft    float64 `js:"actualBoundingBoxLeft"`
+	ActualBoundingBoxRight   float64 `js:"actualBoundingBoxRight"`
+	FontBoundingBoxAscent    float64 `js:"fontBoundingBoxAscent"`
+	FontBoundingBoxDescent   float64 `js:"fontBoundingBoxDescent"`
+	ActualBoundingBoxAscent  float64 `js:"actualBoundingBoxAscent"`
+	ActualBoundingBoxDescent float64 `js:"actualBoundingBoxDescent"`
+	EmHeightAscent           float64 `js:"emHeightAscent"`
+	EmHeightDescent          float64 `js:"emHeightDescent"`
+	HangingBaseline          float64 `js:"hangingBaseline"`
+	AlphabeticBaseline       float64 `js:"alphabeticBaseline"`
+	IdeographicBaseline      float64 `js:"ideographicBaseline"`
+}
+
+// Creating canvas 2d context
+
 func (e *HTMLCanvasElement) GetContext2d() *CanvasRenderingContext2D {
 	ctx := e.GetContext("2d")
 	return &CanvasRenderingContext2D{Object: ctx}
@@ -1946,31 +1992,121 @@ func (e *HTMLCanvasElement) GetContext(param string) *js.Object {
 	return e.Call("getContext", param)
 }
 
-// Colors, Styles, and Shadows
+// Drawing Rectangles
 
-func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 int) {
-	ctx.Call("createLinearGradient", x0, y0, x1, y1)
-}
-
-// Rectangles
-
-func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height int) {
-	ctx.Call("rect", x, y, width, height)
-}
-
-func (ctx *CanvasRenderingContext2D) FillRect(x, y, width, height int) {
-	ctx.Call("fillRect", x, y, width, height)
-}
-
-func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height int) {
-	ctx.Call("strokeRect", x, y, width, height)
-}
-
-func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height int) {
+func (ctx *CanvasRenderingContext2D) ClearRect(x, y, width, height float64) {
 	ctx.Call("clearRect", x, y, width, height)
 }
 
+func (ctx *CanvasRenderingContext2D) FillRect(x, y, width, height float64) {
+	ctx.Call("fillRect", x, y, width, height)
+}
+
+func (ctx *CanvasRenderingContext2D) StrokeRect(x, y, width, height float64) {
+	ctx.Call("strokeRect", x, y, width, height)
+}
+
+// Drawing Text
+
+// FillText fills a given text at the given (x, y) position.
+// If the optional maxWidth parameter is not -1,
+// the text will be scaled to fit that width.
+func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth float64) {
+	if maxWidth == -1 {
+		ctx.Call("fillText", text, x, y)
+		return
+	}
+
+	ctx.Call("fillText", text, x, y, maxWidth)
+}
+
+// StrokeText strokes a given text at the given (x, y) position.
+// If the optional maxWidth parameter is not -1,
+// the text will be scaled to fit that width.
+func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth float64) {
+	if maxWidth == -1 {
+		ctx.Call("strokeText", text, x, y)
+		return
+	}
+
+	ctx.Call("strokeText", text, x, y, maxWidth)
+}
+func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
+	textMetrics := ctx.Call("measureText", text)
+	return &TextMetrics{Object: textMetrics}
+}
+
+// Line styles
+
+func (ctx *CanvasRenderingContext2D) GetLineDash() []float64 {
+	var dashes []float64
+	for _, dash := range ctx.Call("getLineDash").Interface().([]interface{}) {
+		dashes = append(dashes, dash.(float64))
+	}
+	return dashes
+}
+
+func (ctx *CanvasRenderingContext2D) SetLineDash(dashes []float64) {
+	ctx.Call("setLineDash", dashes)
+}
+
+// Gradients and patterns
+
+func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64) {
+	ctx.Call("createLinearGradient", x0, y0, x1, y1)
+}
+
+func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 float64) {
+	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
+}
+
+func (ctx *CanvasRenderingContext2D) CreatePattern(image *Element, repetition string) {
+	ctx.Call("createPattern", image, repetition)
+}
+
 // Paths
+
+func (ctx *CanvasRenderingContext2D) BeginPath() {
+	ctx.Call("beginPath")
+}
+
+func (ctx *CanvasRenderingContext2D) ClosePath() {
+	ctx.Call("closePath")
+}
+
+func (ctx *CanvasRenderingContext2D) MoveTo(x, y float64) {
+	ctx.Call("moveTo", x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) LineTo(x, y float64) {
+	ctx.Call("lineTo", x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y float64) {
+	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y float64) {
+	ctx.Call("quadraticCurveTo", cpx, cpy, x, y)
+}
+
+func (ctx *CanvasRenderingContext2D) Arc(x, y, r, sAngle, eAngle float64, counterclockwise bool) {
+	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
+}
+
+func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r float64) {
+	ctx.Call("arcTo", x1, y1, x2, y2, r)
+}
+
+func (ctx *CanvasRenderingContext2D) Ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle float64, anticlockwise bool) {
+	ctx.Call("ellipse", x, y, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise)
+}
+
+func (ctx *CanvasRenderingContext2D) Rect(x, y, width, height float64) {
+	ctx.Call("rect", x, y, width, height)
+}
+
+// Drawing paths
 
 func (ctx *CanvasRenderingContext2D) Fill() {
 	ctx.Call("fill")
@@ -1980,86 +2116,82 @@ func (ctx *CanvasRenderingContext2D) Stroke() {
 	ctx.Call("stroke")
 }
 
-func (ctx *CanvasRenderingContext2D) BeginPath() {
-	ctx.Call("beginPath")
+func (ctx *CanvasRenderingContext2D) DrawFocusIfNeeded(element HTMLElement, path *js.Object) {
+	ctx.Call("drawFocusIfNeeded", element, path)
 }
 
-func (ctx *CanvasRenderingContext2D) MoveTo(x, y int) {
-	ctx.Call("moveTo", x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) ClosePath() {
-	ctx.Call("closePath")
-}
-
-func (ctx *CanvasRenderingContext2D) LineTo(x, y int) {
-	ctx.Call("lineTo", x, y)
+func (ctx *CanvasRenderingContext2D) ScrollPathIntoView(path *js.Object) {
+	ctx.Call("scrollPathIntoView", path)
 }
 
 func (ctx *CanvasRenderingContext2D) Clip() {
 	ctx.Call("clip")
 }
 
-func (ctx *CanvasRenderingContext2D) QuadraticCurveTo(cpx, cpy, x, y int) {
-	ctx.Call("quadraticCurveTo", cpx, cpy, x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y int) {
-	ctx.Call("bezierCurveTo", cp1x, cp1y, cp2x, cp2y, x, y)
-}
-
-func (ctx *CanvasRenderingContext2D) Arc(x, y, r int, sAngle, eAngle float64, counterclockwise bool) {
-	ctx.Call("arc", x, y, r, sAngle, eAngle, counterclockwise)
-}
-
-func (ctx *CanvasRenderingContext2D) ArcTo(x1, y1, x2, y2, r int) {
-	ctx.Call("arcTo", x1, y1, x2, y2, r)
-}
-
-func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y int) bool {
+func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y float64) bool {
 	return ctx.Call("isPointInPath", x, y).Bool()
 }
 
-// Transformations
-
-func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight int) {
-	ctx.Call("scale", scaleWidth, scaleHeight)
+func (ctx *CanvasRenderingContext2D) IsPointInStroke(path *js.Object, x, y float64) bool {
+	return ctx.Call("isPointInStroke", path, x, y).Bool()
 }
+
+// Transformations
 
 func (ctx *CanvasRenderingContext2D) Rotate(angle float64) {
 	ctx.Call("rotate", angle)
 }
 
-func (ctx *CanvasRenderingContext2D) Translate(x, y int) {
+func (ctx *CanvasRenderingContext2D) Scale(scaleWidth, scaleHeight float64) {
+	ctx.Call("scale", scaleWidth, scaleHeight)
+}
+
+func (ctx *CanvasRenderingContext2D) Translate(x, y float64) {
 	ctx.Call("translate", x, y)
 }
 
-func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f int) {
+func (ctx *CanvasRenderingContext2D) Transform(a, b, c, d, e, f float64) {
 	ctx.Call("transform", a, b, c, d, e, f)
 }
 
-func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f int) {
+func (ctx *CanvasRenderingContext2D) SetTransform(a, b, c, d, e, f float64) {
 	ctx.Call("setTransform", a, b, c, d, e, f)
 }
 
-// Text
-
-func (ctx *CanvasRenderingContext2D) FillText(text string, x, y, maxWidth int) {
-	if maxWidth == -1 {
-		ctx.Call("fillText", text, x, y)
-		return
-	}
-
-	ctx.Call("fillText", text, x, y, maxWidth)
+func (ctx *CanvasRenderingContext2D) ResetTransform() {
+	ctx.Call("resetTransform")
 }
 
-func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth int) {
-	if maxWidth == -1 {
-		ctx.Call("strokeText", text, x, y)
-		return
-	}
+// Drawing images
 
-	ctx.Call("strokeText", text, x, y, maxWidth)
+func (ctx *CanvasRenderingContext2D) DrawImage(image *Element, dx, dy float64) {
+	ctx.Call("drawImage", image, dx, dy)
+}
+
+func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image *Element, dx, dy, dWidth, dHeight float64) {
+	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
+}
+
+func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image *Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
+	ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+}
+
+// Pixel manipulation
+
+func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageData {
+	return &ImageData{Object: ctx.Call("createImageData", width, height)}
+}
+
+func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData {
+	return &ImageData{Object: ctx.Call("getImageData", sx, sy, sw, sh)}
+}
+
+func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy float64) {
+	ctx.Call("putImageData", imageData, dx, dy)
+}
+
+func (ctx *CanvasRenderingContext2D) PutImageDataDirty(imageData *ImageData, dx, dy float64, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
+	ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
 }
 
 // State
@@ -2071,6 +2203,11 @@ func (ctx *CanvasRenderingContext2D) Save() {
 func (ctx *CanvasRenderingContext2D) Restore() {
 	ctx.Call("restore")
 }
+
+// TODO Hit regions:
+// addHitRegion
+// removeHitRegion
+// clearHitRegions
 
 type HTMLDListElement struct{ *BasicHTMLElement }
 
