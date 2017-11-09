@@ -2087,7 +2087,7 @@ func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64
 	return &CanvasGradient{Object: ctx.Call("createLinearGradient", x0, y0, x1, y1)}
 }
 
-// Creates a radial gradient given by the coordinates of the two circles
+// CreateRadialGradient creates a radial gradient given by the coordinates of the two circles
 // represented by the parameters.
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createRadialGradient.
