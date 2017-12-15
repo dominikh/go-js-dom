@@ -18,6 +18,10 @@
 // might live in a separate package. This might require special care
 // to avoid circular dependencies.
 //
+// The documentation for some of the identifiers is based on the
+// MDN Web Docs by Mozilla Contributors (https://developer.mozilla.org/en-US/docs/Web/API),
+// licensed under CC-BY-SA 2.5 (https://creativecommons.org/licenses/by-sa/2.5/).
+//
 //
 // Getting started
 //
