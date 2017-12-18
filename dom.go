@@ -18,6 +18,10 @@
 // might live in a separate package. This might require special care
 // to avoid circular dependencies.
 //
+// The documentation for some of the identifiers is based on the
+// MDN Web Docs by Mozilla Contributors (https://developer.mozilla.org/en-US/docs/Web/API),
+// licensed under CC-BY-SA 2.5 (https://creativecommons.org/licenses/by-sa/2.5/).
+//
 //
 // Getting started
 //
@@ -1964,6 +1968,33 @@ func (imd *ImageData) Set(x, y int, c color.RGBA) {
 	imd.Data.SetIndex(index+3, c.A)
 }
 
+// CanvasGradient represents an opaque object describing a gradient.
+// It is returned by the methods CanvasRenderingContext2D.CreateLinearGradient
+// or CanvasRenderingContext2D.CreateRadialGradient.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasGradient.
+type CanvasGradient struct {
+	*js.Object
+}
+
+// AddColorStop adds a new stop, defined by an offset and a color, to the gradient.
+// It panics with *js.Error if the offset is not between 0 and 1, or if the color
+// can't be parsed as a CSS <color>.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasGradient/addColorStop.
+func (cg *CanvasGradient) AddColorStop(offset float64, color string) {
+	cg.Call("addColorStop", offset, color)
+}
+
+// CanvasPattern represents an opaque object describing a pattern.
+// It is based on an image, a canvas or a video, created by the
+// CanvasRenderingContext2D.CreatePattern method.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasPattern.
+type CanvasPattern struct {
+	*js.Object
+}
+
 type TextMetrics struct {
 	*js.Object
 
@@ -2052,16 +2083,28 @@ func (ctx *CanvasRenderingContext2D) SetLineDash(dashes []float64) {
 
 // Gradients and patterns
 
-func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64) {
-	ctx.Call("createLinearGradient", x0, y0, x1, y1)
+// CreateLinearGradient creates a linear gradient along the line given
+// by the coordinates represented by the parameters.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient.
+func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64) *CanvasGradient {
+	return &CanvasGradient{Object: ctx.Call("createLinearGradient", x0, y0, x1, y1)}
 }
 
-func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 float64) {
-	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
+// CreateRadialGradient creates a radial gradient given by the coordinates of the two circles
+// represented by the parameters.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createRadialGradient.
+func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 float64) *CanvasGradient {
+	return &CanvasGradient{Object: ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)}
 }
 
-func (ctx *CanvasRenderingContext2D) CreatePattern(image Element, repetition string) {
-	ctx.Call("createPattern", image, repetition)
+// CreatePattern creates a pattern using the specified image (a CanvasImageSource).
+// It repeats the source in the directions specified by the repetition argument.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createPattern.
+func (ctx *CanvasRenderingContext2D) CreatePattern(image Element, repetition string) *CanvasPattern {
+	return &CanvasPattern{Object: ctx.Call("createPattern", image, repetition)}
 }
 
 // Paths
