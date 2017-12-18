@@ -2060,7 +2060,7 @@ func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1
 	ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)
 }
 
-func (ctx *CanvasRenderingContext2D) CreatePattern(image *Element, repetition string) {
+func (ctx *CanvasRenderingContext2D) CreatePattern(image Element, repetition string) {
 	ctx.Call("createPattern", image, repetition)
 }
 
@@ -2164,15 +2164,15 @@ func (ctx *CanvasRenderingContext2D) ResetTransform() {
 
 // Drawing images
 
-func (ctx *CanvasRenderingContext2D) DrawImage(image *Element, dx, dy float64) {
+func (ctx *CanvasRenderingContext2D) DrawImage(image Element, dx, dy float64) {
 	ctx.Call("drawImage", image, dx, dy)
 }
 
-func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image *Element, dx, dy, dWidth, dHeight float64) {
+func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image Element, dx, dy, dWidth, dHeight float64) {
 	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
 }
 
-func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image *Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
+func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
 	ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 }
 
