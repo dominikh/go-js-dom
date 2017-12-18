@@ -2103,7 +2103,7 @@ func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1
 // It repeats the source in the directions specified by the repetition argument.
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createPattern.
-func (ctx *CanvasRenderingContext2D) CreatePattern(image *Element, repetition string) *CanvasPattern {
+func (ctx *CanvasRenderingContext2D) CreatePattern(image Element, repetition string) *CanvasPattern {
 	return &CanvasPattern{Object: ctx.Call("createPattern", image, repetition)}
 }
 
@@ -2207,15 +2207,15 @@ func (ctx *CanvasRenderingContext2D) ResetTransform() {
 
 // Drawing images
 
-func (ctx *CanvasRenderingContext2D) DrawImage(image *Element, dx, dy float64) {
+func (ctx *CanvasRenderingContext2D) DrawImage(image Element, dx, dy float64) {
 	ctx.Call("drawImage", image, dx, dy)
 }
 
-func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image *Element, dx, dy, dWidth, dHeight float64) {
+func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image Element, dx, dy, dWidth, dHeight float64) {
 	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
 }
 
-func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image *Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
+func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
 	ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 }
 
