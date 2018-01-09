@@ -113,6 +113,7 @@
 package dom // import "honnef.co/go/js/dom"
 
 import (
+	"image"
 	"image/color"
 	"strings"
 	"time"
@@ -1950,22 +1951,53 @@ type ImageData struct {
 	Data   *js.Object `js:"data"`
 }
 
-func (imd *ImageData) At(x, y int) *color.RGBA {
-	var index = 4 * (x + y*imd.Width)
-	return &color.RGBA{
-		R: uint8(imd.Data.Index(index).Int()),
-		G: uint8(imd.Data.Index(index + 1).Int()),
-		B: uint8(imd.Data.Index(index + 2).Int()),
-		A: uint8(imd.Data.Index(index + 3).Int()),
+func (m *ImageData) ColorModel() color.Model { return color.NRGBAModel }
+
+func (m *ImageData) Bounds() image.Rectangle {
+	return image.Rect(0, 0, m.Width, m.Height)
+}
+
+func (m *ImageData) At(x, y int) color.Color {
+	return m.NRGBAAt(x, y)
+}
+
+func (m *ImageData) NRGBAAt(x, y int) color.NRGBA {
+	if x < 0 || x >= m.Width ||
+		y < 0 || y >= m.Height {
+		return color.NRGBA{}
+	}
+	i := (y*m.Width + x) * 4
+	return color.NRGBA{
+		R: uint8(m.Data.Index(i + 0).Int()),
+		G: uint8(m.Data.Index(i + 1).Int()),
+		B: uint8(m.Data.Index(i + 2).Int()),
+		A: uint8(m.Data.Index(i + 3).Int()),
 	}
 }
 
-func (imd *ImageData) Set(x, y int, c color.RGBA) {
-	var index = 4 * (x + y*imd.Width)
-	imd.Data.SetIndex(index, c.R)
-	imd.Data.SetIndex(index+1, c.G)
-	imd.Data.SetIndex(index+2, c.B)
-	imd.Data.SetIndex(index+3, c.A)
+func (m *ImageData) Set(x, y int, c color.Color) {
+	if x < 0 || x >= m.Width ||
+		y < 0 || y >= m.Height {
+		return
+	}
+	c1 := color.NRGBAModel.Convert(c).(color.NRGBA)
+	i := (y*m.Width + x) * 4
+	m.Data.SetIndex(i+0, c1.R)
+	m.Data.SetIndex(i+1, c1.G)
+	m.Data.SetIndex(i+2, c1.B)
+	m.Data.SetIndex(i+3, c1.A)
+}
+
+func (m *ImageData) SetNRGBA(x, y int, c color.NRGBA) {
+	if x < 0 || x >= m.Width ||
+		y < 0 || y >= m.Height {
+		return
+	}
+	i := (y*m.Width + x) * 4
+	m.Data.SetIndex(i+0, c.R)
+	m.Data.SetIndex(i+1, c.G)
+	m.Data.SetIndex(i+2, c.B)
+	m.Data.SetIndex(i+3, c.A)
 }
 
 // CanvasGradient represents an opaque object describing a gradient.
