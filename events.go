@@ -282,7 +282,7 @@ type MouseEvent struct {
 }
 
 func (ev *MouseEvent) RelatedTarget() Element {
-	return wrapElement(ev.Get("target"))
+	return wrapElement(ev.Get("relatedTarget"))
 }
 
 func (ev *MouseEvent) ModifierState(mod string) bool {
