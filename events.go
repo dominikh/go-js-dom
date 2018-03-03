@@ -227,7 +227,13 @@ type DOMTransactionEvent struct{ *BasicEvent }
 type DragEvent struct{ *BasicEvent }
 type EditingBeforeInputEvent struct{ *BasicEvent }
 type ErrorEvent struct{ *BasicEvent }
+
 type FocusEvent struct{ *BasicEvent }
+
+func (ev *FocusEvent) RelatedTarget() Element {
+	return wrapElement(ev.Get("relatedTarget"))
+}
+
 type GamepadEvent struct{ *BasicEvent }
 type HashChangeEvent struct{ *BasicEvent }
 type IDBVersionChangeEvent struct{ *BasicEvent }
