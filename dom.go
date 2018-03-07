@@ -1852,21 +1852,18 @@ func (e *HTMLAreaElement) Rel() *TokenList {
 type HTMLAudioElement struct{ *HTMLMediaElement }
 
 type HTMLBRElement struct{ *BasicHTMLElement }
-type HTMLBaseElement struct{ *BasicHTMLElement }
-type HTMLBodyElement struct{ *BasicHTMLElement }
 
-type ValidityState struct {
-	*js.Object
-	CustomError     bool `js:"customError"`
-	PatternMismatch bool `js:"patternMismatch"`
-	RangeOverflow   bool `js:"rangeOverflow"`
-	RangeUnderflow  bool `js:"rangeUnderflow"`
-	StepMismatch    bool `js:"stepMismatch"`
-	TooLong         bool `js:"tooLong"`
-	TypeMismatch    bool `js:"typeMismatch"`
-	Valid           bool `js:"valid"`
-	ValueMissing    bool `js:"valueMissing"`
+type HTMLBaseElement struct{ *BasicHTMLElement }
+
+func (e *HTMLBaseElement) Href() string {
+	return e.Get("href").String()
 }
+
+func (e *HTMLBaseElement) Target() string {
+	return e.Get("target").String()
+}
+
+type HTMLBodyElement struct{ *BasicHTMLElement }
 
 type HTMLButtonElement struct {
 	*BasicHTMLElement
@@ -3029,12 +3026,17 @@ type HTMLUnknownElement struct{ *BasicHTMLElement }
 
 type HTMLVideoElement struct{ *HTMLMediaElement }
 
-func (e *HTMLBaseElement) Href() string {
-	return e.Get("href").String()
-}
-
-func (e *HTMLBaseElement) Target() string {
-	return e.Get("target").String()
+type ValidityState struct {
+	*js.Object
+	CustomError     bool `js:"customError"`
+	PatternMismatch bool `js:"patternMismatch"`
+	RangeOverflow   bool `js:"rangeOverflow"`
+	RangeUnderflow  bool `js:"rangeUnderflow"`
+	StepMismatch    bool `js:"stepMismatch"`
+	TooLong         bool `js:"tooLong"`
+	TypeMismatch    bool `js:"typeMismatch"`
+	Valid           bool `js:"valid"`
+	ValueMissing    bool `js:"valueMissing"`
 }
 
 type CSSStyleDeclaration struct{ *js.Object }
