@@ -96,7 +96,7 @@ func wrapEvent(o *js.Object) Event {
 	case js.Global.Get("TimeEvent"):
 		return &TimeEvent{ev}
 	case js.Global.Get("TouchEvent"):
-		return &TouchEvent{ev}
+		return &TouchEvent{BasicEvent: ev}
 	case js.Global.Get("TrackEvent"):
 		return &TrackEvent{ev}
 	case js.Global.Get("TransitionEvent"):
@@ -308,7 +308,81 @@ type StorageEvent struct{ *BasicEvent }
 type SVGEvent struct{ *BasicEvent }
 type SVGZoomEvent struct{ *BasicEvent }
 type TimeEvent struct{ *BasicEvent }
-type TouchEvent struct{ *BasicEvent }
+
+// TouchEvent represents an event sent when the state of contacts with a touch-sensitive
+// surface changes. This surface can be a touch screen or trackpad, for example. The event
+// can describe one or more points of contact with the screen and includes support for
+// detecting movement, addition and removal of contact points, and so forth.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent.
+type TouchEvent struct {
+	*BasicEvent
+	AltKey   bool `js:"altKey"`
+	CtrlKey  bool `js:"ctrlKey"`
+	MetaKey  bool `js:"metaKey"`
+	ShiftKey bool `js:"shiftKey"`
+}
+
+// ChangedTouches lists all individual points of contact whose states changed between
+// the previous touch event and this one.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches.
+func (ev *TouchEvent) ChangedTouches() []*Touch {
+	return touchListToTouches(ev.Get("changedTouches"))
+}
+
+// TargetTouches lists all points of contact that are both currently in contact with the
+// touch surface and were also started on the same element that is the target of the event.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches.
+func (ev *TouchEvent) TargetTouches() []*Touch {
+	return touchListToTouches(ev.Get("targetTouches"))
+}
+
+// Touches lists all current points of contact with the surface, regardless of target
+// or changed status.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/touches.
+func (ev *TouchEvent) Touches() []*Touch {
+	return touchListToTouches(ev.Get("touches"))
+}
+
+func touchListToTouches(tl *js.Object) []*Touch {
+	out := make([]*Touch, tl.Length())
+	for i := range out {
+		out[i] = &Touch{Object: tl.Index(i)}
+	}
+	return out
+}
+
+// Touch represents a single contact point on a touch-sensitive device. The contact point
+// is commonly a finger or stylus and the device may be a touchscreen or trackpad.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/Touch.
+type Touch struct {
+	*js.Object
+	Identifier    int     `js:"identifier"`
+	ScreenX       float64 `js:"screenX"`
+	ScreenY       float64 `js:"screenY"`
+	ClientX       float64 `js:"clientX"`
+	ClientY       float64 `js:"clientY"`
+	PageX         float64 `js:"pageX"`
+	PageY         float64 `js:"pageY"`
+	RadiusX       float64 `js:"radiusX"`
+	RadiusY       float64 `js:"radiusY"`
+	RotationAngle float64 `js:"rotationAngle"`
+	Force         float64 `js:"force"`
+}
+
+// Target returns the Element on which the touch point started when it was first placed
+// on the surface, even if the touch point has since moved outside the interactive area
+// of that element or even been removed from the document.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/Touch/target.
+func (t *Touch) Target() Element {
+	return wrapElement(t.Get("target"))
+}
+
 type TrackEvent struct{ *BasicEvent }
 type TransitionEvent struct{ *BasicEvent }
 type UIEvent struct{ *BasicEvent }
