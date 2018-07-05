@@ -3,9 +3,8 @@
 package dom
 
 import (
+	"syscall/js"
 	"time"
-
-	"github.com/gopherjs/gopherwasm/js"
 )
 
 func WrapEvent(o js.Value) Event {

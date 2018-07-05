@@ -118,9 +118,8 @@ import (
 	"image"
 	"image/color"
 	"strings"
+	"syscall/js"
 	"time"
-
-	"github.com/gopherjs/gopherwasm/js"
 )
 
 // Keys returns the keys of the given JavaScript object.
