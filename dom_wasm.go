@@ -1,4 +1,4 @@
-// +build js,!wasm
+// +build js,wasm
 
 package dom
 
@@ -6,21 +6,33 @@ import (
 	"image"
 	"image/color"
 	"strings"
+	"syscall/js"
 	"time"
-
-	"github.com/gopherjs/gopherjs/js"
 )
+
+// Keys returns the keys of the given JavaScript object.
+func jsKeys(o js.Value) []string {
+	if o == js.Null() || o == js.Undefined() {
+		return nil
+	}
+	a := js.Global().Get("Object").Call("keys", o)
+	s := make([]string, a.Length())
+	for i := 0; i < a.Length(); i++ {
+		s[i] = a.Index(i).String()
+	}
+	return s
+}
 
 // toString returns the string representation of o. If o is nil or
 // undefined, the empty string will be returned instead.
-func toString(o *js.Object) string {
-	if o == nil || o == js.Undefined {
+func toString(o js.Value) string {
+	if o == js.Null() || o == js.Undefined() {
 		return ""
 	}
 	return o.String()
 }
 
-func callRecover(o *js.Object, fn string, args ...interface{}) (err error) {
+func callRecover(o js.Value, fn string, args ...interface{}) (err error) {
 	defer func() {
 		e := recover()
 		if e == nil {
@@ -36,29 +48,29 @@ func callRecover(o *js.Object, fn string, args ...interface{}) (err error) {
 	return nil
 }
 
-func elementConstructor(o *js.Object) *js.Object {
-	if n := o.Get("node"); n != js.Undefined {
+func elementConstructor(o js.Value) js.Value {
+	if n := o.Get("node"); n != js.Undefined() {
 		// Support elements wrapped in Polymer's DOM APIs.
 		return n.Get("constructor")
 	}
 	return o.Get("constructor")
 }
 
-func arrayToObjects(o *js.Object) []*js.Object {
-	var out []*js.Object
+func arrayToObjects(o js.Value) []js.Value {
+	var out []js.Value
 	for i := 0; i < o.Length(); i++ {
 		out = append(out, o.Index(i))
 	}
 	return out
 }
 
-func nodeListToObjects(o *js.Object) []*js.Object {
-	if o.Get("constructor") == js.Global.Get("Array") {
+func nodeListToObjects(o js.Value) []js.Value {
+	if o.Get("constructor") == js.Global().Get("Array") {
 		// Support Polymer's DOM APIs, which uses Arrays instead of
 		// NodeLists
 		return arrayToObjects(o)
 	}
-	var out []*js.Object
+	var out []js.Value
 	length := o.Get("length").Int()
 	for i := 0; i < length; i++ {
 		out = append(out, o.Call("item", i))
@@ -66,7 +78,7 @@ func nodeListToObjects(o *js.Object) []*js.Object {
 	return out
 }
 
-func nodeListToNodes(o *js.Object) []Node {
+func nodeListToNodes(o js.Value) []Node {
 	var out []Node
 	for _, obj := range nodeListToObjects(o) {
 		out = append(out, wrapNode(obj))
@@ -74,7 +86,7 @@ func nodeListToNodes(o *js.Object) []Node {
 	return out
 }
 
-func nodeListToElements(o *js.Object) []Element {
+func nodeListToElements(o js.Value) []Element {
 	var out []Element
 	for _, obj := range nodeListToObjects(o) {
 		out = append(out, wrapElement(obj))
@@ -82,7 +94,7 @@ func nodeListToElements(o *js.Object) []Element {
 	return out
 }
 
-func nodeListToHTMLElements(o *js.Object) []HTMLElement {
+func nodeListToHTMLElements(o js.Value) []HTMLElement {
 	var out []HTMLElement
 	for _, obj := range nodeListToObjects(o) {
 		out = append(out, wrapHTMLElement(obj))
@@ -90,36 +102,36 @@ func nodeListToHTMLElements(o *js.Object) []HTMLElement {
 	return out
 }
 
-func WrapDocument(o *js.Object) Document {
+func WrapDocument(o js.Value) Document {
 	return wrapDocument(o)
 }
 
-func WrapDocumentFragment(o *js.Object) DocumentFragment {
+func WrapDocumentFragment(o js.Value) DocumentFragment {
 	return wrapDocumentFragment(o)
 }
 
-func WrapNode(o *js.Object) Node {
+func WrapNode(o js.Value) Node {
 	return wrapNode(o)
 }
 
-func WrapElement(o *js.Object) Element {
+func WrapElement(o js.Value) Element {
 	return wrapElement(o)
 }
 
-func WrapHTMLElement(o *js.Object) HTMLElement {
+func WrapHTMLElement(o js.Value) HTMLElement {
 	return wrapHTMLElement(o)
 }
 
-func wrapDocument(o *js.Object) Document {
+func wrapDocument(o js.Value) Document {
 	switch elementConstructor(o) {
-	case js.Global.Get("HTMLDocument"):
+	case js.Global().Get("HTMLDocument"):
 		return &htmlDocument{&document{&BasicNode{o}}}
 	default:
 		return &document{&BasicNode{o}}
 	}
 }
 
-func wrapDocumentFragment(o *js.Object) DocumentFragment {
+func wrapDocumentFragment(o js.Value) DocumentFragment {
 	switch elementConstructor(o) {
 	// TODO: do we have any other stuff we want to check
 	default:
@@ -127,21 +139,21 @@ func wrapDocumentFragment(o *js.Object) DocumentFragment {
 	}
 }
 
-func wrapNode(o *js.Object) Node {
-	if o == nil || o == js.Undefined {
+func wrapNode(o js.Value) Node {
+	if o == js.Null() || o == js.Undefined() {
 		return nil
 	}
 	switch elementConstructor(o) {
 	// TODO all the non-element cases
-	case js.Global.Get("Text"):
-		return &Text{&BasicNode{o}}
+	case js.Global().Get("Text"):
+		return Text{&BasicNode{o}}
 	default:
 		return wrapElement(o)
 	}
 }
 
-func wrapElement(o *js.Object) Element {
-	if o == nil || o == js.Undefined {
+func wrapElement(o js.Value) Element {
+	if o == js.Null() || o == js.Undefined() {
 		return nil
 	}
 	switch elementConstructor(o) {
@@ -151,157 +163,157 @@ func wrapElement(o *js.Object) Element {
 	}
 }
 
-func wrapHTMLElement(o *js.Object) HTMLElement {
-	if o == nil || o == js.Undefined {
+func wrapHTMLElement(o js.Value) HTMLElement {
+	if o == js.Null() || o == js.Undefined() {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
 	c := elementConstructor(o)
 	switch c {
-	case js.Global.Get("HTMLAnchorElement"):
-		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Object: o}}
-	case js.Global.Get("HTMLAppletElement"):
+	case js.Global().Get("HTMLAnchorElement"):
+		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
+	case js.Global().Get("HTMLAppletElement"):
 		return &HTMLAppletElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLAreaElement"):
-		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: &URLUtils{Object: o}}
-	case js.Global.Get("HTMLAudioElement"):
+	case js.Global().Get("HTMLAreaElement"):
+		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
+	case js.Global().Get("HTMLAudioElement"):
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case js.Global.Get("HTMLBaseElement"):
+	case js.Global().Get("HTMLBaseElement"):
 		return &HTMLBaseElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLBodyElement"):
+	case js.Global().Get("HTMLBodyElement"):
 		return &HTMLBodyElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLBRElement"):
+	case js.Global().Get("HTMLBRElement"):
 		return &HTMLBRElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLButtonElement"):
+	case js.Global().Get("HTMLButtonElement"):
 		return &HTMLButtonElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLCanvasElement"):
+	case js.Global().Get("HTMLCanvasElement"):
 		return &HTMLCanvasElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLDataElement"):
+	case js.Global().Get("HTMLDataElement"):
 		return &HTMLDataElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLDataListElement"):
+	case js.Global().Get("HTMLDataListElement"):
 		return &HTMLDataListElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLDirectoryElement"):
+	case js.Global().Get("HTMLDirectoryElement"):
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLDivElement"):
+	case js.Global().Get("HTMLDivElement"):
 		return &HTMLDivElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLDListElement"):
+	case js.Global().Get("HTMLDListElement"):
 		return &HTMLDListElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLEmbedElement"):
+	case js.Global().Get("HTMLEmbedElement"):
 		return &HTMLEmbedElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLFieldSetElement"):
+	case js.Global().Get("HTMLFieldSetElement"):
 		return &HTMLFieldSetElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLFontElement"):
+	case js.Global().Get("HTMLFontElement"):
 		return &HTMLFontElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLFormElement"):
+	case js.Global().Get("HTMLFormElement"):
 		return &HTMLFormElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLFrameElement"):
+	case js.Global().Get("HTMLFrameElement"):
 		return &HTMLFrameElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLFrameSetElement"):
+	case js.Global().Get("HTMLFrameSetElement"):
 		return &HTMLFrameSetElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLHeadElement"):
+	case js.Global().Get("HTMLHeadElement"):
 		return &HTMLHeadElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLHeadingElement"):
+	case js.Global().Get("HTMLHeadingElement"):
 		return &HTMLHeadingElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLHtmlElement"):
+	case js.Global().Get("HTMLHtmlElement"):
 		return &HTMLHtmlElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLHRElement"):
+	case js.Global().Get("HTMLHRElement"):
 		return &HTMLHRElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLIFrameElement"):
+	case js.Global().Get("HTMLIFrameElement"):
 		return &HTMLIFrameElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLImageElement"):
+	case js.Global().Get("HTMLImageElement"):
 		return &HTMLImageElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLInputElement"):
+	case js.Global().Get("HTMLInputElement"):
 		return &HTMLInputElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLKeygenElement"):
+	case js.Global().Get("HTMLKeygenElement"):
 		return &HTMLKeygenElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLLabelElement"):
+	case js.Global().Get("HTMLLabelElement"):
 		return &HTMLLabelElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLLegendElement"):
+	case js.Global().Get("HTMLLegendElement"):
 		return &HTMLLegendElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLLIElement"):
+	case js.Global().Get("HTMLLIElement"):
 		return &HTMLLIElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLLinkElement"):
+	case js.Global().Get("HTMLLinkElement"):
 		return &HTMLLinkElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLMapElement"):
+	case js.Global().Get("HTMLMapElement"):
 		return &HTMLMapElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLMediaElement"):
+	case js.Global().Get("HTMLMediaElement"):
 		return &HTMLMediaElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLMenuElement"):
+	case js.Global().Get("HTMLMenuElement"):
 		return &HTMLMenuElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLMetaElement"):
+	case js.Global().Get("HTMLMetaElement"):
 		return &HTMLMetaElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLMeterElement"):
+	case js.Global().Get("HTMLMeterElement"):
 		return &HTMLMeterElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLModElement"):
+	case js.Global().Get("HTMLModElement"):
 		return &HTMLModElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLObjectElement"):
+	case js.Global().Get("HTMLObjectElement"):
 		return &HTMLObjectElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLOListElement"):
+	case js.Global().Get("HTMLOListElement"):
 		return &HTMLOListElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLOptGroupElement"):
+	case js.Global().Get("HTMLOptGroupElement"):
 		return &HTMLOptGroupElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLOptionElement"):
+	case js.Global().Get("HTMLOptionElement"):
 		return &HTMLOptionElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLOutputElement"):
+	case js.Global().Get("HTMLOutputElement"):
 		return &HTMLOutputElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLParagraphElement"):
+	case js.Global().Get("HTMLParagraphElement"):
 		return &HTMLParagraphElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLParamElement"):
+	case js.Global().Get("HTMLParamElement"):
 		return &HTMLParamElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLPreElement"):
+	case js.Global().Get("HTMLPreElement"):
 		return &HTMLPreElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLProgressElement"):
+	case js.Global().Get("HTMLProgressElement"):
 		return &HTMLProgressElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLQuoteElement"):
+	case js.Global().Get("HTMLQuoteElement"):
 		return &HTMLQuoteElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLScriptElement"):
+	case js.Global().Get("HTMLScriptElement"):
 		return &HTMLScriptElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLSelectElement"):
+	case js.Global().Get("HTMLSelectElement"):
 		return &HTMLSelectElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLSourceElement"):
+	case js.Global().Get("HTMLSourceElement"):
 		return &HTMLSourceElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLSpanElement"):
+	case js.Global().Get("HTMLSpanElement"):
 		return &HTMLSpanElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLStyleElement"):
+	case js.Global().Get("HTMLStyleElement"):
 		return &HTMLStyleElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableElement"):
+	case js.Global().Get("HTMLTableElement"):
 		return &HTMLTableElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableCaptionElement"):
+	case js.Global().Get("HTMLTableCaptionElement"):
 		return &HTMLTableCaptionElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableCellElement"):
+	case js.Global().Get("HTMLTableCellElement"):
 		return &HTMLTableCellElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableDataCellElement"):
+	case js.Global().Get("HTMLTableDataCellElement"):
 		return &HTMLTableDataCellElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableHeaderCellElement"):
+	case js.Global().Get("HTMLTableHeaderCellElement"):
 		return &HTMLTableHeaderCellElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableColElement"):
+	case js.Global().Get("HTMLTableColElement"):
 		return &HTMLTableColElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableRowElement"):
+	case js.Global().Get("HTMLTableRowElement"):
 		return &HTMLTableRowElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTableSectionElement"):
+	case js.Global().Get("HTMLTableSectionElement"):
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTextAreaElement"):
+	case js.Global().Get("HTMLTextAreaElement"):
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTimeElement"):
+	case js.Global().Get("HTMLTimeElement"):
 		return &HTMLTimeElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTitleElement"):
+	case js.Global().Get("HTMLTitleElement"):
 		return &HTMLTitleElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLTrackElement"):
+	case js.Global().Get("HTMLTrackElement"):
 		return &HTMLTrackElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLUListElement"):
+	case js.Global().Get("HTMLUListElement"):
 		return &HTMLUListElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLUnknownElement"):
+	case js.Global().Get("HTMLUnknownElement"):
 		return &HTMLUnknownElement{BasicHTMLElement: el}
-	case js.Global.Get("HTMLVideoElement"):
+	case js.Global().Get("HTMLVideoElement"):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case js.Global.Get("HTMLElement"):
+	case js.Global().Get("HTMLElement"):
 		return el
 	default:
 		return el
 	}
 }
 
-func getForm(o *js.Object) *HTMLFormElement {
+func getForm(o js.Value) *HTMLFormElement {
 	form := wrapHTMLElement(o.Get("form"))
 	if form == nil {
 		return nil
@@ -309,7 +321,7 @@ func getForm(o *js.Object) *HTMLFormElement {
 	return form.(*HTMLFormElement)
 }
 
-func getLabels(o *js.Object) []*HTMLLabelElement {
+func getLabels(o js.Value) []*HTMLLabelElement {
 	labels := nodeListToElements(o.Get("labels"))
 	out := make([]*HTMLLabelElement, len(labels))
 	for i, label := range labels {
@@ -318,7 +330,7 @@ func getLabels(o *js.Object) []*HTMLLabelElement {
 	return out
 }
 
-func getOptions(o *js.Object, attr string) []*HTMLOptionElement {
+func getOptions(o js.Value, attr string) []*HTMLOptionElement {
 	options := nodeListToElements(o.Get(attr))
 	out := make([]*HTMLOptionElement, len(options))
 	for i, option := range options {
@@ -328,13 +340,13 @@ func getOptions(o *js.Object, attr string) []*HTMLOptionElement {
 }
 
 func GetWindow() Window {
-	return &window{js.Global}
+	return &window{js.Global()}
 }
 
 type TokenList struct {
-	dtl *js.Object // the underlying DOMTokenList
-	o   *js.Object // the object to which the DOMTokenList belongs
-	sa  string     // the name of the corresponding string attribute, empty if there isn't one
+	dtl js.Value // the underlying DOMTokenList
+	o   js.Value // the object to which the DOMTokenList belongs
+	sa  string   // the name of the corresponding string attribute, empty if there isn't one
 
 	Length int `js:"length"`
 }
@@ -364,7 +376,7 @@ func (tl *TokenList) String() string {
 	if tl.sa != "" {
 		return tl.o.Get(tl.sa).String()
 	}
-	if tl.dtl.Get("constructor") == js.Global.Get("DOMSettableTokenList") {
+	if tl.dtl.Get("constructor") == js.Global().Get("DOMSettableTokenList") {
 		return tl.dtl.Get("value").String()
 	}
 	// We could manually construct the string, but I am not aware of
@@ -389,7 +401,7 @@ func (tl *TokenList) SetString(s string) {
 		tl.o.Set(tl.sa, s)
 		return
 	}
-	if tl.dtl.Get("constructor") == js.Global.Get("DOMSettableTokenList") {
+	if tl.dtl.Get("constructor") == js.Global().Get("DOMSettableTokenList") {
 		tl.dtl.Set("value", s)
 		return
 	}
@@ -478,7 +490,7 @@ type documentFragment struct {
 }
 
 func (d documentFragment) GetElementByID(id string) Element {
-	return wrapElement(d.Call("getElementById", id))
+	return wrapElement(d.Object.Call("getElementById", id))
 }
 
 func (d documentFragment) QuerySelector(sel string) Element {
@@ -498,27 +510,27 @@ type htmlDocument struct {
 }
 
 func (d *htmlDocument) ActiveElement() HTMLElement {
-	return wrapHTMLElement(d.Get("activeElement"))
+	return wrapHTMLElement(d.Object.Get("activeElement"))
 }
 
 func (d *htmlDocument) Body() HTMLElement {
-	return wrapHTMLElement(d.Get("body"))
+	return wrapHTMLElement(d.Object.Get("body"))
 }
 
 func (d *htmlDocument) Cookie() string {
-	return d.Get("cookie").String()
+	return d.Object.Get("cookie").String()
 }
 
 func (d *htmlDocument) SetCookie(s string) {
-	d.Set("cookie", s)
+	d.Object.Set("cookie", s)
 }
 
 func (d *htmlDocument) DefaultView() Window {
-	return &window{d.Get("defaultView")}
+	return &window{d.Object.Get("defaultView")}
 }
 
 func (d *htmlDocument) DesignMode() bool {
-	s := d.Get("designMode").String()
+	s := d.Object.Get("designMode").String()
 	return s != "off"
 }
 
@@ -527,20 +539,20 @@ func (d *htmlDocument) SetDesignMode(b bool) {
 	if b {
 		s = "on"
 	}
-	d.Set("designMode", s)
+	d.Object.Set("designMode", s)
 }
 
 func (d *htmlDocument) Domain() string {
-	return d.Get("domain").String()
+	return d.Object.Get("domain").String()
 }
 
 func (d *htmlDocument) SetDomain(s string) {
-	d.Set("domain", s)
+	d.Object.Set("domain", s)
 }
 
 func (d *htmlDocument) Forms() []*HTMLFormElement {
 	var els []*HTMLFormElement
-	forms := d.Get("forms")
+	forms := d.Object.Get("forms")
 	length := forms.Get("length").Int()
 	for i := 0; i < length; i++ {
 		els = append(els, wrapHTMLElement(forms.Call("item", i)).(*HTMLFormElement))
@@ -549,7 +561,7 @@ func (d *htmlDocument) Forms() []*HTMLFormElement {
 }
 
 func (d *htmlDocument) Head() *HTMLHeadElement {
-	head := wrapElement(d.Get("head"))
+	head := wrapElement(d.Object.Get("head"))
 	if head == nil {
 		return nil
 	}
@@ -558,7 +570,7 @@ func (d *htmlDocument) Head() *HTMLHeadElement {
 
 func (d *htmlDocument) Images() []*HTMLImageElement {
 	var els []*HTMLImageElement
-	images := d.Get("images")
+	images := d.Object.Get("images")
 	length := images.Get("length").Int()
 	for i := 0; i < length; i++ {
 		els = append(els, wrapHTMLElement(images.Call("item", i)).(*HTMLImageElement))
@@ -567,12 +579,12 @@ func (d *htmlDocument) Images() []*HTMLImageElement {
 }
 
 func (d *htmlDocument) LastModified() time.Time {
-	return d.Get("lastModified").Interface().(time.Time)
+	return time.Unix(0, int64(d.Object.Get("lastModified").Call("getTime").Int())*1000000)
 }
 
 func (d *htmlDocument) Links() []HTMLElement {
 	var els []HTMLElement
-	links := d.Get("links")
+	links := d.Object.Get("links")
 	length := links.Get("length").Int()
 	for i := 0; i < length; i++ {
 		els = append(els, wrapHTMLElement(links.Call("item", i)))
@@ -581,13 +593,13 @@ func (d *htmlDocument) Links() []HTMLElement {
 }
 
 func (d *htmlDocument) Location() *Location {
-	o := d.Get("location")
-	return &Location{Object: o, URLUtils: &URLUtils{Object: o}}
+	o := d.Object.Get("location")
+	return &Location{Value: o, URLUtils: &URLUtils{Value: o}}
 }
 
 func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
 	var els []*HTMLEmbedElement
-	forms := d.Get("plugins")
+	forms := d.Object.Get("plugins")
 	length := forms.Get("length").Int()
 	for i := 0; i < length; i++ {
 		els = append(els, wrapHTMLElement(forms.Call("item", i)).(*HTMLEmbedElement))
@@ -596,16 +608,16 @@ func (d *htmlDocument) Plugins() []*HTMLEmbedElement {
 }
 
 func (d *htmlDocument) ReadyState() string {
-	return d.Get("readyState").String()
+	return d.Object.Get("readyState").String()
 }
 
 func (d *htmlDocument) Referrer() string {
-	return d.Get("referrer").String()
+	return d.Object.Get("referrer").String()
 }
 
 func (d *htmlDocument) Scripts() []*HTMLScriptElement {
 	var els []*HTMLScriptElement
-	forms := d.Get("scripts")
+	forms := d.Object.Get("scripts")
 	length := forms.Get("length").Int()
 	for i := 0; i < length; i++ {
 		els = append(els, wrapHTMLElement(forms.Call("item", i)).(*HTMLScriptElement))
@@ -614,23 +626,23 @@ func (d *htmlDocument) Scripts() []*HTMLScriptElement {
 }
 
 func (d *htmlDocument) Title() string {
-	return d.Get("title").String()
+	return d.Object.Get("title").String()
 }
 
 func (d *htmlDocument) SetTitle(s string) {
-	d.Set("title", s)
+	d.Object.Set("title", s)
 }
 
 func (d *htmlDocument) URL() string {
-	return d.Get("URL").String()
+	return d.Object.Get("URL").String()
 }
 
 func (d document) Async() bool {
-	return d.Get("async").Bool()
+	return d.Object.Get("async").Bool()
 }
 
 func (d document) SetAsync(b bool) {
-	d.Set("async", b)
+	d.Object.Set("async", b)
 }
 
 func (d document) Doctype() DocumentType {
@@ -639,11 +651,11 @@ func (d document) Doctype() DocumentType {
 }
 
 func (d document) DocumentElement() Element {
-	return wrapElement(d.Get("documentElement"))
+	return wrapElement(d.Object.Get("documentElement"))
 }
 
 func (d document) DocumentURI() string {
-	return d.Get("documentURI").String()
+	return d.Object.Get("documentURI").String()
 }
 
 func (d document) Implementation() DOMImplementation {
@@ -652,15 +664,15 @@ func (d document) Implementation() DOMImplementation {
 }
 
 func (d document) LastStyleSheetSet() string {
-	return d.Get("lastStyleSheetSet").String()
+	return d.Object.Get("lastStyleSheetSet").String()
 }
 
 func (d document) PreferredStyleSheetSet() string {
-	return d.Get("preferredStyleSheetSet").String()
+	return d.Object.Get("preferredStyleSheetSet").String()
 }
 
 func (d document) SelectedStyleSheetSet() string {
-	return d.Get("selectedStyleSheetSet").String()
+	return d.Object.Get("selectedStyleSheetSet").String()
 }
 
 func (d document) StyleSheets() []StyleSheet {
@@ -674,35 +686,35 @@ func (d document) StyleSheetSets() []StyleSheet {
 }
 
 func (d document) AdoptNode(node Node) Node {
-	return wrapNode(d.Call("adoptNode", node.Underlying()))
+	return wrapNode(d.Object.Call("adoptNode", node.Underlying()))
 }
 
 func (d document) ImportNode(node Node, deep bool) Node {
-	return wrapNode(d.Call("importNode", node.Underlying(), deep))
+	return wrapNode(d.Object.Call("importNode", node.Underlying(), deep))
 }
 
 func (d document) CreateDocumentFragment() DocumentFragment {
-	return wrapDocumentFragment(d.Call("createDocumentFragment"))
+	return wrapDocumentFragment(d.Object.Call("createDocumentFragment"))
 }
 
 func (d document) CreateElement(name string) Element {
-	return wrapElement(d.Call("createElement", name))
+	return wrapElement(d.Object.Call("createElement", name))
 }
 
 func (d document) CreateElementNS(ns string, name string) Element {
-	return wrapElement(d.Call("createElementNS", ns, name))
+	return wrapElement(d.Object.Call("createElementNS", ns, name))
 }
 
 func (d document) CreateTextNode(s string) *Text {
-	return wrapNode(d.Call("createTextNode", s)).(*Text)
+	return wrapNode(d.Object.Call("createTextNode", s)).(*Text)
 }
 
 func (d document) ElementFromPoint(x, y int) Element {
-	return wrapElement(d.Call("elementFromPoint", x, y))
+	return wrapElement(d.Object.Call("elementFromPoint", x, y))
 }
 
 func (d document) EnableStyleSheetsForSet(name string) {
-	d.Call("enableStyleSheetsForSet", name)
+	d.Object.Call("enableStyleSheetsForSet", name)
 }
 
 func (d document) GetElementsByClassName(name string) []Element {
@@ -718,7 +730,7 @@ func (d document) GetElementsByTagNameNS(ns, name string) []Element {
 }
 
 func (d document) GetElementByID(id string) Element {
-	return wrapElement(d.Call("getElementById", id))
+	return wrapElement(d.Object.Call("getElementById", id))
 }
 
 func (d document) QuerySelector(sel string) Element {
@@ -730,7 +742,7 @@ func (d document) QuerySelectorAll(sel string) []Element {
 }
 
 type URLUtils struct {
-	*js.Object
+	js.Value
 
 	Href     string `js:"href"`
 	Protocol string `js:"protocol"`
@@ -748,7 +760,7 @@ type URLUtils struct {
 // TODO Location methods
 
 type Location struct {
-	*js.Object
+	js.Value
 	*URLUtils
 }
 
@@ -851,7 +863,7 @@ type Window interface {
 
 type window struct {
 	// TODO EventTarget
-	*js.Object
+	js.Value
 }
 
 func (w *window) Console() *Console {
@@ -868,7 +880,7 @@ func (w *window) FrameElement() Element {
 
 func (w *window) Location() *Location {
 	o := w.Get("location")
-	return &Location{Object: o, URLUtils: &URLUtils{Object: o}}
+	return &Location{Value: o, URLUtils: &URLUtils{Value: o}}
 }
 
 func (w *window) Name() string {
@@ -946,7 +958,7 @@ func (w *window) Navigator() Navigator {
 }
 
 func (w *window) Screen() *Screen {
-	return &Screen{Object: w.Get("screen")}
+	return &Screen{Value: w.Get("screen")}
 }
 
 func (w *window) Alert(msg string) {
@@ -1076,13 +1088,13 @@ func (w *window) Stop() {
 
 // TODO reuse util.EventTarget
 
-func (w *window) AddEventListener(typ string, useCapture bool, listener func(Event)) func(o *js.Object) {
-	wrapper := func(o *js.Object) { listener(wrapEvent(o)) }
+func (w *window) AddEventListener(typ string, useCapture bool, listener func(Event)) func(o js.Value) {
+	wrapper := func(o js.Value) { listener(wrapEvent(o)) }
 	w.Call("addEventListener", typ, wrapper, useCapture)
 	return wrapper
 }
 
-func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(*js.Object)) {
+func (w *window) RemoveEventListener(typ string, useCapture bool, listener func(js.Value)) {
 	w.Call("removeEventListener", typ, listener, useCapture)
 }
 
@@ -1090,12 +1102,12 @@ func (w *window) DispatchEvent(event Event) bool {
 	return w.Call("dispatchEvent", event).Bool()
 }
 
-func wrapDOMHighResTimeStamp(o *js.Object) time.Duration {
+func wrapDOMHighResTimeStamp(o js.Value) time.Duration {
 	return time.Duration(o.Float() * float64(time.Millisecond))
 }
 
 func (w *window) RequestAnimationFrame(callback func(time.Duration)) int {
-	wrapper := func(o *js.Object) { callback(wrapDOMHighResTimeStamp(o)) }
+	wrapper := func(o js.Value) { callback(wrapDOMHighResTimeStamp(o)) }
 	return w.Call("requestAnimationFrame", wrapper).Int()
 }
 
@@ -1110,7 +1122,7 @@ type Selection interface {
 }
 
 type Screen struct {
-	*js.Object
+	js.Value
 	AvailTop    int `js:"availTop"`
 	AvailLeft   int `js:"availLeft"`
 	AvailHeight int `js:"availHeight"`
@@ -1164,7 +1176,7 @@ type Geolocation interface {
 }
 
 type PositionError struct {
-	*js.Object
+	js.Value
 	Code int `js:"code"`
 }
 
@@ -1184,7 +1196,7 @@ type Position struct {
 }
 
 type Coordinates struct {
-	*js.Object
+	js.Value
 	Latitude         float64 `js:"latitude"`
 	Longitude        float64 `js:"longitude"`
 	Altitude         float64 `js:"altitude"`
@@ -1205,7 +1217,7 @@ type History interface {
 }
 
 type Console struct {
-	*js.Object
+	js.Value
 	// TODO will replace the js/console package
 }
 
@@ -1218,7 +1230,7 @@ type CSSStyleSheet interface{}
 type Node interface {
 	EventTarget
 
-	Underlying() *js.Object
+	Underlying() js.Value
 	BaseURI() string
 	ChildNodes() []Node
 	FirstChild() Node
@@ -1252,61 +1264,62 @@ type Node interface {
 // Type BasicNode implements the Node interface and is embedded by
 // concrete node types and element types.
 type BasicNode struct {
-	*js.Object
+	// Do not use Value because most of the struct that embed this one already has Value of type string.
+	Object js.Value
 }
 
-func (n *BasicNode) Underlying() *js.Object {
+func (n *BasicNode) Underlying() js.Value {
 	return n.Object
 }
 
-func (n *BasicNode) AddEventListener(typ string, useCapture bool, listener func(Event)) func(*js.Object) {
-	wrapper := func(o *js.Object) { listener(wrapEvent(o)) }
-	n.Call("addEventListener", typ, wrapper, useCapture)
+func (n *BasicNode) AddEventListener(typ string, useCapture bool, listener func(Event)) func(js.Value) {
+	wrapper := func(o js.Value) { listener(wrapEvent(o)) }
+	n.Object.Call("addEventListener", typ, wrapper, useCapture)
 	return wrapper
 }
 
-func (n *BasicNode) RemoveEventListener(typ string, useCapture bool, listener func(*js.Object)) {
-	n.Call("removeEventListener", typ, listener, useCapture)
+func (n *BasicNode) RemoveEventListener(typ string, useCapture bool, listener func(js.Value)) {
+	n.Object.Call("removeEventListener", typ, listener, useCapture)
 }
 
 func (n *BasicNode) DispatchEvent(event Event) bool {
-	return n.Call("dispatchEvent", event).Bool()
+	return n.Object.Call("dispatchEvent", event).Bool()
 }
 
 func (n *BasicNode) BaseURI() string {
-	return n.Get("baseURI").String()
+	return n.Object.Get("baseURI").String()
 }
 
 func (n *BasicNode) ChildNodes() []Node {
-	return nodeListToNodes(n.Get("childNodes"))
+	return nodeListToNodes(n.Object.Get("childNodes"))
 }
 
 func (n *BasicNode) FirstChild() Node {
-	return wrapNode(n.Get("firstChild"))
+	return wrapNode(n.Object.Get("firstChild"))
 }
 
 func (n *BasicNode) LastChild() Node {
-	return wrapNode(n.Get("lastChild"))
+	return wrapNode(n.Object.Get("lastChild"))
 }
 
 func (n *BasicNode) NextSibling() Node {
-	return wrapNode(n.Get("nextSibling"))
+	return wrapNode(n.Object.Get("nextSibling"))
 }
 
 func (n *BasicNode) NodeName() string {
-	return n.Get("nodeName").String()
+	return n.Object.Get("nodeName").String()
 }
 
 func (n *BasicNode) NodeType() int {
-	return n.Get("nodeType").Int()
+	return n.Object.Get("nodeType").Int()
 }
 
 func (n *BasicNode) NodeValue() string {
-	return toString(n.Get("nodeValue"))
+	return toString(n.Object.Get("nodeValue"))
 }
 
 func (n *BasicNode) SetNodeValue(s string) {
-	n.Set("nodeValue", s)
+	n.Object.Set("nodeValue", s)
 }
 
 func (n *BasicNode) OwnerDocument() Document {
@@ -1315,31 +1328,31 @@ func (n *BasicNode) OwnerDocument() Document {
 }
 
 func (n *BasicNode) ParentNode() Node {
-	return wrapNode(n.Get("parentNode"))
+	return wrapNode(n.Object.Get("parentNode"))
 }
 
 func (n *BasicNode) ParentElement() Element {
-	return wrapElement(n.Get("parentElement"))
+	return wrapElement(n.Object.Get("parentElement"))
 }
 
 func (n *BasicNode) PreviousSibling() Node {
-	return wrapNode(n.Get("previousSibling"))
+	return wrapNode(n.Object.Get("previousSibling"))
 }
 
 func (n *BasicNode) TextContent() string {
-	return toString(n.Get("textContent"))
+	return toString(n.Object.Get("textContent"))
 }
 
 func (n *BasicNode) SetTextContent(s string) {
-	n.Set("textContent", s)
+	n.Object.Set("textContent", s)
 }
 
 func (n *BasicNode) AppendChild(newchild Node) {
-	n.Call("appendChild", newchild.Underlying())
+	n.Object.Call("appendChild", newchild.Underlying())
 }
 
 func (n *BasicNode) CloneNode(deep bool) Node {
-	return wrapNode(n.Call("cloneNode", deep))
+	return wrapNode(n.Object.Call("cloneNode", deep))
 }
 
 const (
@@ -1352,15 +1365,15 @@ const (
 )
 
 func (n *BasicNode) CompareDocumentPosition(other Node) int {
-	return n.Call("compareDocumentPosition", other.Underlying()).Int()
+	return n.Object.Call("compareDocumentPosition", other.Underlying()).Int()
 }
 
 func (n *BasicNode) Contains(other Node) bool {
-	return n.Call("contains", other.Underlying()).Bool()
+	return n.Object.Call("contains", other.Underlying()).Bool()
 }
 
 func (n *BasicNode) HasChildNodes() bool {
-	return n.Call("hasChildNodes").Bool()
+	return n.Object.Call("hasChildNodes").Bool()
 }
 
 func (n *BasicNode) InsertBefore(which Node, before Node) {
@@ -1368,35 +1381,35 @@ func (n *BasicNode) InsertBefore(which Node, before Node) {
 	if before != nil {
 		o = before.Underlying()
 	}
-	n.Call("insertBefore", which.Underlying(), o)
+	n.Object.Call("insertBefore", which.Underlying(), o)
 }
 
 func (n *BasicNode) IsDefaultNamespace(s string) bool {
-	return n.Call("isDefaultNamespace", s).Bool()
+	return n.Object.Call("isDefaultNamespace", s).Bool()
 }
 
 func (n *BasicNode) IsEqualNode(other Node) bool {
-	return n.Call("isEqualNode", other.Underlying()).Bool()
+	return n.Object.Call("isEqualNode", other.Underlying()).Bool()
 }
 
 func (n *BasicNode) LookupPrefix() string {
-	return n.Call("lookupPrefix").String()
+	return n.Object.Call("lookupPrefix").String()
 }
 
 func (n *BasicNode) LookupNamespaceURI(s string) string {
-	return toString(n.Call("lookupNamespaceURI", s))
+	return toString(n.Object.Call("lookupNamespaceURI", s))
 }
 
 func (n *BasicNode) Normalize() {
-	n.Call("normalize")
+	n.Object.Call("normalize")
 }
 
 func (n *BasicNode) RemoveChild(other Node) {
-	n.Call("removeChild", other.Underlying())
+	n.Object.Call("removeChild", other.Underlying())
 }
 
 func (n *BasicNode) ReplaceChild(newChild, oldChild Node) {
-	n.Call("replaceChild", newChild.Underlying(), oldChild.Underlying())
+	n.Object.Call("replaceChild", newChild.Underlying(), oldChild.Underlying())
 }
 
 type Element interface {
@@ -1430,7 +1443,7 @@ type Element interface {
 }
 
 type ClientRect struct {
-	*js.Object
+	js.Value
 	Height float64 `js:"height"`
 	Width  float64 `js:"width"`
 	Left   float64 `js:"left"`
@@ -1456,13 +1469,13 @@ type BasicHTMLElement struct {
 }
 
 func (e *BasicHTMLElement) AccessKey() string {
-	return e.Get("accessKey").String()
+	return e.Object.Get("accessKey").String()
 }
 
 func (e *BasicHTMLElement) Dataset() map[string]string {
-	o := e.Get("dataset")
+	o := e.Object.Get("dataset")
 	data := map[string]string{}
-	keys := js.Keys(o)
+	keys := jsKeys(o)
 	for _, key := range keys {
 		data[key] = o.Get(key).String()
 	}
@@ -1470,103 +1483,103 @@ func (e *BasicHTMLElement) Dataset() map[string]string {
 }
 
 func (e *BasicHTMLElement) SetAccessKey(s string) {
-	e.Set("accessKey", s)
+	e.Object.Set("accessKey", s)
 }
 
 func (e *BasicHTMLElement) AccessKeyLabel() string {
-	return e.Get("accessKeyLabel").String()
+	return e.Object.Get("accessKeyLabel").String()
 }
 
 func (e *BasicHTMLElement) SetAccessKeyLabel(s string) {
-	e.Set("accessKeyLabel", s)
+	e.Object.Set("accessKeyLabel", s)
 }
 
 func (e *BasicHTMLElement) ContentEditable() string {
-	return e.Get("contentEditable").String()
+	return e.Object.Get("contentEditable").String()
 }
 
 func (e *BasicHTMLElement) SetContentEditable(s string) {
-	e.Set("contentEditable", s)
+	e.Object.Set("contentEditable", s)
 }
 
 func (e *BasicHTMLElement) IsContentEditable() bool {
-	return e.Get("isContentEditable").Bool()
+	return e.Object.Get("isContentEditable").Bool()
 }
 
 func (e *BasicHTMLElement) Dir() string {
-	return e.Get("dir").String()
+	return e.Object.Get("dir").String()
 }
 
 func (e *BasicHTMLElement) SetDir(s string) {
-	e.Set("dir", s)
+	e.Object.Set("dir", s)
 }
 
 func (e *BasicHTMLElement) Draggable() bool {
-	return e.Get("draggable").Bool()
+	return e.Object.Get("draggable").Bool()
 }
 
 func (e *BasicHTMLElement) SetDraggable(b bool) {
-	e.Set("draggable", b)
+	e.Object.Set("draggable", b)
 }
 
 func (e *BasicHTMLElement) Lang() string {
-	return e.Get("lang").String()
+	return e.Object.Get("lang").String()
 }
 
 func (e *BasicHTMLElement) SetLang(s string) {
-	e.Set("lang", s)
+	e.Object.Set("lang", s)
 }
 
 func (e *BasicHTMLElement) OffsetHeight() float64 {
-	return e.Get("offsetHeight").Float()
+	return e.Object.Get("offsetHeight").Float()
 }
 
 func (e *BasicHTMLElement) OffsetLeft() float64 {
-	return e.Get("offsetLeft").Float()
+	return e.Object.Get("offsetLeft").Float()
 }
 
 func (e *BasicHTMLElement) OffsetParent() HTMLElement {
-	return wrapHTMLElement(e.Get("offsetParent"))
+	return wrapHTMLElement(e.Object.Get("offsetParent"))
 }
 
 func (e *BasicHTMLElement) OffsetTop() float64 {
-	return e.Get("offsetTop").Float()
+	return e.Object.Get("offsetTop").Float()
 }
 
 func (e *BasicHTMLElement) OffsetWidth() float64 {
-	return e.Get("offsetWidth").Float()
+	return e.Object.Get("offsetWidth").Float()
 }
 
 func (e *BasicHTMLElement) Style() *CSSStyleDeclaration {
-	return &CSSStyleDeclaration{e.Get("style")}
+	return &CSSStyleDeclaration{e.Object.Get("style")}
 }
 
 func (e *BasicHTMLElement) TabIndex() int {
-	return e.Get("tabIndex").Int()
+	return e.Object.Get("tabIndex").Int()
 }
 
 func (e *BasicHTMLElement) SetTabIndex(i int) {
-	e.Set("tabIndex", i)
+	e.Object.Set("tabIndex", i)
 }
 
 func (e *BasicHTMLElement) Title() string {
-	return e.Get("title").String()
+	return e.Object.Get("title").String()
 }
 
 func (e *BasicHTMLElement) SetTitle(s string) {
-	e.Set("title", s)
+	e.Object.Set("title", s)
 }
 
 func (e *BasicHTMLElement) Blur() {
-	e.Call("blur")
+	e.Object.Call("blur")
 }
 
 func (e *BasicHTMLElement) Click() {
-	e.Call("click")
+	e.Object.Call("click")
 }
 
 func (e *BasicHTMLElement) Focus() {
-	e.Call("focus")
+	e.Object.Call("focus")
 }
 
 // Type BasicElement implements the Element interface and is embedded
@@ -1576,7 +1589,7 @@ type BasicElement struct {
 }
 
 func (e *BasicElement) Attributes() map[string]string {
-	o := e.Get("attributes")
+	o := e.Object.Get("attributes")
 	attrs := map[string]string{}
 	length := o.Get("length").Int()
 	for i := 0; i < length; i++ {
@@ -1587,106 +1600,106 @@ func (e *BasicElement) Attributes() map[string]string {
 }
 
 func (e *BasicElement) GetBoundingClientRect() ClientRect {
-	obj := e.Call("getBoundingClientRect")
-	return ClientRect{Object: obj}
+	obj := e.Object.Call("getBoundingClientRect")
+	return ClientRect{Value: obj}
 }
 
 func (e *BasicElement) PreviousElementSibling() Element {
-	return wrapElement(e.Get("previousElementSibling"))
+	return wrapElement(e.Object.Get("previousElementSibling"))
 }
 
 func (e *BasicElement) NextElementSibling() Element {
-	return wrapElement(e.Get("nextElementSibling"))
+	return wrapElement(e.Object.Get("nextElementSibling"))
 }
 
 func (e *BasicElement) Class() *TokenList {
-	return &TokenList{dtl: e.Get("classList"), o: e.Object, sa: "className"}
+	return &TokenList{dtl: e.Object.Get("classList"), o: e.Object, sa: "className"}
 }
 
 // SetClass sets the element's className attribute to s. Consider
 // using the Class method instead.
 func (e *BasicElement) SetClass(s string) {
-	e.Set("className", s)
+	e.Object.Set("className", s)
 }
 
 func (e *BasicElement) ID() string {
-	return e.Get("id").String()
+	return e.Object.Get("id").String()
 }
 
 func (e *BasicElement) SetID(s string) {
-	e.Set("id", s)
+	e.Object.Set("id", s)
 }
 
 func (e *BasicElement) TagName() string {
-	return e.Get("tagName").String()
+	return e.Object.Get("tagName").String()
 }
 
 func (e *BasicElement) GetAttribute(name string) string {
-	return toString(e.Call("getAttribute", name))
+	return toString(e.Object.Call("getAttribute", name))
 }
 
 func (e *BasicElement) GetAttributeNS(ns string, name string) string {
-	return toString(e.Call("getAttributeNS", ns, name))
+	return toString(e.Object.Call("getAttributeNS", ns, name))
 }
 
 func (e *BasicElement) GetElementsByClassName(s string) []Element {
-	return nodeListToElements(e.Call("getElementsByClassName", s))
+	return nodeListToElements(e.Object.Call("getElementsByClassName", s))
 }
 
 func (e *BasicElement) GetElementsByTagName(s string) []Element {
-	return nodeListToElements(e.Call("getElementsByTagName", s))
+	return nodeListToElements(e.Object.Call("getElementsByTagName", s))
 }
 
 func (e *BasicElement) GetElementsByTagNameNS(ns string, name string) []Element {
-	return nodeListToElements(e.Call("getElementsByTagNameNS", ns, name))
+	return nodeListToElements(e.Object.Call("getElementsByTagNameNS", ns, name))
 }
 
 func (e *BasicElement) HasAttribute(s string) bool {
-	return e.Call("hasAttribute", s).Bool()
+	return e.Object.Call("hasAttribute", s).Bool()
 }
 
 func (e *BasicElement) HasAttributeNS(ns string, name string) bool {
-	return e.Call("hasAttributeNS", ns, name).Bool()
+	return e.Object.Call("hasAttributeNS", ns, name).Bool()
 }
 
 func (e *BasicElement) QuerySelector(s string) Element {
-	return wrapElement(e.Call("querySelector", s))
+	return wrapElement(e.Object.Call("querySelector", s))
 }
 
 func (e *BasicElement) QuerySelectorAll(s string) []Element {
-	return nodeListToElements(e.Call("querySelectorAll", s))
+	return nodeListToElements(e.Object.Call("querySelectorAll", s))
 }
 
 func (e *BasicElement) RemoveAttribute(s string) {
-	e.Call("removeAttribute", s)
+	e.Object.Call("removeAttribute", s)
 }
 
 func (e *BasicElement) RemoveAttributeNS(ns string, name string) {
-	e.Call("removeAttributeNS", ns, name)
+	e.Object.Call("removeAttributeNS", ns, name)
 }
 
 func (e *BasicElement) SetAttribute(name string, value string) {
-	e.Call("setAttribute", name, value)
+	e.Object.Call("setAttribute", name, value)
 }
 
 func (e *BasicElement) SetAttributeNS(ns string, name string, value string) {
-	e.Call("setAttributeNS", ns, name, value)
+	e.Object.Call("setAttributeNS", ns, name, value)
 }
 
 func (e *BasicElement) InnerHTML() string {
-	return e.Get("innerHTML").String()
+	return e.Object.Get("innerHTML").String()
 }
 
 func (e *BasicElement) SetInnerHTML(s string) {
-	e.Set("innerHTML", s)
+	e.Object.Set("innerHTML", s)
 }
 
 func (e *BasicElement) OuterHTML() string {
-	return e.Get("outerHTML").String()
+	return e.Object.Get("outerHTML").String()
 }
 
 func (e *BasicElement) SetOuterHTML(s string) {
-	e.Set("outerHTML", s)
+	e.Object.Set("outerHTML", s)
 }
 
 type HTMLAnchorElement struct {
@@ -1701,7 +1714,7 @@ type HTMLAnchorElement struct {
 }
 
 func (e *HTMLAnchorElement) Rel() *TokenList {
-	return &TokenList{dtl: e.Get("relList"), o: e.Object, sa: "rel"}
+	return &TokenList{dtl: e.Object.Get("relList"), o: e.Object, sa: "rel"}
 }
 
 type HTMLAppletElement struct {
@@ -1718,7 +1731,7 @@ type HTMLAppletElement struct {
 }
 
 func (e *HTMLAppletElement) Rel() *TokenList {
-	return &TokenList{dtl: e.Get("relList"), o: e.Object, sa: "rel"}
+	return &TokenList{dtl: e.Object.Get("relList"), o: e.Object, sa: "rel"}
 }
 
 type HTMLAreaElement struct {
@@ -1736,7 +1749,7 @@ type HTMLAreaElement struct {
 }
 
 func (e *HTMLAreaElement) Rel() *TokenList {
-	return &TokenList{dtl: e.Get("relList"), o: e.Object, sa: "rel"}
+	return &TokenList{dtl: e.Object.Get("relList"), o: e.Object, sa: "rel"}
 }
 
 type HTMLAudioElement struct{ *HTMLMediaElement }
@@ -1746,11 +1759,11 @@ type HTMLBRElement struct{ *BasicHTMLElement }
 type HTMLBaseElement struct{ *BasicHTMLElement }
 
 func (e *HTMLBaseElement) Href() string {
-	return e.Get("href").String()
+	return e.Object.Get("href").String()
 }
 
 func (e *HTMLBaseElement) Target() string {
-	return e.Get("target").String()
+	return e.Object.Get("target").String()
 }
 
 type HTMLBodyElement struct{ *BasicHTMLElement }
@@ -1782,15 +1795,15 @@ func (e *HTMLButtonElement) Labels() []*HTMLLabelElement {
 
 func (e *HTMLButtonElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLButtonElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLButtonElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLCanvasElement struct {
@@ -1800,7 +1813,7 @@ type HTMLCanvasElement struct {
 }
 
 type CanvasRenderingContext2D struct {
-	*js.Object
+	js.Value
 
 	// Colors, Styles, and Shadows
 
@@ -1831,11 +1844,11 @@ type CanvasRenderingContext2D struct {
 }
 
 type ImageData struct {
-	*js.Object
+	js.Value
 
-	Width  int        `js:"width"`
-	Height int        `js:"height"`
-	Data   *js.Object `js:"data"`
+	Width  int      `js:"width"`
+	Height int      `js:"height"`
+	Data   js.Value `js:"data"`
 }
 
 func (m *ImageData) ColorModel() color.Model { return color.NRGBAModel }
@@ -1893,7 +1906,7 @@ func (m *ImageData) SetNRGBA(x, y int, c color.NRGBA) {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasGradient.
 type CanvasGradient struct {
-	*js.Object
+	js.Value
 }
 
 // AddColorStop adds a new stop, defined by an offset and a color, to the gradient.
@@ -1911,11 +1924,11 @@ func (cg *CanvasGradient) AddColorStop(offset float64, color string) {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasPattern.
 type CanvasPattern struct {
-	*js.Object
+	js.Value
 }
 
 type TextMetrics struct {
-	*js.Object
+	js.Value
 
 	Width                    float64 `js:"width"`
 	ActualBoundingBoxLeft    float64 `js:"actualBoundingBoxLeft"`
@@ -1935,11 +1948,11 @@ type TextMetrics struct {
 
 func (e *HTMLCanvasElement) GetContext2d() *CanvasRenderingContext2D {
 	ctx := e.GetContext("2d")
-	return &CanvasRenderingContext2D{Object: ctx}
+	return &CanvasRenderingContext2D{Value: ctx}
 }
 
-func (e *HTMLCanvasElement) GetContext(param string) *js.Object {
-	return e.Call("getContext", param)
+func (e *HTMLCanvasElement) GetContext(param string) js.Value {
+	return e.Object.Call("getContext", param)
 }
 
 // Drawing Rectangles
@@ -1983,15 +1996,16 @@ func (ctx *CanvasRenderingContext2D) StrokeText(text string, x, y, maxWidth floa
 }
 func (ctx *CanvasRenderingContext2D) MeasureText(text string) *TextMetrics {
 	textMetrics := ctx.Call("measureText", text)
-	return &TextMetrics{Object: textMetrics}
+	return &TextMetrics{Value: textMetrics}
 }
 
 // Line styles
 
 func (ctx *CanvasRenderingContext2D) GetLineDash() []float64 {
 	var dashes []float64
-	for _, dash := range ctx.Call("getLineDash").Interface().([]interface{}) {
-		dashes = append(dashes, dash.(float64))
+	lineDash := ctx.Call("getLineDash")
+	for i := 0; i < lineDash.Length(); i++ {
+		dashes = append(dashes, lineDash.Index(i).Float())
 	}
 	return dashes
 }
@@ -2007,7 +2021,7 @@ func (ctx *CanvasRenderingContext2D) SetLineDash(dashes []float64) {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createLinearGradient.
 func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64) *CanvasGradient {
-	return &CanvasGradient{Object: ctx.Call("createLinearGradient", x0, y0, x1, y1)}
+	return &CanvasGradient{Value: ctx.Call("createLinearGradient", x0, y0, x1, y1)}
 }
 
 // CreateRadialGradient creates a radial gradient given by the coordinates of the two circles
@@ -2015,7 +2029,7 @@ func (ctx *CanvasRenderingContext2D) CreateLinearGradient(x0, y0, x1, y1 float64
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createRadialGradient.
 func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1 float64) *CanvasGradient {
-	return &CanvasGradient{Object: ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)}
+	return &CanvasGradient{Value: ctx.Call("createRadialGradient", x0, y0, r0, x1, y1, r1)}
 }
 
 // CreatePattern creates a pattern using the specified image (a CanvasImageSource).
@@ -2023,7 +2037,7 @@ func (ctx *CanvasRenderingContext2D) CreateRadialGradient(x0, y0, r0, x1, y1, r1
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/createPattern.
 func (ctx *CanvasRenderingContext2D) CreatePattern(image Element, repetition string) *CanvasPattern {
-	return &CanvasPattern{Object: ctx.Call("createPattern", image, repetition)}
+	return &CanvasPattern{Value: ctx.Call("createPattern", image, repetition)}
 }
 
 // Paths
@@ -2078,11 +2092,11 @@ func (ctx *CanvasRenderingContext2D) Stroke() {
 	ctx.Call("stroke")
 }
 
-func (ctx *CanvasRenderingContext2D) DrawFocusIfNeeded(element HTMLElement, path *js.Object) {
+func (ctx *CanvasRenderingContext2D) DrawFocusIfNeeded(element HTMLElement, path js.Value) {
 	ctx.Call("drawFocusIfNeeded", element, path)
 }
 
-func (ctx *CanvasRenderingContext2D) ScrollPathIntoView(path *js.Object) {
+func (ctx *CanvasRenderingContext2D) ScrollPathIntoView(path js.Value) {
 	ctx.Call("scrollPathIntoView", path)
 }
 
@@ -2094,7 +2108,7 @@ func (ctx *CanvasRenderingContext2D) IsPointInPath(x, y float64) bool {
 	return ctx.Call("isPointInPath", x, y).Bool()
 }
 
-func (ctx *CanvasRenderingContext2D) IsPointInStroke(path *js.Object, x, y float64) bool {
+func (ctx *CanvasRenderingContext2D) IsPointInStroke(path js.Value, x, y float64) bool {
 	return ctx.Call("isPointInStroke", path, x, y).Bool()
 }
 
@@ -2141,11 +2155,11 @@ func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image Element, sx, s
 // Pixel manipulation
 
 func (ctx *CanvasRenderingContext2D) CreateImageData(width, height int) *ImageData {
-	return &ImageData{Object: ctx.Call("createImageData", width, height)}
+	return &ImageData{Value: ctx.Call("createImageData", width, height)}
 }
 
 func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData {
-	return &ImageData{Object: ctx.Call("getImageData", sx, sy, sw, sh)}
+	return &ImageData{Value: ctx.Call("getImageData", sx, sy, sw, sh)}
 }
 
 func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy float64) {
@@ -2204,7 +2218,7 @@ type HTMLFieldSetElement struct {
 }
 
 func (e *HTMLFieldSetElement) Elements() []HTMLElement {
-	return nodeListToHTMLElements(e.Get("elements"))
+	return nodeListToHTMLElements(e.Object.Get("elements"))
 }
 
 func (e *HTMLFieldSetElement) Form() *HTMLFormElement {
@@ -2213,15 +2227,15 @@ func (e *HTMLFieldSetElement) Form() *HTMLFormElement {
 
 func (e *HTMLFieldSetElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLFieldSetElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLFieldSetElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLFontElement struct{ *BasicHTMLElement }
@@ -2241,27 +2255,27 @@ type HTMLFormElement struct {
 }
 
 func (e *HTMLFormElement) Elements() []HTMLElement {
-	return nodeListToHTMLElements(e.Get("elements"))
+	return nodeListToHTMLElements(e.Object.Get("elements"))
 }
 
 func (e *HTMLFormElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLFormElement) Submit() {
-	e.Call("submit")
+	e.Object.Call("submit")
 }
 
 func (e *HTMLFormElement) Reset() {
-	e.Call("reset")
+	e.Object.Call("reset")
 }
 
 func (e *HTMLFormElement) Item(index int) HTMLElement {
-	return wrapHTMLElement(e.Call("item", index))
+	return wrapHTMLElement(e.Object.Call("item", index))
 }
 
 func (e *HTMLFormElement) NamedItem(name string) HTMLElement {
-	return wrapHTMLElement(e.Call("namedItem", name))
+	return wrapHTMLElement(e.Object.Call("namedItem", name))
 }
 
 type HTMLFrameElement struct{ *BasicHTMLElement }
@@ -2283,11 +2297,11 @@ type HTMLIFrameElement struct {
 }
 
 func (e *HTMLIFrameElement) ContentDocument() Document {
-	return wrapDocument(e.Get("contentDocument"))
+	return wrapDocument(e.Object.Get("contentDocument"))
 }
 
 func (e *HTMLIFrameElement) ContentWindow() Window {
-	return &window{e.Get("contentWindow")}
+	return &window{e.Object.Get("contentWindow")}
 }
 
 type HTMLImageElement struct {
@@ -2351,11 +2365,11 @@ type HTMLInputElement struct {
 // and drop. The dom package does not define any methods on File nor
 // does it provide access to the blob or a way to read it.
 type File struct {
-	*js.Object
+	js.Value
 }
 
 func (e *HTMLInputElement) Files() []*File {
-	files := e.Get("files")
+	files := e.Object.Get("files")
 	out := make([]*File, files.Get("length").Int())
 	for i := range out {
 		out[i] = &File{files.Call("item", i)}
@@ -2364,7 +2378,7 @@ func (e *HTMLInputElement) Files() []*File {
 }
 
 func (e *HTMLInputElement) List() *HTMLDataListElement {
-	list := wrapHTMLElement(e.Get("list"))
+	list := wrapHTMLElement(e.Object.Get("list"))
 	if list == nil {
 		return nil
 	}
@@ -2381,23 +2395,23 @@ func (e *HTMLInputElement) Form() *HTMLFormElement {
 
 func (e *HTMLInputElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLInputElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLInputElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 func (e *HTMLInputElement) Select() {
-	e.Call("select")
+	e.Object.Call("select")
 }
 
 func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
-	e.Call("setSelectionRange", start, end, direction)
+	e.Object.Call("setSelectionRange", start, end, direction)
 }
 
 func (e *HTMLInputElement) StepDown(n int) error {
@@ -2430,15 +2444,15 @@ func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement {
 
 func (e *HTMLKeygenElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLKeygenElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLKeygenElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLLIElement struct {
@@ -2452,7 +2466,7 @@ type HTMLLabelElement struct {
 }
 
 func (e *HTMLLabelElement) Control() HTMLElement {
-	return wrapHTMLElement(e.Get("control"))
+	return wrapHTMLElement(e.Object.Get("control"))
 }
 
 func (e *HTMLLabelElement) Form() *HTMLFormElement {
@@ -2475,11 +2489,11 @@ type HTMLLinkElement struct {
 }
 
 func (e *HTMLLinkElement) Rel() *TokenList {
-	return &TokenList{dtl: e.Get("relList"), o: e.Object, sa: "rel"}
+	return &TokenList{dtl: e.Object.Get("relList"), o: e.Object, sa: "rel"}
 }
 
 func (e *HTMLLinkElement) Sizes() *TokenList {
-	return &TokenList{dtl: e.Get("sizes"), o: e.Object}
+	return &TokenList{dtl: e.Object.Get("sizes"), o: e.Object}
 }
 
 func (e *HTMLLinkElement) Sheet() StyleSheet {
@@ -2493,7 +2507,7 @@ type HTMLMapElement struct {
 }
 
 func (e *HTMLMapElement) Areas() []*HTMLAreaElement {
-	areas := nodeListToElements(e.Get("areas"))
+	areas := nodeListToElements(e.Object.Get("areas"))
 	out := make([]*HTMLAreaElement, len(areas))
 	for i, area := range areas {
 		out[i] = area.(*HTMLAreaElement)
@@ -2502,7 +2516,7 @@ func (e *HTMLMapElement) Areas() []*HTMLAreaElement {
 }
 
 func (e *HTMLMapElement) Images() []HTMLElement {
-	return nodeListToHTMLElements(e.Get("areas"))
+	return nodeListToHTMLElements(e.Object.Get("areas"))
 }
 
 type HTMLMediaElement struct {
@@ -2511,11 +2525,11 @@ type HTMLMediaElement struct {
 }
 
 func (e *HTMLMediaElement) Play() {
-	e.Call("play")
+	e.Object.Call("play")
 }
 
 func (e *HTMLMediaElement) Pause() {
-	e.Call("pause")
+	e.Object.Call("pause")
 }
 
 type HTMLMenuElement struct{ *BasicHTMLElement }
@@ -2572,24 +2586,24 @@ func (e *HTMLObjectElement) Form() *HTMLFormElement {
 }
 
 func (e *HTMLObjectElement) ContentDocument() Document {
-	return wrapDocument(e.Get("contentDocument"))
+	return wrapDocument(e.Object.Get("contentDocument"))
 }
 
 func (e *HTMLObjectElement) ContentWindow() Window {
-	return &window{e.Get("contentWindow")}
+	return &window{e.Object.Get("contentWindow")}
 }
 
 func (e *HTMLObjectElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLObjectElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLObjectElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLOptGroupElement struct {
@@ -2633,19 +2647,19 @@ func (e *HTMLOutputElement) Labels() []*HTMLLabelElement {
 
 func (e *HTMLOutputElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLOutputElement) For() *TokenList {
-	return &TokenList{dtl: e.Get("htmlFor"), o: e.Object}
+	return &TokenList{dtl: e.Object.Get("htmlFor"), o: e.Object}
 }
 
 func (e *HTMLOutputElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLOutputElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLParagraphElement struct{ *BasicHTMLElement }
@@ -2717,7 +2731,7 @@ func (e *HTMLSelectElement) SelectedOptions() []*HTMLOptionElement {
 }
 
 func (e *HTMLSelectElement) Item(index int) *HTMLOptionElement {
-	el := wrapHTMLElement(e.Call("item", index))
+	el := wrapHTMLElement(e.Object.Call("item", index))
 	if el == nil {
 		return nil
 	}
@@ -2725,7 +2739,7 @@ func (e *HTMLSelectElement) Item(index int) *HTMLOptionElement {
 }
 
 func (e *HTMLSelectElement) NamedItem(name string) *HTMLOptionElement {
-	el := wrapHTMLElement(e.Call("namedItem", name))
+	el := wrapHTMLElement(e.Object.Call("namedItem", name))
 	if el == nil {
 		return nil
 	}
@@ -2738,15 +2752,15 @@ func (e *HTMLSelectElement) NamedItem(name string) *HTMLOptionElement {
 // instead.
 
 func (e *HTMLSelectElement) Validity() *ValidityState {
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLSelectElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLSelectElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 type HTMLSourceElement struct {
@@ -2789,7 +2803,7 @@ type HTMLTableRowElement struct {
 }
 
 func (e *HTMLTableRowElement) Cells() []*HTMLTableCellElement {
-	cells := nodeListToElements(e.Get("cells"))
+	cells := nodeListToElements(e.Object.Get("cells"))
 	out := make([]*HTMLTableCellElement, len(cells))
 	for i, cell := range cells {
 		out[i] = cell.(*HTMLTableCellElement)
@@ -2798,18 +2812,18 @@ func (e *HTMLTableRowElement) Cells() []*HTMLTableCellElement {
 }
 
 func (e *HTMLTableRowElement) InsertCell(index int) *HTMLTableCellElement {
-	return wrapHTMLElement(e.Call("insertCell", index)).(*HTMLTableCellElement)
+	return wrapHTMLElement(e.Object.Call("insertCell", index)).(*HTMLTableCellElement)
 }
 
 func (e *HTMLTableRowElement) DeleteCell(index int) {
 	// FIXME exception handling/check that index is in bounds
-	e.Call("deleteCell", index)
+	e.Object.Call("deleteCell", index)
 }
 
 type HTMLTableSectionElement struct{ *BasicHTMLElement }
 
 func (e *HTMLTableSectionElement) Rows() []*HTMLTableRowElement {
-	rows := nodeListToElements(e.Get("rows"))
+	rows := nodeListToElements(e.Object.Get("rows"))
 	out := make([]*HTMLTableRowElement, len(rows))
 	for i, row := range rows {
 		out[i] = row.(*HTMLTableRowElement)
@@ -2819,11 +2833,11 @@ func (e *HTMLTableSectionElement) Rows() []*HTMLTableRowElement {
 
 func (e *HTMLTableSectionElement) DeleteRow(index int) {
 	// FIXME exception handling/check that index is in bounds
-	e.Call("deleteRow", index)
+	e.Object.Call("deleteRow", index)
 }
 
 func (e *HTMLTableSectionElement) InsertRow(index int) *HTMLTableRowElement {
-	return wrapHTMLElement(e.Call("insertRow", index)).(*HTMLTableRowElement)
+	return wrapHTMLElement(e.Object.Call("insertRow", index)).(*HTMLTableRowElement)
 }
 
 type HTMLTextAreaElement struct {
@@ -2862,23 +2876,23 @@ func (e *HTMLTextAreaElement) Labels() []*HTMLLabelElement {
 
 func (e *HTMLTextAreaElement) Validity() *ValidityState {
 	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Object: e.Get("validity")}
+	return &ValidityState{Value: e.Object.Get("validity")}
 }
 
 func (e *HTMLTextAreaElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
+	return e.Object.Call("checkValidity").Bool()
 }
 
 func (e *HTMLTextAreaElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
+	e.Object.Call("setCustomValidity", s)
 }
 
 func (e *HTMLTextAreaElement) Select() {
-	e.Call("select")
+	e.Object.Call("select")
 }
 
 func (e *HTMLTextAreaElement) SetSelectionRange(start, end int, direction string) {
-	e.Call("setSelectionRange", start, end, direction)
+	e.Object.Call("setSelectionRange", start, end, direction)
 }
 
 type HTMLTimeElement struct {
@@ -2895,7 +2909,7 @@ type HTMLTitleElement struct {
 // not currently provide any methods or attributes and it hasn't been
 // decided yet whether they will be added to this package or a
 // separate package.
-type TextTrack struct{ *js.Object }
+type TextTrack struct{ js.Value }
 
 type HTMLTrackElement struct {
 	*BasicHTMLElement
@@ -2908,7 +2922,7 @@ type HTMLTrackElement struct {
 }
 
 func (e *HTMLTrackElement) Track() *TextTrack {
-	return &TextTrack{e.Get("track")}
+	return &TextTrack{e.Object.Get("track")}
 }
 
 type HTMLUListElement struct{ *BasicHTMLElement }
@@ -2917,7 +2931,7 @@ type HTMLUnknownElement struct{ *BasicHTMLElement }
 type HTMLVideoElement struct{ *HTMLMediaElement }
 
 type ValidityState struct {
-	*js.Object
+	js.Value
 	CustomError     bool `js:"customError"`
 	PatternMismatch bool `js:"patternMismatch"`
 	RangeOverflow   bool `js:"rangeOverflow"`
@@ -2929,7 +2943,7 @@ type ValidityState struct {
 	ValueMissing    bool `js:"valueMissing"`
 }
 
-type CSSStyleDeclaration struct{ *js.Object }
+type CSSStyleDeclaration struct{ js.Value }
 
 func (css *CSSStyleDeclaration) ToMap() map[string]string {
 	m := make(map[string]string)

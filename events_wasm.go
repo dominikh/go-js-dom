@@ -1,113 +1,112 @@
-// +build js,!wasm
+// +build js,wasm
 
 package dom
 
 import (
+	"syscall/js"
 	"time"
-
-	"github.com/gopherjs/gopherjs/js"
 )
 
-func WrapEvent(o *js.Object) Event {
+func WrapEvent(o js.Value) Event {
 	return wrapEvent(o)
 }
 
-func wrapEvent(o *js.Object) Event {
-	if o == nil || o == js.Undefined {
+func wrapEvent(o js.Value) Event {
+	if o == js.Null() || o == js.Undefined() {
 		return nil
 	}
 	ev := &BasicEvent{o}
 	c := o.Get("constructor")
 	switch c {
-	case js.Global.Get("AnimationEvent"):
+	case js.Global().Get("AnimationEvent"):
 		return &AnimationEvent{ev}
-	case js.Global.Get("AudioProcessingEvent"):
+	case js.Global().Get("AudioProcessingEvent"):
 		return &AudioProcessingEvent{ev}
-	case js.Global.Get("BeforeInputEvent"):
+	case js.Global().Get("BeforeInputEvent"):
 		return &BeforeInputEvent{ev}
-	case js.Global.Get("BeforeUnloadEvent"):
+	case js.Global().Get("BeforeUnloadEvent"):
 		return &BeforeUnloadEvent{ev}
-	case js.Global.Get("BlobEvent"):
+	case js.Global().Get("BlobEvent"):
 		return &BlobEvent{ev}
-	case js.Global.Get("ClipboardEvent"):
+	case js.Global().Get("ClipboardEvent"):
 		return &ClipboardEvent{ev}
-	case js.Global.Get("CloseEvent"):
+	case js.Global().Get("CloseEvent"):
 		return &CloseEvent{BasicEvent: ev}
-	case js.Global.Get("CompositionEvent"):
+	case js.Global().Get("CompositionEvent"):
 		return &CompositionEvent{ev}
-	case js.Global.Get("CSSFontFaceLoadEvent"):
+	case js.Global().Get("CSSFontFaceLoadEvent"):
 		return &CSSFontFaceLoadEvent{ev}
-	case js.Global.Get("CustomEvent"):
+	case js.Global().Get("CustomEvent"):
 		return &CustomEvent{ev}
-	case js.Global.Get("DeviceLightEvent"):
+	case js.Global().Get("DeviceLightEvent"):
 		return &DeviceLightEvent{ev}
-	case js.Global.Get("DeviceMotionEvent"):
+	case js.Global().Get("DeviceMotionEvent"):
 		return &DeviceMotionEvent{ev}
-	case js.Global.Get("DeviceOrientationEvent"):
+	case js.Global().Get("DeviceOrientationEvent"):
 		return &DeviceOrientationEvent{ev}
-	case js.Global.Get("DeviceProximityEvent"):
+	case js.Global().Get("DeviceProximityEvent"):
 		return &DeviceProximityEvent{ev}
-	case js.Global.Get("DOMTransactionEvent"):
+	case js.Global().Get("DOMTransactionEvent"):
 		return &DOMTransactionEvent{ev}
-	case js.Global.Get("DragEvent"):
+	case js.Global().Get("DragEvent"):
 		return &DragEvent{ev}
-	case js.Global.Get("EditingBeforeInputEvent"):
+	case js.Global().Get("EditingBeforeInputEvent"):
 		return &EditingBeforeInputEvent{ev}
-	case js.Global.Get("ErrorEvent"):
+	case js.Global().Get("ErrorEvent"):
 		return &ErrorEvent{ev}
-	case js.Global.Get("FocusEvent"):
+	case js.Global().Get("FocusEvent"):
 		return &FocusEvent{ev}
-	case js.Global.Get("GamepadEvent"):
+	case js.Global().Get("GamepadEvent"):
 		return &GamepadEvent{ev}
-	case js.Global.Get("HashChangeEvent"):
+	case js.Global().Get("HashChangeEvent"):
 		return &HashChangeEvent{ev}
-	case js.Global.Get("IDBVersionChangeEvent"):
+	case js.Global().Get("IDBVersionChangeEvent"):
 		return &IDBVersionChangeEvent{ev}
-	case js.Global.Get("KeyboardEvent"):
+	case js.Global().Get("KeyboardEvent"):
 		return &KeyboardEvent{BasicEvent: ev}
-	case js.Global.Get("MediaStreamEvent"):
+	case js.Global().Get("MediaStreamEvent"):
 		return &MediaStreamEvent{ev}
-	case js.Global.Get("MessageEvent"):
+	case js.Global().Get("MessageEvent"):
 		return &MessageEvent{BasicEvent: ev}
-	case js.Global.Get("MouseEvent"):
+	case js.Global().Get("MouseEvent"):
 		return &MouseEvent{UIEvent: &UIEvent{ev}}
-	case js.Global.Get("MutationEvent"):
+	case js.Global().Get("MutationEvent"):
 		return &MutationEvent{ev}
-	case js.Global.Get("OfflineAudioCompletionEvent"):
+	case js.Global().Get("OfflineAudioCompletionEvent"):
 		return &OfflineAudioCompletionEvent{ev}
-	case js.Global.Get("PageTransitionEvent"):
+	case js.Global().Get("PageTransitionEvent"):
 		return &PageTransitionEvent{ev}
-	case js.Global.Get("PointerEvent"):
+	case js.Global().Get("PointerEvent"):
 		return &PointerEvent{ev}
-	case js.Global.Get("PopStateEvent"):
+	case js.Global().Get("PopStateEvent"):
 		return &PopStateEvent{ev}
-	case js.Global.Get("ProgressEvent"):
+	case js.Global().Get("ProgressEvent"):
 		return &ProgressEvent{ev}
-	case js.Global.Get("RelatedEvent"):
+	case js.Global().Get("RelatedEvent"):
 		return &RelatedEvent{ev}
-	case js.Global.Get("RTCPeerConnectionIceEvent"):
+	case js.Global().Get("RTCPeerConnectionIceEvent"):
 		return &RTCPeerConnectionIceEvent{ev}
-	case js.Global.Get("SensorEvent"):
+	case js.Global().Get("SensorEvent"):
 		return &SensorEvent{ev}
-	case js.Global.Get("StorageEvent"):
+	case js.Global().Get("StorageEvent"):
 		return &StorageEvent{ev}
-	case js.Global.Get("SVGEvent"):
+	case js.Global().Get("SVGEvent"):
 		return &SVGEvent{ev}
-	case js.Global.Get("SVGZoomEvent"):
+	case js.Global().Get("SVGZoomEvent"):
 		return &SVGZoomEvent{ev}
-	case js.Global.Get("TimeEvent"):
+	case js.Global().Get("TimeEvent"):
 		return &TimeEvent{ev}
-	case js.Global.Get("TouchEvent"):
+	case js.Global().Get("TouchEvent"):
 		return &TouchEvent{BasicEvent: ev}
-	case js.Global.Get("TrackEvent"):
+	case js.Global().Get("TrackEvent"):
 		return &TrackEvent{ev}
-	case js.Global.Get("TransitionEvent"):
+	case js.Global().Get("TransitionEvent"):
 		return &TransitionEvent{ev}
-	case js.Global.Get("UIEvent"):
+	case js.Global().Get("UIEvent"):
 		return &UIEvent{ev}
-	case js.Global.Get("UserProximityEvent"):
+	case js.Global().Get("UserProximityEvent"):
 		return &UserProximityEvent{ev}
-	case js.Global.Get("WheelEvent"):
+	case js.Global().Get("WheelEvent"):
 		return &WheelEvent{BasicEvent: ev}
 	default:
 		return ev
@@ -133,12 +132,12 @@ type Event interface {
 	PreventDefault()
 	StopImmediatePropagation()
 	StopPropagation()
-	Underlying() *js.Object
+	Underlying() js.Value
 }
 
 // Type BasicEvent implements the Event interface and is embedded by
 // concrete event types.
-type BasicEvent struct{ *js.Object }
+type BasicEvent struct{ Object js.Value }
 
 type EventOptions struct {
 	Bubbles    bool
@@ -146,61 +145,63 @@ type EventOptions struct {
 }
 
 func CreateEvent(typ string, opts EventOptions) *BasicEvent {
-	var event = js.Global.Get("Event").New(typ, js.M{
-		"bubbles":    opts.Bubbles,
-		"cancelable": opts.Cancelable,
-	})
+	var event = js.Global().Get("Event").New(
+		typ,
+		map[string]interface{}{
+			"bubbles":    opts.Bubbles,
+			"cancelable": opts.Cancelable,
+		})
 	return &BasicEvent{event}
 }
 
 func (ev *BasicEvent) Bubbles() bool {
-	return ev.Get("bubbles").Bool()
+	return ev.Object.Get("bubbles").Bool()
 }
 
 func (ev *BasicEvent) Cancelable() bool {
-	return ev.Get("cancelable").Bool()
+	return ev.Object.Get("cancelable").Bool()
 }
 
 func (ev *BasicEvent) CurrentTarget() Element {
-	return wrapElement(ev.Get("currentTarget"))
+	return wrapElement(ev.Object.Get("currentTarget"))
 }
 
 func (ev *BasicEvent) DefaultPrevented() bool {
-	return ev.Get("defaultPrevented").Bool()
+	return ev.Object.Get("defaultPrevented").Bool()
 }
 
 func (ev *BasicEvent) EventPhase() int {
-	return ev.Get("eventPhase").Int()
+	return ev.Object.Get("eventPhase").Int()
 }
 
 func (ev *BasicEvent) Target() Element {
-	return wrapElement(ev.Get("target"))
+	return wrapElement(ev.Object.Get("target"))
 }
 
 func (ev *BasicEvent) Timestamp() time.Time {
-	ms := ev.Get("timeStamp").Int()
+	ms := ev.Object.Get("timeStamp").Int()
 	s := ms / 1000
 	ns := (ms % 1000 * 1e6)
 	return time.Unix(int64(s), int64(ns))
 }
 
 func (ev *BasicEvent) Type() string {
-	return ev.Get("type").String()
+	return ev.Object.Get("type").String()
 }
 
 func (ev *BasicEvent) PreventDefault() {
-	ev.Call("preventDefault")
+	ev.Object.Call("preventDefault")
 }
 
 func (ev *BasicEvent) StopImmediatePropagation() {
-	ev.Call("stopImmediatePropagation")
+	ev.Object.Call("stopImmediatePropagation")
 }
 
 func (ev *BasicEvent) StopPropagation() {
-	ev.Call("stopPropagation")
+	ev.Object.Call("stopPropagation")
 }
 
-func (ev *BasicEvent) Underlying() *js.Object {
+func (ev *BasicEvent) Underlying() js.Value {
 	return ev.Object
 }
 
@@ -233,7 +234,7 @@ type ErrorEvent struct{ *BasicEvent }
 type FocusEvent struct{ *BasicEvent }
 
 func (ev *FocusEvent) RelatedTarget() Element {
-	return wrapElement(ev.Get("relatedTarget"))
+	return wrapElement(ev.Object.Get("relatedTarget"))
 }
 
 type GamepadEvent struct{ *BasicEvent }
@@ -264,14 +265,14 @@ type KeyboardEvent struct {
 }
 
 func (ev *KeyboardEvent) ModifierState(mod string) bool {
-	return ev.Call("getModifierState", mod).Bool()
+	return ev.Object.Call("getModifierState", mod).Bool()
 }
 
 type MediaStreamEvent struct{ *BasicEvent }
 
 type MessageEvent struct {
 	*BasicEvent
-	Data *js.Object `js:"data"`
+	Data js.Value `js:"data"`
 }
 
 type MouseEvent struct {
@@ -290,11 +291,11 @@ type MouseEvent struct {
 }
 
 func (ev *MouseEvent) RelatedTarget() Element {
-	return wrapElement(ev.Get("relatedTarget"))
+	return wrapElement(ev.Object.Get("relatedTarget"))
 }
 
 func (ev *MouseEvent) ModifierState(mod string) bool {
-	return ev.Call("getModifierState", mod).Bool()
+	return ev.Object.Call("getModifierState", mod).Bool()
 }
 
 type MutationEvent struct{ *BasicEvent }
@@ -330,7 +331,7 @@ type TouchEvent struct {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/changedTouches.
 func (ev *TouchEvent) ChangedTouches() []*Touch {
-	return touchListToTouches(ev.Get("changedTouches"))
+	return touchListToTouches(ev.Object.Get("changedTouches"))
 }
 
 // TargetTouches lists all points of contact that are both currently in contact with the
@@ -338,7 +339,7 @@ func (ev *TouchEvent) ChangedTouches() []*Touch {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/targetTouches.
 func (ev *TouchEvent) TargetTouches() []*Touch {
-	return touchListToTouches(ev.Get("targetTouches"))
+	return touchListToTouches(ev.Object.Get("targetTouches"))
 }
 
 // Touches lists all current points of contact with the surface, regardless of target
@@ -346,13 +347,13 @@ func (ev *TouchEvent) TargetTouches() []*Touch {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/touches.
 func (ev *TouchEvent) Touches() []*Touch {
-	return touchListToTouches(ev.Get("touches"))
+	return touchListToTouches(ev.Object.Get("touches"))
 }
 
-func touchListToTouches(tl *js.Object) []*Touch {
+func touchListToTouches(tl js.Value) []*Touch {
 	out := make([]*Touch, tl.Length())
 	for i := range out {
-		out[i] = &Touch{Object: tl.Index(i)}
+		out[i] = &Touch{Value: tl.Index(i)}
 	}
 	return out
 }
@@ -362,7 +363,7 @@ func touchListToTouches(tl *js.Object) []*Touch {
 //
 // Reference: https://developer.mozilla.org/en-US/docs/Web/API/Touch.
 type Touch struct {
-	*js.Object
+	js.Value
 	Identifier    int     `js:"identifier"`
 	ScreenX       float64 `js:"screenX"`
 	ScreenY       float64 `js:"screenY"`
@@ -408,7 +409,7 @@ type EventTarget interface {
 	// AddEventListener adds a new event listener and returns the
 	// wrapper function it generated. If using RemoveEventListener,
 	// that wrapper has to be used.
-	AddEventListener(typ string, useCapture bool, listener func(Event)) func(*js.Object)
-	RemoveEventListener(typ string, useCapture bool, listener func(*js.Object))
+	AddEventListener(typ string, useCapture bool, listener func(Event)) func(js.Value)
+	RemoveEventListener(typ string, useCapture bool, listener func(js.Value))
 	DispatchEvent(event Event) bool
 }
