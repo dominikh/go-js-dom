@@ -110,5 +110,4 @@
 //
 // If you depend on none of the APIs changing unexpectedly, you're
 // advised to vendor this package.
-
 package dom // import "honnef.co/go/js/dom"

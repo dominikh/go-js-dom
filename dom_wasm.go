@@ -1,6 +1,6 @@
 // +build js,wasm
 
-package dom // import "honnef.co/go/js/dom"
+package dom
 
 import (
 	"image"
