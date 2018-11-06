@@ -404,6 +404,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLUnknownElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLVideoElement"):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
+	case js.Global.Get("HTMLTemplateElement"):
+		return &HTMLTemplateElement{el}
 	case js.Global.Get("HTMLElement"):
 		return el
 	default:
@@ -3025,6 +3027,12 @@ type HTMLUListElement struct{ *BasicHTMLElement }
 type HTMLUnknownElement struct{ *BasicHTMLElement }
 
 type HTMLVideoElement struct{ *HTMLMediaElement }
+
+type HTMLTemplateElement struct{ *BasicHTMLElement }
+
+func (e *HTMLTemplateElement) Content() DocumentFragment {
+	return wrapDocumentFragment(e.Get("content"))
+}
 
 type ValidityState struct {
 	*js.Object
