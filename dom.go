@@ -390,6 +390,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLTableRowElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTableSectionElement"):
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLTemplateElement"):
+		return &HTMLTemplateElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTextAreaElement"):
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTimeElement"):
@@ -404,8 +406,6 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLUnknownElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLVideoElement"):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case js.Global.Get("HTMLTemplateElement"):
-		return &HTMLTemplateElement{el}
 	case js.Global.Get("HTMLElement"):
 		return el
 	default:
@@ -2938,6 +2938,12 @@ func (e *HTMLTableSectionElement) InsertRow(index int) *HTMLTableRowElement {
 	return wrapHTMLElement(e.Call("insertRow", index)).(*HTMLTableRowElement)
 }
 
+type HTMLTemplateElement struct{ *BasicHTMLElement }
+
+func (e *HTMLTemplateElement) Content() DocumentFragment {
+	return wrapDocumentFragment(e.Get("content"))
+}
+
 type HTMLTextAreaElement struct {
 	*BasicHTMLElement
 	Autocomplete       string `js:"autocomplete"`
@@ -3027,12 +3033,6 @@ type HTMLUListElement struct{ *BasicHTMLElement }
 type HTMLUnknownElement struct{ *BasicHTMLElement }
 
 type HTMLVideoElement struct{ *HTMLMediaElement }
-
-type HTMLTemplateElement struct{ *BasicHTMLElement }
-
-func (e *HTMLTemplateElement) Content() DocumentFragment {
-	return wrapDocumentFragment(e.Get("content"))
-}
 
 type ValidityState struct {
 	*js.Object
