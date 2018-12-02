@@ -390,6 +390,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLTableRowElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTableSectionElement"):
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLTemplateElement"):
+		return &HTMLTemplateElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTextAreaElement"):
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLTimeElement"):
@@ -2934,6 +2936,12 @@ func (e *HTMLTableSectionElement) DeleteRow(index int) {
 
 func (e *HTMLTableSectionElement) InsertRow(index int) *HTMLTableRowElement {
 	return wrapHTMLElement(e.Call("insertRow", index)).(*HTMLTableRowElement)
+}
+
+type HTMLTemplateElement struct{ *BasicHTMLElement }
+
+func (e *HTMLTemplateElement) Content() DocumentFragment {
+	return wrapDocumentFragment(e.Get("content"))
 }
 
 type HTMLTextAreaElement struct {
