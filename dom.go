@@ -290,6 +290,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLDataElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDataListElement"):
 		return &HTMLDataListElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLDialogElement"):
+		return &HTMLDialogElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDirectoryElement"):
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDivElement"):
@@ -358,6 +360,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLParagraphElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLParamElement"):
 		return &HTMLParamElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLPictureElement"):
+		return &HTMLPictureElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLPreElement"):
 		return &HTMLPreElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLProgressElement"):
@@ -368,6 +372,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLScriptElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLSelectElement"):
 		return &HTMLSelectElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLSlotElement"):
+		return &HTMLSlotElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLSourceElement"):
 		return &HTMLSourceElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLSpanElement"):
@@ -2296,6 +2302,24 @@ func (e *HTMLDataListElement) Options() []*HTMLOptionElement {
 	return getOptions(e.Object, "options")
 }
 
+type HTMLDialogElement struct {
+	*BasicHTMLElement
+	Open        bool   `js:"open"`
+	ReturnValue string `js:"returnValue"`
+}
+
+func (e *HTMLDialogElement) Close(returnValue string) {
+	e.Call("close", returnValue)
+}
+
+func (e *HTMLDialogElement) Show() {
+	e.Call("show")
+}
+
+func (e *HTMLDialogElement) ShowModal() {
+	e.Call("showModal")
+}
+
 type HTMLDirectoryElement struct{ *BasicHTMLElement }
 type HTMLDivElement struct{ *BasicHTMLElement }
 
@@ -2768,6 +2792,7 @@ type HTMLParamElement struct {
 	Value string `js:"value"`
 }
 
+type HTMLPictureElement struct{ *BasicHTMLElement }
 type HTMLPreElement struct{ *BasicHTMLElement }
 
 type HTMLProgressElement struct {
@@ -2859,6 +2884,15 @@ func (e *HTMLSelectElement) CheckValidity() bool {
 
 func (e *HTMLSelectElement) SetCustomValidity(s string) {
 	e.Call("setCustomValidity", s)
+}
+
+type HTMLSlotElement struct {
+	*BasicHTMLElement
+	Name string `js:"name"`
+}
+
+func (e *HTMLSlotElement) AssignedNodes() []Element {
+	return nodeListToElements(e.Call("assignedNodes"))
 }
 
 type HTMLSourceElement struct {
