@@ -1518,6 +1518,7 @@ type Element interface {
 
 	Attributes() map[string]string
 	Class() *TokenList
+	Closest(string) Element
 	ID() string
 	SetID(string)
 	TagName() string
@@ -1529,6 +1530,7 @@ type Element interface {
 	GetElementsByTagNameNS(ns string, name string) []Element
 	HasAttribute(string) bool
 	HasAttributeNS(ns string, name string) bool
+	Matches(string) bool
 	QuerySelector(string) Element
 	QuerySelectorAll(string) []Element
 	RemoveAttribute(string)
@@ -1721,6 +1723,10 @@ func (e *BasicElement) SetClass(s string) {
 	e.Set("className", s)
 }
 
+func (e *BasicElement) Closest(s string) Element {
+	return wrapElement(e.Call("closest", s))
+}
+
 func (e *BasicElement) ID() string {
 	return e.Get("id").String()
 }
@@ -1759,6 +1765,10 @@ func (e *BasicElement) HasAttribute(s string) bool {
 
 func (e *BasicElement) HasAttributeNS(ns string, name string) bool {
 	return e.Call("hasAttributeNS", ns, name).Bool()
+}
+
+func (e *BasicElement) Matches(s string) bool {
+	return e.Call("matches", s).Bool()
 }
 
 func (e *BasicElement) QuerySelector(s string) Element {
