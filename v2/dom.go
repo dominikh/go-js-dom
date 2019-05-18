@@ -858,6 +858,17 @@ func (u *URLUtils) Username() string { return u.Get("username").String() }
 func (u *URLUtils) Password() string { return u.Get("password").String() }
 func (u *URLUtils) Origin() string   { return u.Get("origin").String() }
 
+func (u *URLUtils) SetHref(v string)     { u.Set("href", v) }
+func (u *URLUtils) SetProtocol(v string) { u.Set("protocol", v) }
+func (u *URLUtils) SetHost(v string)     { u.Set("host", v) }
+func (u *URLUtils) SetHostname(v string) { u.Set("hostname", v) }
+func (u *URLUtils) SetPort(v string)     { u.Set("port", v) }
+func (u *URLUtils) SetPathname(v string) { u.Set("pathname", v) }
+func (u *URLUtils) SetSearch(v string)   { u.Set("search", v) }
+func (u *URLUtils) SetHash(v string)     { u.Set("hash", v) }
+func (u *URLUtils) SetUsername(v string) { u.Set("username", v) }
+func (u *URLUtils) SetPassword(v string) { u.Set("password", v) }
+
 // TODO Location methods
 
 type Location struct {
@@ -1182,8 +1193,8 @@ func (w *window) SetInterval(fn func(), delay int) int {
 
 	var wrapper js.Func
 	wrapper = js.FuncOf(func(js.Value, []js.Value) interface{} {
-	    fn()
-	    return nil
+		fn()
+		return nil
 	})
 	return w.Call("setInterval", wrapper, delay).Int()
 }
@@ -1196,9 +1207,9 @@ func (w *window) SetTimeout(fn func(), delay int) int {
 
 	var wrapper js.Func
 	wrapper = js.FuncOf(func(js.Value, []js.Value) interface{} {
-	    fn()
-	    wrapper.Release()
-	    return nil
+		fn()
+		wrapper.Release()
+		return nil
 	})
 	return w.Call("setTimeout", wrapper, delay).Int()
 }
@@ -1211,8 +1222,8 @@ func (w *window) Stop() {
 
 func (w *window) AddEventListener(typ string, useCapture bool, listener func(Event)) js.Func {
 	wrapper := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
-	    listener(wrapEvent(args[0]))
-	    return nil
+		listener(wrapEvent(args[0]))
+		return nil
 	})
 	w.Call("addEventListener", typ, wrapper, useCapture)
 	return wrapper
@@ -1248,9 +1259,9 @@ func (w *window) RequestAnimationFrame(callback func(time.Duration)) int {
 
 	var wrapper js.Func
 	wrapper = js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
-	    callback(wrapDOMHighResTimeStamp(args[0]))
-	    wrapper.Release()
-	    return nil
+		callback(wrapDOMHighResTimeStamp(args[0]))
+		wrapper.Release()
+		return nil
 	})
 	return w.Call("requestAnimationFrame", wrapper).Int()
 }
@@ -1420,8 +1431,8 @@ func (n *BasicNode) Underlying() js.Value {
 
 func (n *BasicNode) AddEventListener(typ string, useCapture bool, listener func(Event)) js.Func {
 	wrapper := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
-	    listener(wrapEvent(args[0]))
-	    return nil
+		listener(wrapEvent(args[0]))
+		return nil
 	})
 	n.Call("addEventListener", typ, wrapper, useCapture)
 	return wrapper
@@ -1604,6 +1615,11 @@ func (r *ClientRect) Left() float64   { return r.Get("left").Float() }
 func (r *ClientRect) Right() float64  { return r.Get("right").Float() }
 func (r *ClientRect) Top() float64    { return r.Get("top").Float() }
 func (r *ClientRect) Bottom() float64 { return r.Get("bottom").Float() }
+
+func (r *ClientRect) SetLeft(v float64)   { r.Set("left", v) }
+func (r *ClientRect) SetRight(v float64)  { r.Set("right", v) }
+func (r *ClientRect) SetTop(v float64)    { r.Set("top", v) }
+func (r *ClientRect) SetBottom(v float64) { r.Set("bottom", v) }
 
 type ParentNode interface {
 	// No properties/methods that aren't experimental
@@ -1881,18 +1897,22 @@ type HTMLAnchorElement struct {
 	*URLUtils
 }
 
-func (e *HTMLAnchorElement) HrefLang() string {
-	return e.BasicHTMLElement.Get("hreflang").String()
-}
-func (e *HTMLAnchorElement) Media() string  { return e.BasicHTMLElement.Get("media").String() }
-func (e *HTMLAnchorElement) TabIndex() int  { return e.BasicHTMLElement.Get("tabIndex").Int() }
-func (e *HTMLAnchorElement) Target() string { return e.BasicHTMLElement.Get("target").String() }
-func (e *HTMLAnchorElement) Text() string   { return e.BasicHTMLElement.Get("text").String() }
-func (e *HTMLAnchorElement) Type() string   { return e.BasicHTMLElement.Get("type").String() }
-
+func (e *HTMLAnchorElement) HrefLang() string { return e.BasicHTMLElement.Get("hreflang").String() }
+func (e *HTMLAnchorElement) Media() string    { return e.BasicHTMLElement.Get("media").String() }
+func (e *HTMLAnchorElement) TabIndex() int    { return e.BasicHTMLElement.Get("tabIndex").Int() }
+func (e *HTMLAnchorElement) Target() string   { return e.BasicHTMLElement.Get("target").String() }
+func (e *HTMLAnchorElement) Text() string     { return e.BasicHTMLElement.Get("text").String() }
+func (e *HTMLAnchorElement) Type() string     { return e.BasicHTMLElement.Get("type").String() }
 func (e *HTMLAnchorElement) Rel() *TokenList {
 	return &TokenList{dtl: e.Get("relList"), o: e.Value, sa: "rel"}
 }
+
+func (e *HTMLAnchorElement) SetHrefLang(v string) { e.BasicHTMLElement.Set("hreflang", v) }
+func (e *HTMLAnchorElement) SetMedia(v string)    { e.BasicHTMLElement.Set("media", v) }
+func (e *HTMLAnchorElement) SetTabIndex(v int)    { e.BasicHTMLElement.Set("tabIndex", v) }
+func (e *HTMLAnchorElement) SetTarget(v string)   { e.BasicHTMLElement.Set("target", v) }
+func (e *HTMLAnchorElement) SetText(v string)     { e.BasicHTMLElement.Set("text", v) }
+func (e *HTMLAnchorElement) SetType(v string)     { e.BasicHTMLElement.Set("type", v) }
 
 type HTMLAppletElement struct {
 	*BasicHTMLElement
@@ -1907,10 +1927,19 @@ func (e *HTMLAppletElement) Shape() string    { return e.Get("shape").String() }
 func (e *HTMLAppletElement) TabIndex() int    { return e.Get("tabIndex").Int() }
 func (e *HTMLAppletElement) Target() string   { return e.Get("target").String() }
 func (e *HTMLAppletElement) Type() string     { return e.Get("type").String() }
-
 func (e *HTMLAppletElement) Rel() *TokenList {
 	return &TokenList{dtl: e.Get("relList"), o: e.Value, sa: "rel"}
 }
+
+func (e *HTMLAppletElement) SetAlt(v string)      { e.Set("alt", v) }
+func (e *HTMLAppletElement) SetCoords(v string)   { e.Set("coords", v) }
+func (e *HTMLAppletElement) SetHrefLang(v string) { e.Set("hreflang", v) }
+func (e *HTMLAppletElement) SetMedia(v string)    { e.Set("media", v) }
+func (e *HTMLAppletElement) SetSearch(v string)   { e.Set("search", v) }
+func (e *HTMLAppletElement) SetShape(v string)    { e.Set("shape", v) }
+func (e *HTMLAppletElement) SetTabIndex(v int)    { e.Set("tabIndex", v) }
+func (e *HTMLAppletElement) SetTarget(v string)   { e.Set("target", v) }
+func (e *HTMLAppletElement) SetType(v string)     { e.Set("type", v) }
 
 type HTMLAreaElement struct {
 	*BasicHTMLElement
@@ -1926,10 +1955,19 @@ func (e *HTMLAreaElement) Shape() string    { return e.BasicHTMLElement.Get("sha
 func (e *HTMLAreaElement) TabIndex() int    { return e.BasicHTMLElement.Get("tabIndex").Int() }
 func (e *HTMLAreaElement) Target() string   { return e.BasicHTMLElement.Get("target").String() }
 func (e *HTMLAreaElement) Type() string     { return e.BasicHTMLElement.Get("type").String() }
-
 func (e *HTMLAreaElement) Rel() *TokenList {
 	return &TokenList{dtl: e.Get("relList"), o: e.Value, sa: "rel"}
 }
+
+func (e *HTMLAreaElement) SetAlt(v string)      { e.Set("alt", v) }
+func (e *HTMLAreaElement) SetCoords(v string)   { e.Set("coords", v) }
+func (e *HTMLAreaElement) SetHrefLang(v string) { e.Set("hreflang", v) }
+func (e *HTMLAreaElement) SetMedia(v string)    { e.Set("media", v) }
+func (e *HTMLAreaElement) SetSearch(v string)   { e.Set("search", v) }
+func (e *HTMLAreaElement) SetShape(v string)    { e.Set("shape", v) }
+func (e *HTMLAreaElement) SetTabIndex(v int)    { e.Set("tabIndex", v) }
+func (e *HTMLAreaElement) SetTarget(v string)   { e.Set("target", v) }
+func (e *HTMLAreaElement) SetType(v string)     { e.Set("type", v) }
 
 type HTMLAudioElement struct{ *HTMLMediaElement }
 
@@ -1951,42 +1989,37 @@ type HTMLButtonElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLButtonElement) AutoFocus() bool      { return e.Get("autofocus").Bool() }
-func (e *HTMLButtonElement) Disabled() bool       { return e.Get("disabled").Bool() }
-func (e *HTMLButtonElement) FormAction() string   { return e.Get("formAction").String() }
-func (e *HTMLButtonElement) FormEncType() string  { return e.Get("formEncType").String() }
-func (e *HTMLButtonElement) FormMethod() string   { return e.Get("formMethod").String() }
-func (e *HTMLButtonElement) FormNoValidate() bool { return e.Get("formNoValidate").Bool() }
-func (e *HTMLButtonElement) FormTarget() string   { return e.Get("formTarget").String() }
-func (e *HTMLButtonElement) Name() string         { return e.Get("name").String() }
-func (e *HTMLButtonElement) TabIndex() int        { return e.Get("tabIndex").Int() }
-func (e *HTMLButtonElement) Type() string         { return e.Get("type").String() }
-func (e *HTMLButtonElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLButtonElement) Value() string      { return e.Get("value").String() }
-func (e *HTMLButtonElement) WillValidate() bool { return e.Get("willValidate").Bool() }
+func (e *HTMLButtonElement) AutoFocus() bool             { return e.Get("autofocus").Bool() }
+func (e *HTMLButtonElement) Disabled() bool              { return e.Get("disabled").Bool() }
+func (e *HTMLButtonElement) FormAction() string          { return e.Get("formAction").String() }
+func (e *HTMLButtonElement) FormEncType() string         { return e.Get("formEncType").String() }
+func (e *HTMLButtonElement) FormMethod() string          { return e.Get("formMethod").String() }
+func (e *HTMLButtonElement) FormNoValidate() bool        { return e.Get("formNoValidate").Bool() }
+func (e *HTMLButtonElement) FormTarget() string          { return e.Get("formTarget").String() }
+func (e *HTMLButtonElement) Name() string                { return e.Get("name").String() }
+func (e *HTMLButtonElement) TabIndex() int               { return e.Get("tabIndex").Int() }
+func (e *HTMLButtonElement) Type() string                { return e.Get("type").String() }
+func (e *HTMLButtonElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
+func (e *HTMLButtonElement) Value() string               { return e.Get("value").String() }
+func (e *HTMLButtonElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
+func (e *HTMLButtonElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
+func (e *HTMLButtonElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
+func (e *HTMLButtonElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
 
-func (e *HTMLButtonElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
+func (e *HTMLButtonElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
+func (e *HTMLButtonElement) SetAutoFocus(v bool)        { e.Set("autofocus", v) }
+func (e *HTMLButtonElement) SetDisabled(v bool)         { e.Set("disabled", v) }
+func (e *HTMLButtonElement) SetFormAction(v string)     { e.Set("formAction", v) }
+func (e *HTMLButtonElement) SetFormEncType(v string)    { e.Set("formEncType", v) }
+func (e *HTMLButtonElement) SetFormMethod(v string)     { e.Set("formMethod", v) }
+func (e *HTMLButtonElement) SetFormNoValidate(v bool)   { e.Set("formNoValidate", v) }
+func (e *HTMLButtonElement) SetFormTarget(v string)     { e.Set("formTarget", v) }
+func (e *HTMLButtonElement) SetName(v string)           { e.Set("name", v) }
+func (e *HTMLButtonElement) SetTabIndex(v int)          { e.Set("tabIndex", v) }
+func (e *HTMLButtonElement) SetType(v string)           { e.Set("type", v) }
+func (e *HTMLButtonElement) SetValue(v string)          { e.Set("value", v) }
 
-func (e *HTMLButtonElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
-
-func (e *HTMLButtonElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Value: e.Get("validity")}
-}
-
-func (e *HTMLButtonElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLButtonElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
+func (e *HTMLButtonElement) CheckValidity() bool { return e.Call("checkValidity").Bool() }
 
 type HTMLCanvasElement struct {
 	*BasicHTMLElement
@@ -1994,6 +2027,9 @@ type HTMLCanvasElement struct {
 
 func (e *HTMLCanvasElement) Width() int  { return e.Get("width").Int() }
 func (e *HTMLCanvasElement) Height() int { return e.Get("height").Int() }
+
+func (e *HTMLCanvasElement) SetWidth(v int)  { e.Set("width", v) }
+func (e *HTMLCanvasElement) SetHeight(v int) { e.Set("height", v) }
 
 type CanvasRenderingContext2D struct {
 	js.Value
@@ -2008,6 +2044,13 @@ func (ctx *CanvasRenderingContext2D) ShadowBlur() int     { return ctx.Get("shad
 func (ctx *CanvasRenderingContext2D) ShadowOffsetX() int  { return ctx.Get("shadowOffsetX").Int() }
 func (ctx *CanvasRenderingContext2D) ShadowOffsetY() int  { return ctx.Get("shadowOffsetY").Int() }
 
+func (ctx *CanvasRenderingContext2D) SetFillStyle(v string)   { ctx.Set("fillStyle", v) }
+func (ctx *CanvasRenderingContext2D) SetStrokeStyle(v string) { ctx.Set("strokeStyle", v) }
+func (ctx *CanvasRenderingContext2D) SetShadowColor(v string) { ctx.Set("shadowColor", v) }
+func (ctx *CanvasRenderingContext2D) SetShadowBlur(v int)     { ctx.Set("shadowBlur", v) }
+func (ctx *CanvasRenderingContext2D) SetShadowOffsetX(v int)  { ctx.Set("shadowOffsetX", v) }
+func (ctx *CanvasRenderingContext2D) SetShadowOffsetY(v int)  { ctx.Set("shadowOffsetY", v) }
+
 // Line Styles
 
 func (ctx *CanvasRenderingContext2D) LineCap() string  { return ctx.Get("lineCap").String() }
@@ -2015,19 +2058,31 @@ func (ctx *CanvasRenderingContext2D) LineJoin() string { return ctx.Get("lineJoi
 func (ctx *CanvasRenderingContext2D) LineWidth() int   { return ctx.Get("lineWidth").Int() }
 func (ctx *CanvasRenderingContext2D) MiterLimit() int  { return ctx.Get("miterLimit").Int() }
 
+func (ctx *CanvasRenderingContext2D) SetLineCap(v string)  { ctx.Set("lineCap", v) }
+func (ctx *CanvasRenderingContext2D) SetLineJoin(v string) { ctx.Set("lineJoin", v) }
+func (ctx *CanvasRenderingContext2D) SetLineWidth(v int)   { ctx.Set("lineWidth", v) }
+func (ctx *CanvasRenderingContext2D) SetMiterLimit(v int)  { ctx.Set("miterLimit", v) }
+
 // Text
 
 func (ctx *CanvasRenderingContext2D) Font() string         { return ctx.Get("font").String() }
 func (ctx *CanvasRenderingContext2D) TextAlign() string    { return ctx.Get("textAlign").String() }
 func (ctx *CanvasRenderingContext2D) TextBaseline() string { return ctx.Get("textBaseline").String() }
 
+func (ctx *CanvasRenderingContext2D) SetFont(v string)         { ctx.Set("font", v) }
+func (ctx *CanvasRenderingContext2D) SetTextAlign(v string)    { ctx.Set("textAlign", v) }
+func (ctx *CanvasRenderingContext2D) SetTextBaseline(v string) { ctx.Set("textBaseline", v) }
+
 // Compositing
 
-func (ctx *CanvasRenderingContext2D) GlobalAlpha() float64 {
-	return ctx.Get("globalAlpha").Float()
-}
+func (ctx *CanvasRenderingContext2D) GlobalAlpha() float64 { return ctx.Get("globalAlpha").Float() }
 func (ctx *CanvasRenderingContext2D) GlobalCompositeOperation() string {
 	return ctx.Get("globalCompositeOperation").String()
+}
+
+func (ctx *CanvasRenderingContext2D) SetGlobalAlpha(v float64) { ctx.Set("globalAlpha", v) }
+func (ctx *CanvasRenderingContext2D) SetGlobalCompositeOperation(v string) {
+	ctx.Set("globalCompositeOperation", v)
 }
 
 type ImageData struct {
@@ -2118,19 +2173,11 @@ type TextMetrics struct {
 	js.Value
 }
 
-func (m *TextMetrics) Width() float64 { return m.Get("width").Float() }
-func (m *TextMetrics) ActualBoundingBoxLeft() float64 {
-	return m.Get("actualBoundingBoxLeft").Float()
-}
-func (m *TextMetrics) ActualBoundingBoxRight() float64 {
-	return m.Get("actualBoundingBoxRight").Float()
-}
-func (m *TextMetrics) FontBoundingBoxAscent() float64 {
-	return m.Get("fontBoundingBoxAscent").Float()
-}
-func (m *TextMetrics) FontBoundingBoxDescent() float64 {
-	return m.Get("fontBoundingBoxDescent").Float()
-}
+func (m *TextMetrics) Width() float64                  { return m.Get("width").Float() }
+func (m *TextMetrics) ActualBoundingBoxLeft() float64  { return m.Get("actualBoundingBoxLeft").Float() }
+func (m *TextMetrics) ActualBoundingBoxRight() float64 { return m.Get("actualBoundingBoxRight").Float() }
+func (m *TextMetrics) FontBoundingBoxAscent() float64  { return m.Get("fontBoundingBoxAscent").Float() }
+func (m *TextMetrics) FontBoundingBoxDescent() float64 { return m.Get("fontBoundingBoxDescent").Float() }
 func (m *TextMetrics) ActualBoundingBoxAscent() float64 {
 	return m.Get("actualBoundingBoxAscent").Float()
 }
@@ -2392,6 +2439,8 @@ type HTMLDataElement struct {
 
 func (e *HTMLDataElement) Value() string { return e.Get("value").String() }
 
+func (e *HTMLDataElement) SetValue(v string) { e.Set("value", v) }
+
 type HTMLDataListElement struct{ *BasicHTMLElement }
 
 func (e *HTMLDataListElement) Options() []*HTMLOptionElement {
@@ -2410,17 +2459,20 @@ func (e *HTMLEmbedElement) Type() string { return e.Get("type").String() }
 func (e *HTMLEmbedElement) Width() int   { return e.Get("width").Int() }
 func (e *HTMLEmbedElement) Height() int  { return e.Get("height").Int() }
 
+func (e *HTMLEmbedElement) SetSrc(v string)  { e.Set("src", v) }
+func (e *HTMLEmbedElement) SetType(v string) { e.Set("type", v) }
+func (e *HTMLEmbedElement) SetWidth(v int)   { e.Set("width", v) }
+func (e *HTMLEmbedElement) SetHeight(v int)  { e.Set("height", v) }
+
 type HTMLFieldSetElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLFieldSetElement) Disabled() bool { return e.Get("disabled").Bool() }
-func (e *HTMLFieldSetElement) Name() string   { return e.Get("name").String() }
-func (e *HTMLFieldSetElement) Type() string   { return e.Get("type").String() }
-func (e *HTMLFieldSetElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLFieldSetElement) WillValidate() bool { return e.Get("willValidate").Bool() }
+func (e *HTMLFieldSetElement) Disabled() bool            { return e.Get("disabled").Bool() }
+func (e *HTMLFieldSetElement) Name() string              { return e.Get("name").String() }
+func (e *HTMLFieldSetElement) Type() string              { return e.Get("type").String() }
+func (e *HTMLFieldSetElement) ValidationMessage() string { return e.Get("validationMessage").String() }
+func (e *HTMLFieldSetElement) WillValidate() bool        { return e.Get("willValidate").Bool() }
 
 func (e *HTMLFieldSetElement) Elements() []HTMLElement {
 	return nodeListToHTMLElements(e.Get("elements"))
@@ -2443,43 +2495,42 @@ func (e *HTMLFieldSetElement) SetCustomValidity(s string) {
 	e.Call("setCustomValidity", s)
 }
 
+func (e *HTMLFieldSetElement) SetDisabled(v bool)            { e.Set("disabled", v) }
+func (e *HTMLFieldSetElement) SetName(v string)              { e.Set("name", v) }
+func (e *HTMLFieldSetElement) SetValidationMessage(v string) { e.Set("validationMessage", v) }
+
 type HTMLFontElement struct{ *BasicHTMLElement }
 
 type HTMLFormElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLFormElement) AcceptCharset() string { return e.Get("acceptCharset").String() }
-func (e *HTMLFormElement) Action() string        { return e.Get("action").String() }
-func (e *HTMLFormElement) Autocomplete() string  { return e.Get("autocomplete").String() }
-func (e *HTMLFormElement) Encoding() string      { return e.Get("encoding").String() }
-func (e *HTMLFormElement) Enctype() string       { return e.Get("enctype").String() }
-func (e *HTMLFormElement) Length() int           { return e.Get("length").Int() }
-func (e *HTMLFormElement) Method() string        { return e.Get("method").String() }
-func (e *HTMLFormElement) Name() string          { return e.Get("name").String() }
-func (e *HTMLFormElement) NoValidate() bool      { return e.Get("noValidate").Bool() }
-func (e *HTMLFormElement) Target() string        { return e.Get("target").String() }
+func (e *HTMLFormElement) AcceptCharset() string   { return e.Get("acceptCharset").String() }
+func (e *HTMLFormElement) Action() string          { return e.Get("action").String() }
+func (e *HTMLFormElement) Autocomplete() string    { return e.Get("autocomplete").String() }
+func (e *HTMLFormElement) Encoding() string        { return e.Get("encoding").String() }
+func (e *HTMLFormElement) Enctype() string         { return e.Get("enctype").String() }
+func (e *HTMLFormElement) Length() int             { return e.Get("length").Int() }
+func (e *HTMLFormElement) Method() string          { return e.Get("method").String() }
+func (e *HTMLFormElement) Name() string            { return e.Get("name").String() }
+func (e *HTMLFormElement) NoValidate() bool        { return e.Get("noValidate").Bool() }
+func (e *HTMLFormElement) Target() string          { return e.Get("target").String() }
+func (e *HTMLFormElement) Elements() []HTMLElement { return nodeListToHTMLElements(e.Get("elements")) }
 
-func (e *HTMLFormElement) Elements() []HTMLElement {
-	return nodeListToHTMLElements(e.Get("elements"))
-}
+func (e *HTMLFormElement) SetAcceptCharset(v string) { e.Set("acceptCharset", v) }
+func (e *HTMLFormElement) SetAction(v string)        { e.Set("action", v) }
+func (e *HTMLFormElement) SetAutocomplete(v string)  { e.Set("autocomplete", v) }
+func (e *HTMLFormElement) SetEncoding(v string)      { e.Set("encoding", v) }
+func (e *HTMLFormElement) SetEnctype(v string)       { e.Set("enctype", v) }
+func (e *HTMLFormElement) SetMethod(v string)        { e.Set("method", v) }
+func (e *HTMLFormElement) SetName(v string)          { e.Set("name", v) }
+func (e *HTMLFormElement) SetNoValidate(v bool)      { e.Set("noValidate", v) }
+func (e *HTMLFormElement) SetTarget(v string)        { e.Set("target", v) }
 
-func (e *HTMLFormElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLFormElement) Submit() {
-	e.Call("submit")
-}
-
-func (e *HTMLFormElement) Reset() {
-	e.Call("reset")
-}
-
-func (e *HTMLFormElement) Item(index int) HTMLElement {
-	return wrapHTMLElement(e.Call("item", index))
-}
-
+func (e *HTMLFormElement) CheckValidity() bool        { return e.Call("checkValidity").Bool() }
+func (e *HTMLFormElement) Submit()                    { e.Call("submit") }
+func (e *HTMLFormElement) Reset()                     { e.Call("reset") }
+func (e *HTMLFormElement) Item(index int) HTMLElement { return wrapHTMLElement(e.Call("item", index)) }
 func (e *HTMLFormElement) NamedItem(name string) HTMLElement {
 	return wrapHTMLElement(e.Call("namedItem", name))
 }
@@ -2496,20 +2547,21 @@ type HTMLIFrameElement struct {
 	// TODO sandbox attribute
 }
 
-func (e *HTMLIFrameElement) Width() string  { return e.Get("width").String() }
-func (e *HTMLIFrameElement) Height() string { return e.Get("height").String() }
-func (e *HTMLIFrameElement) Name() string   { return e.Get("name").String() }
-func (e *HTMLIFrameElement) Src() string    { return e.Get("src").String() }
-func (e *HTMLIFrameElement) SrcDoc() string { return e.Get("srcdoc").String() }
-func (e *HTMLIFrameElement) Seamless() bool { return e.Get("seamless").Bool() }
+func (e *HTMLIFrameElement) ContentDocument() Document { return wrapDocument(e.Get("contentDocument")) }
+func (e *HTMLIFrameElement) ContentWindow() Window     { return &window{e.Get("contentWindow")} }
+func (e *HTMLIFrameElement) Height() string            { return e.Get("height").String() }
+func (e *HTMLIFrameElement) Name() string              { return e.Get("name").String() }
+func (e *HTMLIFrameElement) Seamless() bool            { return e.Get("seamless").Bool() }
+func (e *HTMLIFrameElement) Src() string               { return e.Get("src").String() }
+func (e *HTMLIFrameElement) SrcDoc() string            { return e.Get("srcdoc").String() }
+func (e *HTMLIFrameElement) Width() string             { return e.Get("width").String() }
 
-func (e *HTMLIFrameElement) ContentDocument() Document {
-	return wrapDocument(e.Get("contentDocument"))
-}
-
-func (e *HTMLIFrameElement) ContentWindow() Window {
-	return &window{e.Get("contentWindow")}
-}
+func (e *HTMLIFrameElement) SetWidth(v string)  { e.Set("width", v) }
+func (e *HTMLIFrameElement) SetHeight(v string) { e.Set("height", v) }
+func (e *HTMLIFrameElement) SetName(v string)   { e.Set("name", v) }
+func (e *HTMLIFrameElement) SetSrc(v string)    { e.Set("src", v) }
+func (e *HTMLIFrameElement) SetSrcDoc(v string) { e.Set("srcdoc", v) }
+func (e *HTMLIFrameElement) SetSeamless(v bool) { e.Set("seamless", v) }
 
 type HTMLImageElement struct {
 	*BasicHTMLElement
@@ -2526,55 +2578,93 @@ func (e *HTMLImageElement) Src() string         { return e.Get("src").String() }
 func (e *HTMLImageElement) UseMap() string      { return e.Get("useMap").String() }
 func (e *HTMLImageElement) Width() int          { return e.Get("width").Int() }
 
+func (e *HTMLImageElement) SetCrossOrigin(v string) { e.Set("crossOrigin", v) }
+func (e *HTMLImageElement) SetHeight(v int)         { e.Set("height", v) }
+func (e *HTMLImageElement) SetIsMap(v bool)         { e.Set("isMap", v) }
+func (e *HTMLImageElement) SetSrc(v string)         { e.Set("src", v) }
+func (e *HTMLImageElement) SetUseMap(v string)      { e.Set("useMap", v) }
+func (e *HTMLImageElement) SetWidth(v int)          { e.Set("width", v) }
+
 type HTMLInputElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLInputElement) Accept() string       { return e.Get("accept").String() }
-func (e *HTMLInputElement) Alt() string          { return e.Get("alt").String() }
-func (e *HTMLInputElement) Autocomplete() string { return e.Get("autocomplete").String() }
-func (e *HTMLInputElement) Autofocus() bool      { return e.Get("autofocus").Bool() }
-func (e *HTMLInputElement) Checked() bool        { return e.Get("checked").Bool() }
-func (e *HTMLInputElement) DefaultChecked() bool { return e.Get("defaultChecked").Bool() }
-func (e *HTMLInputElement) DefaultValue() string { return e.Get("defaultValue").String() }
-func (e *HTMLInputElement) DirName() string      { return e.Get("dirName").String() }
-func (e *HTMLInputElement) Disabled() bool       { return e.Get("disabled").Bool() }
-func (e *HTMLInputElement) FormAction() string   { return e.Get("formAction").String() }
-func (e *HTMLInputElement) FormEncType() string  { return e.Get("formEncType").String() }
-func (e *HTMLInputElement) FormMethod() string   { return e.Get("formMethod").String() }
-func (e *HTMLInputElement) FormNoValidate() bool { return e.Get("formNoValidate").Bool() }
-func (e *HTMLInputElement) FormTarget() string   { return e.Get("formTarget").String() }
-func (e *HTMLInputElement) Height() string       { return e.Get("height").String() }
-func (e *HTMLInputElement) Indeterminate() bool  { return e.Get("indeterminate").Bool() }
-func (e *HTMLInputElement) Max() string          { return e.Get("max").String() }
-func (e *HTMLInputElement) MaxLength() int       { return e.Get("maxLength").Int() }
-func (e *HTMLInputElement) Min() string          { return e.Get("min").String() }
-func (e *HTMLInputElement) Multiple() bool       { return e.Get("multiple").Bool() }
-func (e *HTMLInputElement) Name() string         { return e.Get("name").String() }
-func (e *HTMLInputElement) Pattern() string      { return e.Get("pattern").String() }
-func (e *HTMLInputElement) Placeholder() string  { return e.Get("placeholder").String() }
-func (e *HTMLInputElement) ReadOnly() bool       { return e.Get("readOnly").Bool() }
-func (e *HTMLInputElement) Required() bool       { return e.Get("required").Bool() }
-func (e *HTMLInputElement) SelectionDirection() string {
-	return e.Get("selectionDirection").String()
-}
-func (e *HTMLInputElement) SelectionEnd() int   { return e.Get("selectionEnd").Int() }
-func (e *HTMLInputElement) SelectionStart() int { return e.Get("selectionStart").Int() }
-func (e *HTMLInputElement) Size() int           { return e.Get("size").Int() }
-func (e *HTMLInputElement) Src() string         { return e.Get("src").String() }
-func (e *HTMLInputElement) Step() string        { return e.Get("step").String() }
-func (e *HTMLInputElement) TabIndex() int       { return e.Get("tabIndex").Int() }
-func (e *HTMLInputElement) Type() string        { return e.Get("type").String() }
-func (e *HTMLInputElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLInputElement) Value() string { return e.Get("value").String() }
+func (e *HTMLInputElement) Accept() string             { return e.Get("accept").String() }
+func (e *HTMLInputElement) Alt() string                { return e.Get("alt").String() }
+func (e *HTMLInputElement) Autocomplete() string       { return e.Get("autocomplete").String() }
+func (e *HTMLInputElement) Autofocus() bool            { return e.Get("autofocus").Bool() }
+func (e *HTMLInputElement) Checked() bool              { return e.Get("checked").Bool() }
+func (e *HTMLInputElement) DefaultChecked() bool       { return e.Get("defaultChecked").Bool() }
+func (e *HTMLInputElement) DefaultValue() string       { return e.Get("defaultValue").String() }
+func (e *HTMLInputElement) DirName() string            { return e.Get("dirName").String() }
+func (e *HTMLInputElement) Disabled() bool             { return e.Get("disabled").Bool() }
+func (e *HTMLInputElement) FormAction() string         { return e.Get("formAction").String() }
+func (e *HTMLInputElement) FormEncType() string        { return e.Get("formEncType").String() }
+func (e *HTMLInputElement) FormMethod() string         { return e.Get("formMethod").String() }
+func (e *HTMLInputElement) FormNoValidate() bool       { return e.Get("formNoValidate").Bool() }
+func (e *HTMLInputElement) FormTarget() string         { return e.Get("formTarget").String() }
+func (e *HTMLInputElement) Height() string             { return e.Get("height").String() }
+func (e *HTMLInputElement) Indeterminate() bool        { return e.Get("indeterminate").Bool() }
+func (e *HTMLInputElement) Max() string                { return e.Get("max").String() }
+func (e *HTMLInputElement) MaxLength() int             { return e.Get("maxLength").Int() }
+func (e *HTMLInputElement) Min() string                { return e.Get("min").String() }
+func (e *HTMLInputElement) Multiple() bool             { return e.Get("multiple").Bool() }
+func (e *HTMLInputElement) Name() string               { return e.Get("name").String() }
+func (e *HTMLInputElement) Pattern() string            { return e.Get("pattern").String() }
+func (e *HTMLInputElement) Placeholder() string        { return e.Get("placeholder").String() }
+func (e *HTMLInputElement) ReadOnly() bool             { return e.Get("readOnly").Bool() }
+func (e *HTMLInputElement) Required() bool             { return e.Get("required").Bool() }
+func (e *HTMLInputElement) SelectionDirection() string { return e.Get("selectionDirection").String() }
+func (e *HTMLInputElement) SelectionEnd() int          { return e.Get("selectionEnd").Int() }
+func (e *HTMLInputElement) SelectionStart() int        { return e.Get("selectionStart").Int() }
+func (e *HTMLInputElement) Size() int                  { return e.Get("size").Int() }
+func (e *HTMLInputElement) Src() string                { return e.Get("src").String() }
+func (e *HTMLInputElement) Step() string               { return e.Get("step").String() }
+func (e *HTMLInputElement) TabIndex() int              { return e.Get("tabIndex").Int() }
+func (e *HTMLInputElement) Type() string               { return e.Get("type").String() }
+func (e *HTMLInputElement) ValidationMessage() string  { return e.Get("validationMessage").String() }
+func (e *HTMLInputElement) Value() string              { return e.Get("value").String() }
 func (e *HTMLInputElement) ValueAsDate() time.Time {
 	return time.Unix(0, int64(e.Get("valueAsDate").Call("getTime").Int())*1000000)
 }
 func (e *HTMLInputElement) ValueAsNumber() float64 { return e.Get("valueAsNumber").Float() }
 func (e *HTMLInputElement) Width() string          { return e.Get("width").String() }
 func (e *HTMLInputElement) WillValidate() bool     { return e.Get("willValidate").Bool() }
+
+func (e *HTMLInputElement) SetAccept(v string)             { e.Set("accept", v) }
+func (e *HTMLInputElement) SetAlt(v string)                { e.Set("alt", v) }
+func (e *HTMLInputElement) SetAutocomplete(v string)       { e.Set("autocomplete", v) }
+func (e *HTMLInputElement) SetAutofocus(v bool)            { e.Set("autofocus", v) }
+func (e *HTMLInputElement) SetChecked(v bool)              { e.Set("checked", v) }
+func (e *HTMLInputElement) SetDefaultChecked(v bool)       { e.Set("defaultChecked", v) }
+func (e *HTMLInputElement) SetDefaultValue(v string)       { e.Set("defaultValue", v) }
+func (e *HTMLInputElement) SetDirName(v string)            { e.Set("dirName", v) }
+func (e *HTMLInputElement) SetDisabled(v bool)             { e.Set("disabled", v) }
+func (e *HTMLInputElement) SetFormAction(v string)         { e.Set("formAction", v) }
+func (e *HTMLInputElement) SetFormEncType(v string)        { e.Set("formEncType", v) }
+func (e *HTMLInputElement) SetFormMethod(v string)         { e.Set("formMethod", v) }
+func (e *HTMLInputElement) SetFormNoValidate(v bool)       { e.Set("formNoValidate", v) }
+func (e *HTMLInputElement) SetFormTarget(v string)         { e.Set("formTarget", v) }
+func (e *HTMLInputElement) SetHeight(v string)             { e.Set("height", v) }
+func (e *HTMLInputElement) SetMax(v string)                { e.Set("max", v) }
+func (e *HTMLInputElement) SetMaxLength(v int)             { e.Set("maxLength", v) }
+func (e *HTMLInputElement) SetMin(v string)                { e.Set("min", v) }
+func (e *HTMLInputElement) SetMultiple(v bool)             { e.Set("multiple", v) }
+func (e *HTMLInputElement) SetName(v string)               { e.Set("name", v) }
+func (e *HTMLInputElement) SetPattern(v string)            { e.Set("pattern", v) }
+func (e *HTMLInputElement) SetPlaceholder(v string)        { e.Set("placeholder", v) }
+func (e *HTMLInputElement) SetReadOnly(v bool)             { e.Set("readOnly", v) }
+func (e *HTMLInputElement) SetRequired(v bool)             { e.Set("required", v) }
+func (e *HTMLInputElement) SetSelectionDirection(v string) { e.Set("selectionDirection", v) }
+func (e *HTMLInputElement) SetSelectionEnd(v int)          { e.Set("selectionEnd", v) }
+func (e *HTMLInputElement) SetSelectionStart(v int)        { e.Set("selectionStart", v) }
+func (e *HTMLInputElement) SetSize(v int)                  { e.Set("size", v) }
+func (e *HTMLInputElement) SetSrc(v string)                { e.Set("src", v) }
+func (e *HTMLInputElement) SetStep(v string)               { e.Set("step", v) }
+func (e *HTMLInputElement) SetType(v string)               { e.Set("type", v) }
+func (e *HTMLInputElement) SetValue(v string)              { e.Set("value", v) }
+func (e *HTMLInputElement) SetWidth(v string)              { e.Set("width", v) }
+func (e *HTMLInputElement) SetWillValidate(v bool)         { e.Set("willValidate", v) }
 
 // File represents files as can be obtained from file choosers or drag
 // and drop. The dom package does not define any methods on File nor
@@ -2600,78 +2690,42 @@ func (e *HTMLInputElement) List() *HTMLDataListElement {
 	return list.(*HTMLDataListElement)
 }
 
-func (e *HTMLInputElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
-
-func (e *HTMLInputElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
-
-func (e *HTMLInputElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Value: e.Get("validity")}
-}
-
-func (e *HTMLInputElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLInputElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
-
-func (e *HTMLInputElement) Select() {
-	e.Call("select")
-}
-
+func (e *HTMLInputElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
+func (e *HTMLInputElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
+func (e *HTMLInputElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLInputElement) CheckValidity() bool         { return e.Call("checkValidity").Bool() }
+func (e *HTMLInputElement) SetCustomValidity(s string)  { e.Call("setCustomValidity", s) }
+func (e *HTMLInputElement) Select()                     { e.Call("select") }
 func (e *HTMLInputElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
 }
-
-func (e *HTMLInputElement) StepDown(n int) error {
-	return callRecover(e.Underlying(), "stepDown", n)
-}
-
-func (e *HTMLInputElement) StepUp(n int) error {
-	return callRecover(e.Underlying(), "stepUp", n)
-}
+func (e *HTMLInputElement) StepDown(n int) error { return callRecover(e.Underlying(), "stepDown", n) }
+func (e *HTMLInputElement) StepUp(n int) error   { return callRecover(e.Underlying(), "stepUp", n) }
 
 type HTMLKeygenElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLKeygenElement) Autofocus() bool   { return e.Get("autofocus").Bool() }
-func (e *HTMLKeygenElement) Challenge() string { return e.Get("challenge").String() }
-func (e *HTMLKeygenElement) Disabled() bool    { return e.Get("disabled").Bool() }
-func (e *HTMLKeygenElement) Keytype() string   { return e.Get("keytype").String() }
-func (e *HTMLKeygenElement) Name() string      { return e.Get("name").String() }
-func (e *HTMLKeygenElement) Type() string      { return e.Get("type").String() }
-func (e *HTMLKeygenElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLKeygenElement) WillValidate() bool { return e.Get("willValidate").Bool() }
+func (e *HTMLKeygenElement) Autofocus() bool             { return e.Get("autofocus").Bool() }
+func (e *HTMLKeygenElement) Challenge() string           { return e.Get("challenge").String() }
+func (e *HTMLKeygenElement) Disabled() bool              { return e.Get("disabled").Bool() }
+func (e *HTMLKeygenElement) Form() *HTMLFormElement      { return getForm(e.Value) }
+func (e *HTMLKeygenElement) Keytype() string             { return e.Get("keytype").String() }
+func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement { return getLabels(e.Value) }
+func (e *HTMLKeygenElement) Name() string                { return e.Get("name").String() }
+func (e *HTMLKeygenElement) Type() string                { return e.Get("type").String() }
+func (e *HTMLKeygenElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
+func (e *HTMLKeygenElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLKeygenElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
 
-func (e *HTMLKeygenElement) Form() *HTMLFormElement {
-	return getForm(e.Value)
-}
+func (e *HTMLKeygenElement) SetAutofocus(v bool)        { e.Set("autofocus", v) }
+func (e *HTMLKeygenElement) SetChallenge(v string)      { e.Set("challenge", v) }
+func (e *HTMLKeygenElement) SetDisabled(v bool)         { e.Set("disabled", v) }
+func (e *HTMLKeygenElement) SetKeytype(v string)        { e.Set("keytype", v) }
+func (e *HTMLKeygenElement) SetName(v string)           { e.Set("name", v) }
+func (e *HTMLKeygenElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
 
-func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Value)
-}
-
-func (e *HTMLKeygenElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Value: e.Get("validity")}
-}
-
-func (e *HTMLKeygenElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLKeygenElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
+func (e *HTMLKeygenElement) CheckValidity() bool { return e.Call("checkValidity").Bool() }
 
 type HTMLLIElement struct {
 	*BasicHTMLElement
@@ -2683,21 +2737,13 @@ type HTMLLabelElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLLabelElement) For() string { return e.Get("htmlFor").String() }
-
-func (e *HTMLLabelElement) Control() HTMLElement {
-	return wrapHTMLElement(e.Get("control"))
-}
-
-func (e *HTMLLabelElement) Form() *HTMLFormElement {
-	return getForm(e.Value)
-}
+func (e *HTMLLabelElement) For() string            { return e.Get("htmlFor").String() }
+func (e *HTMLLabelElement) Control() HTMLElement   { return wrapHTMLElement(e.Get("control")) }
+func (e *HTMLLabelElement) Form() *HTMLFormElement { return getForm(e.Value) }
 
 type HTMLLegendElement struct{ *BasicHTMLElement }
 
-func (e *HTMLLegendElement) Form() *HTMLFormElement {
-	return getForm(e.Value)
-}
+func (e *HTMLLegendElement) Form() *HTMLFormElement { return getForm(e.Value) }
 
 type HTMLLinkElement struct {
 	*BasicHTMLElement
@@ -2708,6 +2754,12 @@ func (e *HTMLLinkElement) Href() string     { return e.Get("href").String() }
 func (e *HTMLLinkElement) HrefLang() string { return e.Get("hrefLang").String() }
 func (e *HTMLLinkElement) Media() string    { return e.Get("media").String() }
 func (e *HTMLLinkElement) Type() string     { return e.Get("type").String() }
+
+func (e *HTMLLinkElement) SetDisabled(v bool)   { e.Set("disabled", v) }
+func (e *HTMLLinkElement) SetHref(v string)     { e.Set("href", v) }
+func (e *HTMLLinkElement) SetHrefLang(v string) { e.Set("hrefLang", v) }
+func (e *HTMLLinkElement) SetMedia(v string)    { e.Set("media", v) }
+func (e *HTMLLinkElement) SetType(v string)     { e.Set("type", v) }
 
 func (e *HTMLLinkElement) Rel() *TokenList {
 	return &TokenList{dtl: e.Get("relList"), o: e.Value, sa: "rel"}
@@ -2728,6 +2780,8 @@ type HTMLMapElement struct {
 
 func (e *HTMLMapElement) Name() string { return e.Get("name").String() }
 
+func (e *HTMLMapElement) SetName(v string) { e.Set("name", v) }
+
 func (e *HTMLMapElement) Areas() []*HTMLAreaElement {
 	areas := nodeListToElements(e.Get("areas"))
 	out := make([]*HTMLAreaElement, len(areas))
@@ -2747,13 +2801,10 @@ type HTMLMediaElement struct {
 
 func (e *HTMLMediaElement) Paused() bool { return e.Get("paused").Bool() }
 
-func (e *HTMLMediaElement) Play() {
-	e.Call("play")
-}
+func (e *HTMLMediaElement) SetPaused(v bool) { e.Set("paused", v) }
 
-func (e *HTMLMediaElement) Pause() {
-	e.Call("pause")
-}
+func (e *HTMLMediaElement) Play()  { e.Call("play") }
+func (e *HTMLMediaElement) Pause() { e.Call("pause") }
 
 type HTMLMenuElement struct{ *BasicHTMLElement }
 
@@ -2765,19 +2816,26 @@ func (e *HTMLMetaElement) Content() string   { return e.Get("content").String() 
 func (e *HTMLMetaElement) HTTPEquiv() string { return e.Get("httpEquiv").String() }
 func (e *HTMLMetaElement) Name() string      { return e.Get("name").String() }
 
+func (e *HTMLMetaElement) SetContent(v string)   { e.Set("content", v) }
+func (e *HTMLMetaElement) SetHTTPEquiv(v string) { e.Set("httpEquiv", v) }
+func (e *HTMLMetaElement) SetName(v string)      { e.Set("name", v) }
+
 type HTMLMeterElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLMeterElement) High() float64    { return e.Get("high").Float() }
-func (e *HTMLMeterElement) Low() float64     { return e.Get("low").Float() }
-func (e *HTMLMeterElement) Max() float64     { return e.Get("max").Float() }
-func (e *HTMLMeterElement) Min() float64     { return e.Get("min").Float() }
-func (e *HTMLMeterElement) Optimum() float64 { return e.Get("optimum").Float() }
+func (e *HTMLMeterElement) High() float64              { return e.Get("high").Float() }
+func (e *HTMLMeterElement) Low() float64               { return e.Get("low").Float() }
+func (e *HTMLMeterElement) Max() float64               { return e.Get("max").Float() }
+func (e *HTMLMeterElement) Min() float64               { return e.Get("min").Float() }
+func (e *HTMLMeterElement) Optimum() float64           { return e.Get("optimum").Float() }
+func (e HTMLMeterElement) Labels() []*HTMLLabelElement { return getLabels(e.Value) }
 
-func (e HTMLMeterElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Value)
-}
+func (e *HTMLMeterElement) SetHigh(v float64)    { e.Set("high", v) }
+func (e *HTMLMeterElement) SetLow(v float64)     { e.Set("low", v) }
+func (e *HTMLMeterElement) SetMax(v float64)     { e.Set("max", v) }
+func (e *HTMLMeterElement) SetMin(v float64)     { e.Set("min", v) }
+func (e *HTMLMeterElement) SetOptimum(v float64) { e.Set("optimum", v) }
 
 type HTMLModElement struct {
 	*BasicHTMLElement
@@ -2785,6 +2843,9 @@ type HTMLModElement struct {
 
 func (e *HTMLModElement) Cite() string     { return e.Get("cite").String() }
 func (e *HTMLModElement) DateTime() string { return e.Get("dateTime").String() }
+
+func (e *HTMLModElement) SetCite(v string)     { e.Set("cite", v) }
+func (e *HTMLModElement) SetDateTime(v string) { e.Set("dateTime", v) }
 
 type HTMLOListElement struct {
 	*BasicHTMLElement
@@ -2794,47 +2855,39 @@ func (e *HTMLOListElement) Reversed() bool { return e.Get("reversed").Bool() }
 func (e *HTMLOListElement) Start() int     { return e.Get("start").Int() }
 func (e *HTMLOListElement) Type() string   { return e.Get("type").String() }
 
+func (e *HTMLOListElement) SetReversed(v bool) { e.Set("reversed", v) }
+func (e *HTMLOListElement) SetStart(v int)     { e.Set("start", v) }
+func (e *HTMLOListElement) SetType(v string)   { e.Set("type", v) }
+
 type HTMLObjectElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLObjectElement) Data() string        { return e.Get("data").String() }
-func (e *HTMLObjectElement) Height() string      { return e.Get("height").String() }
-func (e *HTMLObjectElement) Name() string        { return e.Get("name").String() }
-func (e *HTMLObjectElement) TabIndex() int       { return e.Get("tabIndex").Int() }
-func (e *HTMLObjectElement) Type() string        { return e.Get("type").String() }
-func (e *HTMLObjectElement) TypeMustMatch() bool { return e.Get("typeMustMatch").Bool() }
-func (e *HTMLObjectElement) UseMap() string      { return e.Get("useMap").String() }
-func (e *HTMLObjectElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLObjectElement) With() string       { return e.Get("with").String() }
-func (e *HTMLObjectElement) WillValidate() bool { return e.Get("willValidate").Bool() }
+func (e *HTMLObjectElement) CheckValidity() bool       { return e.Call("checkValidity").Bool() }
+func (e *HTMLObjectElement) ContentDocument() Document { return wrapDocument(e.Get("contentDocument")) }
+func (e *HTMLObjectElement) ContentWindow() Window     { return &window{e.Get("contentWindow")} }
+func (e *HTMLObjectElement) Data() string              { return e.Get("data").String() }
+func (e *HTMLObjectElement) Form() *HTMLFormElement    { return getForm(e.Value) }
+func (e *HTMLObjectElement) Height() string            { return e.Get("height").String() }
+func (e *HTMLObjectElement) Name() string              { return e.Get("name").String() }
+func (e *HTMLObjectElement) TabIndex() int             { return e.Get("tabIndex").Int() }
+func (e *HTMLObjectElement) Type() string              { return e.Get("type").String() }
+func (e *HTMLObjectElement) TypeMustMatch() bool       { return e.Get("typeMustMatch").Bool() }
+func (e *HTMLObjectElement) UseMap() string            { return e.Get("useMap").String() }
+func (e *HTMLObjectElement) ValidationMessage() string { return e.Get("validationMessage").String() }
+func (e *HTMLObjectElement) Validity() *ValidityState  { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLObjectElement) WillValidate() bool        { return e.Get("willValidate").Bool() }
+func (e *HTMLObjectElement) With() string              { return e.Get("with").String() }
 
-func (e *HTMLObjectElement) Form() *HTMLFormElement {
-	return getForm(e.Value)
-}
-
-func (e *HTMLObjectElement) ContentDocument() Document {
-	return wrapDocument(e.Get("contentDocument"))
-}
-
-func (e *HTMLObjectElement) ContentWindow() Window {
-	return &window{e.Get("contentWindow")}
-}
-
-func (e *HTMLObjectElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Value: e.Get("validity")}
-}
-
-func (e *HTMLObjectElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLObjectElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
+func (e *HTMLObjectElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
+func (e *HTMLObjectElement) SetData(v string)           { e.Set("data", v) }
+func (e *HTMLObjectElement) SetHeight(v string)         { e.Set("height", v) }
+func (e *HTMLObjectElement) SetName(v string)           { e.Set("name", v) }
+func (e *HTMLObjectElement) SetTabIndex(v int)          { e.Set("tabIndex", v) }
+func (e *HTMLObjectElement) SetType(v string)           { e.Set("type", v) }
+func (e *HTMLObjectElement) SetTypeMustMatch(v bool)    { e.Set("typeMustMatch", v) }
+func (e *HTMLObjectElement) SetUseMap(v string)         { e.Set("useMap", v) }
+func (e *HTMLObjectElement) SetWith(v string)           { e.Set("with", v) }
 
 type HTMLOptGroupElement struct {
 	*BasicHTMLElement
@@ -2843,59 +2896,51 @@ type HTMLOptGroupElement struct {
 func (e *HTMLOptGroupElement) Disabled() bool { return e.Get("disabled").Bool() }
 func (e *HTMLOptGroupElement) Label() string  { return e.Get("label").String() }
 
+func (e *HTMLOptGroupElement) SetDisabled(v bool) { e.Set("disabled", v) }
+func (e *HTMLOptGroupElement) SetLabel(v string)  { e.Set("label", v) }
+
 type HTMLOptionElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLOptionElement) DefaultSelected() bool { return e.Get("defaultSelected").Bool() }
-func (e *HTMLOptionElement) Disabled() bool        { return e.Get("disabled").Bool() }
-func (e *HTMLOptionElement) Index() int            { return e.Get("index").Int() }
-func (e *HTMLOptionElement) Label() string         { return e.Get("label").String() }
-func (e *HTMLOptionElement) Selected() bool        { return e.Get("selected").Bool() }
-func (e *HTMLOptionElement) Text() string          { return e.Get("text").String() }
-func (e *HTMLOptionElement) Value() string         { return e.Get("value").String() }
+func (e *HTMLOptionElement) DefaultSelected() bool  { return e.Get("defaultSelected").Bool() }
+func (e *HTMLOptionElement) Disabled() bool         { return e.Get("disabled").Bool() }
+func (e *HTMLOptionElement) Form() *HTMLFormElement { return getForm(e.Underlying()) }
+func (e *HTMLOptionElement) Index() int             { return e.Get("index").Int() }
+func (e *HTMLOptionElement) Label() string          { return e.Get("label").String() }
+func (e *HTMLOptionElement) Selected() bool         { return e.Get("selected").Bool() }
+func (e *HTMLOptionElement) Text() string           { return e.Get("text").String() }
+func (e *HTMLOptionElement) Value() string          { return e.Get("value").String() }
 
-func (e *HTMLOptionElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
+func (e *HTMLOptionElement) SetDefaultSelected(v bool) { e.Set("defaultSelected", v) }
+func (e *HTMLOptionElement) SetDisabled(v bool)        { e.Set("disabled", v) }
+func (e *HTMLOptionElement) SetLabel(v string)         { e.Set("label", v) }
+func (e *HTMLOptionElement) SetSelected(v bool)        { e.Set("selected", v) }
+func (e *HTMLOptionElement) SetText(v string)          { e.Set("text", v) }
+func (e *HTMLOptionElement) SetValue(v string)         { e.Set("value", v) }
 
 type HTMLOutputElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLOutputElement) DefaultValue() string { return e.Get("defaultValue").String() }
-func (e *HTMLOutputElement) Name() string         { return e.Get("name").String() }
-func (e *HTMLOutputElement) Type() string         { return e.Get("type").String() }
-func (e *HTMLOutputElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLOutputElement) Value() string      { return e.Get("value").String() }
-func (e *HTMLOutputElement) WillValidate() bool { return e.Get("willValidate").Bool() }
-
-func (e *HTMLOutputElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
-
-func (e *HTMLOutputElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
-
-func (e *HTMLOutputElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
-	return &ValidityState{Value: e.Get("validity")}
-}
-
+func (e *HTMLOutputElement) DefaultValue() string        { return e.Get("defaultValue").String() }
+func (e *HTMLOutputElement) Name() string                { return e.Get("name").String() }
+func (e *HTMLOutputElement) Type() string                { return e.Get("type").String() }
+func (e *HTMLOutputElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
+func (e *HTMLOutputElement) Value() string               { return e.Get("value").String() }
+func (e *HTMLOutputElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
+func (e *HTMLOutputElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
+func (e *HTMLOutputElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
+func (e *HTMLOutputElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
 func (e *HTMLOutputElement) For() *TokenList {
 	return &TokenList{dtl: e.Get("htmlFor"), o: e.Underlying()}
 }
+func (e *HTMLOutputElement) CheckValidity() bool        { return e.Call("checkValidity").Bool() }
+func (e *HTMLOutputElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
 
-func (e *HTMLOutputElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLOutputElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
+func (e *HTMLOutputElement) SetDefaultValue(v string) { e.Set("defaultValue", v) }
+func (e *HTMLOutputElement) SetName(v string)         { e.Set("name", v) }
+func (e *HTMLOutputElement) SetValue(v string)        { e.Set("value", v) }
 
 type HTMLParagraphElement struct{ *BasicHTMLElement }
 
@@ -2906,19 +2951,22 @@ type HTMLParamElement struct {
 func (e *HTMLParamElement) Name() string  { return e.Get("name").String() }
 func (e *HTMLParamElement) Value() string { return e.Get("value").String() }
 
+func (e *HTMLParamElement) SetName(v string)  { e.Set("name", v) }
+func (e *HTMLParamElement) SetValue(v string) { e.Set("value", v) }
+
 type HTMLPreElement struct{ *BasicHTMLElement }
 
 type HTMLProgressElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLProgressElement) Max() float64      { return e.Get("max").Float() }
-func (e *HTMLProgressElement) Position() float64 { return e.Get("position").Float() }
-func (e *HTMLProgressElement) Value() float64    { return e.Get("value").Float() }
+func (e *HTMLProgressElement) Max() float64                { return e.Get("max").Float() }
+func (e *HTMLProgressElement) Position() float64           { return e.Get("position").Float() }
+func (e *HTMLProgressElement) Value() float64              { return e.Get("value").Float() }
+func (e *HTMLProgressElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
 
-func (e HTMLProgressElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
+func (e *HTMLProgressElement) SetMax(v float64)   { e.Set("max", v) }
+func (e *HTMLProgressElement) SetValue(v float64) { e.Set("value", v) }
 
 type HTMLQuoteElement struct {
 	*BasicHTMLElement
@@ -2937,41 +2985,38 @@ func (e *HTMLScriptElement) Async() bool     { return e.Get("async").Bool() }
 func (e *HTMLScriptElement) Defer() bool     { return e.Get("defer").Bool() }
 func (e *HTMLScriptElement) Text() string    { return e.Get("text").String() }
 
+func (e *HTMLScriptElement) SetType(v string)    { e.Set("type", v) }
+func (e *HTMLScriptElement) SetSrc(v string)     { e.Set("src", v) }
+func (e *HTMLScriptElement) SetCharset(v string) { e.Set("charset", v) }
+func (e *HTMLScriptElement) SetAsync(v bool)     { e.Set("async", v) }
+func (e *HTMLScriptElement) SetDefer(v bool)     { e.Set("defer", v) }
+func (e *HTMLScriptElement) SetText(v string)    { e.Set("text", v) }
+
 type HTMLSelectElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLSelectElement) Autofocus() bool    { return e.Get("autofocus").Bool() }
-func (e *HTMLSelectElement) Disabled() bool     { return e.Get("disabled").Bool() }
-func (e *HTMLSelectElement) Length() int        { return e.Get("length").Int() }
-func (e *HTMLSelectElement) Multiple() bool     { return e.Get("multiple").Bool() }
-func (e *HTMLSelectElement) Name() string       { return e.Get("name").String() }
-func (e *HTMLSelectElement) Required() bool     { return e.Get("required").Bool() }
-func (e *HTMLSelectElement) SelectedIndex() int { return e.Get("selectedIndex").Int() }
-func (e *HTMLSelectElement) Size() int          { return e.Get("size").Int() }
-func (e *HTMLSelectElement) Type() string       { return e.Get("type").String() }
-func (e *HTMLSelectElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLSelectElement) Value() string      { return e.Get("value").String() }
-func (e *HTMLSelectElement) WillValidate() bool { return e.Get("willValidate").Bool() }
-
-func (e *HTMLSelectElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
-
-func (e *HTMLSelectElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
-
+func (e *HTMLSelectElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLSelectElement) Autofocus() bool             { return e.Get("autofocus").Bool() }
+func (e *HTMLSelectElement) Disabled() bool              { return e.Get("disabled").Bool() }
+func (e *HTMLSelectElement) Length() int                 { return e.Get("length").Int() }
+func (e *HTMLSelectElement) Multiple() bool              { return e.Get("multiple").Bool() }
+func (e *HTMLSelectElement) Name() string                { return e.Get("name").String() }
+func (e *HTMLSelectElement) Required() bool              { return e.Get("required").Bool() }
+func (e *HTMLSelectElement) SelectedIndex() int          { return e.Get("selectedIndex").Int() }
+func (e *HTMLSelectElement) Size() int                   { return e.Get("size").Int() }
+func (e *HTMLSelectElement) Type() string                { return e.Get("type").String() }
+func (e *HTMLSelectElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
+func (e *HTMLSelectElement) Value() string               { return e.Get("value").String() }
+func (e *HTMLSelectElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
+func (e *HTMLSelectElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
+func (e *HTMLSelectElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
 func (e *HTMLSelectElement) Options() []*HTMLOptionElement {
 	return getOptions(e.Underlying(), "options")
 }
-
 func (e *HTMLSelectElement) SelectedOptions() []*HTMLOptionElement {
 	return getOptions(e.Underlying(), "selectedOptions")
 }
-
 func (e *HTMLSelectElement) Item(index int) *HTMLOptionElement {
 	el := wrapHTMLElement(e.Call("item", index))
 	if el == nil {
@@ -2979,7 +3024,6 @@ func (e *HTMLSelectElement) Item(index int) *HTMLOptionElement {
 	}
 	return el.(*HTMLOptionElement)
 }
-
 func (e *HTMLSelectElement) NamedItem(name string) *HTMLOptionElement {
 	el := wrapHTMLElement(e.Call("namedItem", name))
 	if el == nil {
@@ -2988,22 +3032,23 @@ func (e *HTMLSelectElement) NamedItem(name string) *HTMLOptionElement {
 	return el.(*HTMLOptionElement)
 }
 
+func (e *HTMLSelectElement) SetAutofocus(v bool)        { e.Set("autofocus", v) }
+func (e *HTMLSelectElement) SetDisabled(v bool)         { e.Set("disabled", v) }
+func (e *HTMLSelectElement) SetLength(v int)            { e.Set("length", v) }
+func (e *HTMLSelectElement) SetMultiple(v bool)         { e.Set("multiple", v) }
+func (e *HTMLSelectElement) SetName(v string)           { e.Set("name", v) }
+func (e *HTMLSelectElement) SetRequired(v bool)         { e.Set("required", v) }
+func (e *HTMLSelectElement) SetSelectedIndex(v int)     { e.Set("selectedIndex", v) }
+func (e *HTMLSelectElement) SetSize(v int)              { e.Set("size", v) }
+func (e *HTMLSelectElement) SetValue(v string)          { e.Set("value", v) }
+func (e *HTMLSelectElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
+
+func (e *HTMLSelectElement) CheckValidity() bool { return e.Call("checkValidity").Bool() }
+
 // TODO(dominikh): Not implementing Add or Remove for now. For one,
 // Add with "before" behaves weird when dealing with optgroups. Also,
 // there's already InsertBefore and RemoveChild which can be used
 // instead.
-
-func (e *HTMLSelectElement) Validity() *ValidityState {
-	return &ValidityState{Value: e.Get("validity")}
-}
-
-func (e *HTMLSelectElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLSelectElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
 
 type HTMLSourceElement struct {
 	*BasicHTMLElement
@@ -3012,6 +3057,10 @@ type HTMLSourceElement struct {
 func (e *HTMLSourceElement) Media() string { return e.Get("media").String() }
 func (e *HTMLSourceElement) Src() string   { return e.Get("src").String() }
 func (e *HTMLSourceElement) Type() string  { return e.Get("type").String() }
+
+func (e *HTMLSourceElement) SetMedia(v string) { e.Set("media", v) }
+func (e *HTMLSourceElement) SetSrc(v string)   { e.Set("src", v) }
+func (e *HTMLSourceElement) SetType(v string)  { e.Set("type", v) }
 
 type HTMLSpanElement struct{ *BasicHTMLElement }
 type HTMLStyleElement struct{ *BasicHTMLElement }
@@ -3026,11 +3075,16 @@ func (e *HTMLTableCellElement) ColSpan() int   { return e.Get("colSpan").Int() }
 func (e *HTMLTableCellElement) RowSpan() int   { return e.Get("rowSpan").Int() }
 func (e *HTMLTableCellElement) CellIndex() int { return e.Get("cellIndex").Int() }
 
+func (e *HTMLTableCellElement) SetColSpan(v int) { e.Set("colSpan", v) }
+func (e *HTMLTableCellElement) SetRowSpan(v int) { e.Set("rowSpan", v) }
+
 type HTMLTableColElement struct {
 	*BasicHTMLElement
 }
 
 func (e *HTMLTableColElement) Span() int { return e.Get("span").Int() }
+
+func (e *HTMLTableColElement) SetSpan(v int) { e.Set("span", v) }
 
 type HTMLTableDataCellElement struct{ *BasicHTMLElement }
 type HTMLTableElement struct{ *BasicHTMLElement }
@@ -3042,13 +3096,15 @@ type HTMLTableHeaderCellElement struct {
 func (e *HTMLTableHeaderCellElement) Abbr() string  { return e.Get("abbr").String() }
 func (e *HTMLTableHeaderCellElement) Scope() string { return e.Get("scope").String() }
 
+func (e *HTMLTableHeaderCellElement) SetAbbr(v string)  { e.Set("abbr", v) }
+func (e *HTMLTableHeaderCellElement) SetScope(v string) { e.Set("scope", v) }
+
 type HTMLTableRowElement struct {
 	*BasicHTMLElement
 }
 
 func (e *HTMLTableRowElement) RowIndex() int        { return e.Get("rowIndex").Int() }
 func (e *HTMLTableRowElement) SectionRowIndex() int { return e.Get("sectionRowIndex").Int() }
-
 func (e *HTMLTableRowElement) Cells() []*HTMLTableCellElement {
 	cells := nodeListToElements(e.Get("cells"))
 	out := make([]*HTMLTableCellElement, len(cells))
@@ -3097,65 +3153,59 @@ type HTMLTextAreaElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLTextAreaElement) Autocomplete() string {
-	return e.Get("autocomplete").String()
-}
-func (e *HTMLTextAreaElement) Autofocus() bool { return e.Get("autofocus").Bool() }
-func (e *HTMLTextAreaElement) Cols() int       { return e.Get("cols").Int() }
-func (e *HTMLTextAreaElement) DefaultValue() string {
-	return e.Get("defaultValue").String()
-}
-func (e *HTMLTextAreaElement) DirName() string     { return e.Get("dirName").String() }
-func (e *HTMLTextAreaElement) Disabled() bool      { return e.Get("disabled").Bool() }
-func (e *HTMLTextAreaElement) MaxLength() int      { return e.Get("maxLength").Int() }
-func (e *HTMLTextAreaElement) Name() string        { return e.Get("name").String() }
-func (e *HTMLTextAreaElement) Placeholder() string { return e.Get("placeholder").String() }
-func (e *HTMLTextAreaElement) ReadOnly() bool      { return e.Get("readOnly").Bool() }
-func (e *HTMLTextAreaElement) Required() bool      { return e.Get("required").Bool() }
-func (e *HTMLTextAreaElement) Rows() int           { return e.Get("rows").Int() }
-func (e *HTMLTextAreaElement) SelectionDirection() string {
-	return e.Get("selectionDirection").String()
-}
-func (e *HTMLTextAreaElement) SelectionStart() int { return e.Get("selectionStart").Int() }
-func (e *HTMLTextAreaElement) SelectionEnd() int   { return e.Get("selectionEnd").Int() }
-func (e *HTMLTextAreaElement) TabIndex() int       { return e.Get("tabIndex").Int() }
-func (e *HTMLTextAreaElement) TextLength() int     { return e.Get("textLength").Int() }
-func (e *HTMLTextAreaElement) Type() string        { return e.Get("type").String() }
-func (e *HTMLTextAreaElement) ValidationMessage() string {
-	return e.Get("validationMessage").String()
-}
-func (e *HTMLTextAreaElement) Value() string      { return e.Get("value").String() }
-func (e *HTMLTextAreaElement) WillValidate() bool { return e.Get("willValidate").Bool() }
-func (e *HTMLTextAreaElement) Wrap() string       { return e.Get("wrap").String() }
-
-func (e *HTMLTextAreaElement) Form() *HTMLFormElement {
-	return getForm(e.Underlying())
-}
-
-func (e *HTMLTextAreaElement) Labels() []*HTMLLabelElement {
-	return getLabels(e.Underlying())
-}
-
+func (e *HTMLTextAreaElement) Autocomplete() string        { return e.Get("autocomplete").String() }
+func (e *HTMLTextAreaElement) Autofocus() bool             { return e.Get("autofocus").Bool() }
+func (e *HTMLTextAreaElement) Cols() int                   { return e.Get("cols").Int() }
+func (e *HTMLTextAreaElement) DefaultValue() string        { return e.Get("defaultValue").String() }
+func (e *HTMLTextAreaElement) DirName() string             { return e.Get("dirName").String() }
+func (e *HTMLTextAreaElement) Disabled() bool              { return e.Get("disabled").Bool() }
+func (e *HTMLTextAreaElement) MaxLength() int              { return e.Get("maxLength").Int() }
+func (e *HTMLTextAreaElement) Name() string                { return e.Get("name").String() }
+func (e *HTMLTextAreaElement) Placeholder() string         { return e.Get("placeholder").String() }
+func (e *HTMLTextAreaElement) ReadOnly() bool              { return e.Get("readOnly").Bool() }
+func (e *HTMLTextAreaElement) Required() bool              { return e.Get("required").Bool() }
+func (e *HTMLTextAreaElement) Rows() int                   { return e.Get("rows").Int() }
+func (e *HTMLTextAreaElement) SelectionDirection() string  { return e.Get("selectionDirection").String() }
+func (e *HTMLTextAreaElement) SelectionStart() int         { return e.Get("selectionStart").Int() }
+func (e *HTMLTextAreaElement) SelectionEnd() int           { return e.Get("selectionEnd").Int() }
+func (e *HTMLTextAreaElement) TabIndex() int               { return e.Get("tabIndex").Int() }
+func (e *HTMLTextAreaElement) TextLength() int             { return e.Get("textLength").Int() }
+func (e *HTMLTextAreaElement) Type() string                { return e.Get("type").String() }
+func (e *HTMLTextAreaElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
+func (e *HTMLTextAreaElement) Value() string               { return e.Get("value").String() }
+func (e *HTMLTextAreaElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
+func (e *HTMLTextAreaElement) Wrap() string                { return e.Get("wrap").String() }
+func (e *HTMLTextAreaElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
+func (e *HTMLTextAreaElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
 func (e *HTMLTextAreaElement) Validity() *ValidityState {
-	// TODO replace with a field once GopherJS supports that
 	return &ValidityState{Value: e.Get("validity")}
 }
 
-func (e *HTMLTextAreaElement) CheckValidity() bool {
-	return e.Call("checkValidity").Bool()
-}
-
-func (e *HTMLTextAreaElement) SetCustomValidity(s string) {
-	e.Call("setCustomValidity", s)
-}
-
-func (e *HTMLTextAreaElement) Select() {
-	e.Call("select")
-}
-
+func (e *HTMLTextAreaElement) SetAutocomplete(v string)       { e.Set("autocomplete", v) }
+func (e *HTMLTextAreaElement) SetAutofocus(v bool)            { e.Set("autofocus", v) }
+func (e *HTMLTextAreaElement) SetCols(v int)                  { e.Set("cols", v) }
+func (e *HTMLTextAreaElement) SetDefaultValue(v string)       { e.Set("defaultValue", v) }
+func (e *HTMLTextAreaElement) SetDirName(v string)            { e.Set("dirName", v) }
+func (e *HTMLTextAreaElement) SetDisabled(v bool)             { e.Set("disabled", v) }
+func (e *HTMLTextAreaElement) SetMaxLength(v int)             { e.Set("maxLength", v) }
+func (e *HTMLTextAreaElement) SetName(v string)               { e.Set("name", v) }
+func (e *HTMLTextAreaElement) SetPlaceholder(v string)        { e.Set("placeholder", v) }
+func (e *HTMLTextAreaElement) SetReadOnly(v bool)             { e.Set("readOnly", v) }
+func (e *HTMLTextAreaElement) SetRequired(v bool)             { e.Set("required", v) }
+func (e *HTMLTextAreaElement) SetRows(v int)                  { e.Set("rows", v) }
+func (e *HTMLTextAreaElement) SetSelectionDirection(v string) { e.Set("selectionDirection", v) }
+func (e *HTMLTextAreaElement) SetSelectionStart(v int)        { e.Set("selectionStart", v) }
+func (e *HTMLTextAreaElement) SetSelectionEnd(v int)          { e.Set("selectionEnd", v) }
+func (e *HTMLTextAreaElement) SetTabIndex(v int)              { e.Set("tabIndex", v) }
+func (e *HTMLTextAreaElement) SetValue(v string)              { e.Set("value", v) }
+func (e *HTMLTextAreaElement) SetWrap(v string)               { e.Set("wrap", v) }
+func (e *HTMLTextAreaElement) SetCustomValidity(s string)     { e.Call("setCustomValidity", s) }
 func (e *HTMLTextAreaElement) SetSelectionRange(start, end int, direction string) {
 	e.Call("setSelectionRange", start, end, direction)
 }
+
+func (e *HTMLTextAreaElement) CheckValidity() bool { return e.Call("checkValidity").Bool() }
+func (e *HTMLTextAreaElement) Select()             { e.Call("select") }
 
 type HTMLTimeElement struct {
 	*BasicHTMLElement
@@ -3179,16 +3229,19 @@ type HTMLTrackElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLTrackElement) Kind() string    { return e.Get("kind").String() }
-func (e *HTMLTrackElement) Src() string     { return e.Get("src").String() }
-func (e *HTMLTrackElement) Srclang() string { return e.Get("srclang").String() }
-func (e *HTMLTrackElement) Label() string   { return e.Get("label").String() }
-func (e *HTMLTrackElement) Default() bool   { return e.Get("default").Bool() }
-func (e *HTMLTrackElement) ReadyState() int { return e.Get("readyState").Int() }
+func (e *HTMLTrackElement) Kind() string      { return e.Get("kind").String() }
+func (e *HTMLTrackElement) Src() string       { return e.Get("src").String() }
+func (e *HTMLTrackElement) Srclang() string   { return e.Get("srclang").String() }
+func (e *HTMLTrackElement) Label() string     { return e.Get("label").String() }
+func (e *HTMLTrackElement) Default() bool     { return e.Get("default").Bool() }
+func (e *HTMLTrackElement) ReadyState() int   { return e.Get("readyState").Int() }
+func (e *HTMLTrackElement) Track() *TextTrack { return &TextTrack{e.Get("track")} }
 
-func (e *HTMLTrackElement) Track() *TextTrack {
-	return &TextTrack{e.Get("track")}
-}
+func (e *HTMLTrackElement) SetKind(v string)    { e.Set("kind", v) }
+func (e *HTMLTrackElement) SetSrc(v string)     { e.Set("src", v) }
+func (e *HTMLTrackElement) SetSrclang(v string) { e.Set("srclang", v) }
+func (e *HTMLTrackElement) SetLabel(v string)   { e.Set("label", v) }
+func (e *HTMLTrackElement) SetDefault(v bool)   { e.Set("default", v) }
 
 type HTMLUListElement struct{ *BasicHTMLElement }
 type HTMLUnknownElement struct{ *BasicHTMLElement }
@@ -3223,9 +3276,7 @@ func (css *CSSStyleDeclaration) ToMap() map[string]string {
 	return m
 }
 
-func (css *CSSStyleDeclaration) RemoveProperty(name string) {
-	css.Call("removeProperty", name)
-}
+func (css *CSSStyleDeclaration) RemoveProperty(name string) { css.Call("removeProperty", name) }
 
 func (css *CSSStyleDeclaration) GetPropertyValue(name string) string {
 	return toString(css.Call("getPropertyValue", name))

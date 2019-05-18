@@ -280,21 +280,18 @@ type MouseEvent struct {
 	*UIEvent
 }
 
-func (ev *MouseEvent) AltKey() bool   { return ev.Get("altKey").Bool() }
-func (ev *MouseEvent) Button() int    { return ev.Get("button").Int() }
-func (ev *MouseEvent) ClientX() int   { return ev.Get("clientX").Int() }
-func (ev *MouseEvent) ClientY() int   { return ev.Get("clientY").Int() }
-func (ev *MouseEvent) CtrlKey() bool  { return ev.Get("ctrlKey").Bool() }
-func (ev *MouseEvent) MetaKey() bool  { return ev.Get("metaKey").Bool() }
-func (ev *MouseEvent) MovementX() int { return ev.Get("movementX").Int() }
-func (ev *MouseEvent) MovementY() int { return ev.Get("movementY").Int() }
-func (ev *MouseEvent) ScreenX() int   { return ev.Get("screenX").Int() }
-func (ev *MouseEvent) ScreenY() int   { return ev.Get("screenY").Int() }
-func (ev *MouseEvent) ShiftKey() bool { return ev.Get("shiftKey").Bool() }
-
-func (ev *MouseEvent) RelatedTarget() Element {
-	return wrapElement(ev.Get("relatedTarget"))
-}
+func (ev *MouseEvent) AltKey() bool           { return ev.Get("altKey").Bool() }
+func (ev *MouseEvent) Button() int            { return ev.Get("button").Int() }
+func (ev *MouseEvent) ClientX() int           { return ev.Get("clientX").Int() }
+func (ev *MouseEvent) ClientY() int           { return ev.Get("clientY").Int() }
+func (ev *MouseEvent) CtrlKey() bool          { return ev.Get("ctrlKey").Bool() }
+func (ev *MouseEvent) MetaKey() bool          { return ev.Get("metaKey").Bool() }
+func (ev *MouseEvent) MovementX() int         { return ev.Get("movementX").Int() }
+func (ev *MouseEvent) MovementY() int         { return ev.Get("movementY").Int() }
+func (ev *MouseEvent) ScreenX() int           { return ev.Get("screenX").Int() }
+func (ev *MouseEvent) ScreenY() int           { return ev.Get("screenY").Int() }
+func (ev *MouseEvent) ShiftKey() bool         { return ev.Get("shiftKey").Bool() }
+func (ev *MouseEvent) RelatedTarget() Element { return wrapElement(ev.Get("relatedTarget")) }
 
 func (ev *MouseEvent) ModifierState(mod string) bool {
 	return ev.Call("getModifierState", mod).Bool()
