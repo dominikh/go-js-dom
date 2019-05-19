@@ -95,20 +95,13 @@
 //
 // Backwards compatibility
 //
-// This package has a relatively stable API. However, there will be
-// backwards incompatible changes from time to time. This is because
-// the package isn't complete yet, as well as because the DOM is a
-// moving target, and APIs do change sometimes.
+// This package is currently in development and has an unstable API.
+// There may be backwards incompatible changes before it graduates
+// from its current alpha status.
 //
-// While an attempt is made to reduce changing function signatures to
-// a minimum, it can't always be guaranteed. Sometimes mistakes in the
-// bindings are found that require changing arguments or return
-// values.
-//
-// Interfaces defined in this package may also change on a
-// semi-regular basis, as new methods are added to them. This happens
-// because the bindings aren't complete and can never really be, as
-// new features are added to the DOM.
+// There may be additional backwards incompatible changes from time to
+// time. This is because the package isn't complete yet, as well as
+// because the DOM is a moving target, and APIs do change sometimes.
 //
 // If you depend on none of the APIs changing unexpectedly, you're
 // advised to vendor this package.
@@ -1191,8 +1184,7 @@ func (w *window) SetInterval(fn func(), delay int) int {
 	// gets cancelled via ClearInterval.
 	// See TODO comment in window.RequestAnimationFrame for more details.
 
-	var wrapper js.Func
-	wrapper = js.FuncOf(func(js.Value, []js.Value) interface{} {
+	wrapper := js.FuncOf(func(js.Value, []js.Value) interface{} {
 		fn()
 		return nil
 	})
@@ -1586,7 +1578,7 @@ type Element interface {
 	TagName() string
 	GetAttribute(string) string                   // TODO can attributes only be strings?
 	GetAttributeNS(ns string, name string) string // can attributes only be strings?
-	GetBoundingClientRect() ClientRect
+	GetBoundingClientRect() *Rect
 	GetElementsByClassName(string) []Element
 	GetElementsByTagName(string) []Element
 	GetElementsByTagNameNS(ns string, name string) []Element
@@ -1605,21 +1597,30 @@ type Element interface {
 	SetOuterHTML(string)
 }
 
-type ClientRect struct {
+// Rect represents a rectangle.
+//
+// Reference: https://developer.mozilla.org/en-US/docs/Web/API/DOMRect.
+type Rect struct {
 	js.Value
 }
 
-func (r *ClientRect) Height() float64 { return r.Get("height").Float() }
-func (r *ClientRect) Width() float64  { return r.Get("width").Float() }
-func (r *ClientRect) Left() float64   { return r.Get("left").Float() }
-func (r *ClientRect) Right() float64  { return r.Get("right").Float() }
-func (r *ClientRect) Top() float64    { return r.Get("top").Float() }
-func (r *ClientRect) Bottom() float64 { return r.Get("bottom").Float() }
+func (r *Rect) X() float64      { return r.Get("x").Float() }
+func (r *Rect) Y() float64      { return r.Get("y").Float() }
+func (r *Rect) Width() float64  { return r.Get("width").Float() }
+func (r *Rect) Height() float64 { return r.Get("height").Float() }
+func (r *Rect) Top() float64    { return r.Get("top").Float() }
+func (r *Rect) Right() float64  { return r.Get("right").Float() }
+func (r *Rect) Bottom() float64 { return r.Get("bottom").Float() }
+func (r *Rect) Left() float64   { return r.Get("left").Float() }
 
-func (r *ClientRect) SetLeft(v float64)   { r.Set("left", v) }
-func (r *ClientRect) SetRight(v float64)  { r.Set("right", v) }
-func (r *ClientRect) SetTop(v float64)    { r.Set("top", v) }
-func (r *ClientRect) SetBottom(v float64) { r.Set("bottom", v) }
+func (r *Rect) SetX(v float64)      { r.Set("x", v) }
+func (r *Rect) SetY(v float64)      { r.Set("y", v) }
+func (r *Rect) SetWidth(v float64)  { r.Set("width", v) }
+func (r *Rect) SetHeight(v float64) { r.Set("height", v) }
+func (r *Rect) SetTop(v float64)    { r.Set("top", v) }
+func (r *Rect) SetRight(v float64)  { r.Set("right", v) }
+func (r *Rect) SetBottom(v float64) { r.Set("bottom", v) }
+func (r *Rect) SetLeft(v float64)   { r.Set("left", v) }
 
 type ParentNode interface {
 	// No properties/methods that aren't experimental
@@ -1781,9 +1782,9 @@ func (e *BasicElement) Attributes() map[string]string {
 	return attrs
 }
 
-func (e *BasicElement) GetBoundingClientRect() ClientRect {
+func (e *BasicElement) GetBoundingClientRect() *Rect {
 	obj := e.Call("getBoundingClientRect")
-	return ClientRect{Value: obj}
+	return &Rect{Value: obj}
 }
 
 func (e *BasicElement) PreviousElementSibling() Element {
