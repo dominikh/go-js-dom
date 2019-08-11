@@ -2410,11 +2410,11 @@ func (ctx *CanvasRenderingContext2D) GetImageData(sx, sy, sw, sh int) *ImageData
 }
 
 func (ctx *CanvasRenderingContext2D) PutImageData(imageData *ImageData, dx, dy float64) {
-	ctx.Call("putImageData", imageData, dx, dy)
+	ctx.Call("putImageData", imageData.Value, dx, dy)
 }
 
 func (ctx *CanvasRenderingContext2D) PutImageDataDirty(imageData *ImageData, dx, dy float64, dirtyX, dirtyY, dirtyWidth, dirtyHeight int) {
-	ctx.Call("putImageData", imageData, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
+	ctx.Call("putImageData", imageData.Value, dx, dy, dirtyX, dirtyY, dirtyWidth, dirtyHeight)
 }
 
 // State
