@@ -1,5 +1,5 @@
 // +build js
-// +build !go1.14
+// +build go1.14
 
 // Package dom provides Go bindings for the JavaScript DOM APIs.
 //
@@ -119,7 +119,7 @@ import (
 // toString returns the string representation of o. If o is nil or
 // undefined, the empty string will be returned instead.
 func toString(o js.Value) string {
-	if o == js.Null() || o == js.Undefined() {
+	if o.IsNull() || o.IsUndefined() {
 		return ""
 	}
 	return o.String()
@@ -142,7 +142,7 @@ func callRecover(o js.Value, fn string, args ...interface{}) (err error) {
 }
 
 func elementConstructor(o js.Value) js.Value {
-	if n := o.Get("node"); n != js.Undefined() {
+	if n := o.Get("node"); !n.IsUndefined() {
 		// Support elements wrapped in Polymer's DOM APIs.
 		return n.Get("constructor")
 	}
@@ -158,7 +158,7 @@ func arrayToObjects(o js.Value) []js.Value {
 }
 
 func nodeListToObjects(o js.Value) []js.Value {
-	if o.Get("constructor") == js.Global().Get("Array") {
+	if o.Get("constructor").Equal(js.Global().Get("Array")) {
 		// Support Polymer's DOM APIs, which uses Arrays instead of
 		// NodeLists
 		return arrayToObjects(o)
@@ -216,196 +216,186 @@ func WrapHTMLElement(o js.Value) HTMLElement {
 }
 
 func wrapDocument(o js.Value) Document {
-	switch elementConstructor(o) {
-	case js.Global().Get("HTMLDocument"):
+	if elementConstructor(o).Equal(js.Global().Get("HTMLDocument")) {
 		return &htmlDocument{&document{&BasicNode{o}}}
-	default:
-		return &document{&BasicNode{o}}
 	}
+	return &document{&BasicNode{o}}
 }
 
 func wrapDocumentFragment(o js.Value) DocumentFragment {
-	switch elementConstructor(o) {
 	// TODO: do we have any other stuff we want to check
-	default:
-		return &documentFragment{&BasicNode{o}}
-	}
+	//if elementConstructor(o).Equal(...) {...}
+	return &documentFragment{&BasicNode{o}}
 }
 
 func wrapNode(o js.Value) Node {
-	if o == js.Null() || o == js.Undefined() {
+	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
-	switch elementConstructor(o) {
-	// TODO all the non-element cases
-	case js.Global().Get("Text"):
+	if elementConstructor(o).Equal(js.Global().Get("Text")) {
+		// TODO all the non-element cases
 		return Text{&BasicNode{o}}
-	default:
-		return wrapElement(o)
 	}
+	return wrapElement(o)
 }
 
 func wrapElement(o js.Value) Element {
-	if o == js.Null() || o == js.Undefined() {
+	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
-	switch elementConstructor(o) {
 	// TODO all the non-HTML cases
-	default:
-		return wrapHTMLElement(o)
-	}
+	//if elementConstructor(o).Equal(...) {...}
+	return wrapHTMLElement(o)
 }
 
 func wrapHTMLElement(o js.Value) HTMLElement {
-	if o == js.Null() || o == js.Undefined() {
+	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
-	c := elementConstructor(o)
-	switch c {
-	case js.Global().Get("HTMLAnchorElement"):
+	ec := elementConstructor(o)
+	if ec.Equal(js.Global().Get("HTMLAnchorElement")) {
 		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
-	case js.Global().Get("HTMLAppletElement"):
+	} else if ec.Equal(js.Global().Get("HTMLAppletElement")) {
 		return &HTMLAppletElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLAreaElement"):
+	} else if ec.Equal(js.Global().Get("HTMLAreaElement")) {
 		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
-	case js.Global().Get("HTMLAudioElement"):
+	} else if ec.Equal(js.Global().Get("HTMLAudioElement")) {
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case js.Global().Get("HTMLBaseElement"):
+	} else if ec.Equal(js.Global().Get("HTMLBaseElement")) {
 		return &HTMLBaseElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLBodyElement"):
+	} else if ec.Equal(js.Global().Get("HTMLBodyElement")) {
 		return &HTMLBodyElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLBRElement"):
+	} else if ec.Equal(js.Global().Get("HTMLBRElement")) {
 		return &HTMLBRElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLButtonElement"):
+	} else if ec.Equal(js.Global().Get("HTMLButtonElement")) {
 		return &HTMLButtonElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLCanvasElement"):
+	} else if ec.Equal(js.Global().Get("HTMLCanvasElement")) {
 		return &HTMLCanvasElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLDataElement"):
+	} else if ec.Equal(js.Global().Get("HTMLDataElement")) {
 		return &HTMLDataElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLDataListElement"):
+	} else if ec.Equal(js.Global().Get("HTMLDataListElement")) {
 		return &HTMLDataListElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLDirectoryElement"):
+	} else if ec.Equal(js.Global().Get("HTMLDirectoryElement")) {
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLDivElement"):
+	} else if ec.Equal(js.Global().Get("HTMLDivElement")) {
 		return &HTMLDivElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLDListElement"):
+	} else if ec.Equal(js.Global().Get("HTMLDListElement")) {
 		return &HTMLDListElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLEmbedElement"):
+	} else if ec.Equal(js.Global().Get("HTMLEmbedElement")) {
 		return &HTMLEmbedElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLFieldSetElement"):
+	} else if ec.Equal(js.Global().Get("HTMLFieldSetElement")) {
 		return &HTMLFieldSetElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLFontElement"):
+	} else if ec.Equal(js.Global().Get("HTMLFontElement")) {
 		return &HTMLFontElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLFormElement"):
+	} else if ec.Equal(js.Global().Get("HTMLFormElement")) {
 		return &HTMLFormElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLFrameElement"):
+	} else if ec.Equal(js.Global().Get("HTMLFrameElement")) {
 		return &HTMLFrameElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLFrameSetElement"):
+	} else if ec.Equal(js.Global().Get("HTMLFrameSetElement")) {
 		return &HTMLFrameSetElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLHeadElement"):
+	} else if ec.Equal(js.Global().Get("HTMLHeadElement")) {
 		return &HTMLHeadElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLHeadingElement"):
+	} else if ec.Equal(js.Global().Get("HTMLHeadingElement")) {
 		return &HTMLHeadingElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLHtmlElement"):
+	} else if ec.Equal(js.Global().Get("HTMLHtmlElement")) {
 		return &HTMLHtmlElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLHRElement"):
+	} else if ec.Equal(js.Global().Get("HTMLHRElement")) {
 		return &HTMLHRElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLIFrameElement"):
+	} else if ec.Equal(js.Global().Get("HTMLIFrameElement")) {
 		return &HTMLIFrameElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLImageElement"):
+	} else if ec.Equal(js.Global().Get("HTMLImageElement")) {
 		return &HTMLImageElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLInputElement"):
+	} else if ec.Equal(js.Global().Get("HTMLInputElement")) {
 		return &HTMLInputElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLKeygenElement"):
+	} else if ec.Equal(js.Global().Get("HTMLKeygenElement")) {
 		return &HTMLKeygenElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLLabelElement"):
+	} else if ec.Equal(js.Global().Get("HTMLLabelElement")) {
 		return &HTMLLabelElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLLegendElement"):
+	} else if ec.Equal(js.Global().Get("HTMLLegendElement")) {
 		return &HTMLLegendElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLLIElement"):
+	} else if ec.Equal(js.Global().Get("HTMLLIElement")) {
 		return &HTMLLIElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLLinkElement"):
+	} else if ec.Equal(js.Global().Get("HTMLLinkElement")) {
 		return &HTMLLinkElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLMapElement"):
+	} else if ec.Equal(js.Global().Get("HTMLMapElement")) {
 		return &HTMLMapElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLMediaElement"):
+	} else if ec.Equal(js.Global().Get("HTMLMediaElement")) {
 		return &HTMLMediaElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLMenuElement"):
+	} else if ec.Equal(js.Global().Get("HTMLMenuElement")) {
 		return &HTMLMenuElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLMetaElement"):
+	} else if ec.Equal(js.Global().Get("HTMLMetaElement")) {
 		return &HTMLMetaElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLMeterElement"):
+	} else if ec.Equal(js.Global().Get("HTMLMeterElement")) {
 		return &HTMLMeterElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLModElement"):
+	} else if ec.Equal(js.Global().Get("HTMLModElement")) {
 		return &HTMLModElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLObjectElement"):
+	} else if ec.Equal(js.Global().Get("HTMLObjectElement")) {
 		return &HTMLObjectElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLOListElement"):
+	} else if ec.Equal(js.Global().Get("HTMLOListElement")) {
 		return &HTMLOListElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLOptGroupElement"):
+	} else if ec.Equal(js.Global().Get("HTMLOptGroupElement")) {
 		return &HTMLOptGroupElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLOptionElement"):
+	} else if ec.Equal(js.Global().Get("HTMLOptionElement")) {
 		return &HTMLOptionElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLOutputElement"):
+	} else if ec.Equal(js.Global().Get("HTMLOutputElement")) {
 		return &HTMLOutputElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLParagraphElement"):
+	} else if ec.Equal(js.Global().Get("HTMLParagraphElement")) {
 		return &HTMLParagraphElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLParamElement"):
+	} else if ec.Equal(js.Global().Get("HTMLParamElement")) {
 		return &HTMLParamElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLPreElement"):
+	} else if ec.Equal(js.Global().Get("HTMLPreElement")) {
 		return &HTMLPreElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLProgressElement"):
+	} else if ec.Equal(js.Global().Get("HTMLProgressElement")) {
 		return &HTMLProgressElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLQuoteElement"):
+	} else if ec.Equal(js.Global().Get("HTMLQuoteElement")) {
 		return &HTMLQuoteElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLScriptElement"):
+	} else if ec.Equal(js.Global().Get("HTMLScriptElement")) {
 		return &HTMLScriptElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLSelectElement"):
+	} else if ec.Equal(js.Global().Get("HTMLSelectElement")) {
 		return &HTMLSelectElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLSourceElement"):
+	} else if ec.Equal(js.Global().Get("HTMLSourceElement")) {
 		return &HTMLSourceElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLSpanElement"):
+	} else if ec.Equal(js.Global().Get("HTMLSpanElement")) {
 		return &HTMLSpanElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLStyleElement"):
+	} else if ec.Equal(js.Global().Get("HTMLStyleElement")) {
 		return &HTMLStyleElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableElement")) {
 		return &HTMLTableElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableCaptionElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableCaptionElement")) {
 		return &HTMLTableCaptionElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableCellElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableCellElement")) {
 		return &HTMLTableCellElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableDataCellElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableDataCellElement")) {
 		return &HTMLTableDataCellElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableHeaderCellElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableHeaderCellElement")) {
 		return &HTMLTableHeaderCellElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableColElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableColElement")) {
 		return &HTMLTableColElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableRowElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableRowElement")) {
 		return &HTMLTableRowElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTableSectionElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTableSectionElement")) {
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTemplateElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTemplateElement")) {
 		return &HTMLTemplateElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTextAreaElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTextAreaElement")) {
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTimeElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTimeElement")) {
 		return &HTMLTimeElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTitleElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTitleElement")) {
 		return &HTMLTitleElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLTrackElement"):
+	} else if ec.Equal(js.Global().Get("HTMLTrackElement")) {
 		return &HTMLTrackElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLUListElement"):
+	} else if ec.Equal(js.Global().Get("HTMLUListElement")) {
 		return &HTMLUListElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLUnknownElement"):
+	} else if ec.Equal(js.Global().Get("HTMLUnknownElement")) {
 		return &HTMLUnknownElement{BasicHTMLElement: el}
-	case js.Global().Get("HTMLVideoElement"):
+	} else if ec.Equal(js.Global().Get("HTMLVideoElement")) {
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	case js.Global().Get("HTMLElement"):
-		return el
-	default:
+	} else if ec.Equal(js.Global().Get("HTMLElement")) {
 		return el
 	}
+	return el
 }
 
 func getForm(o js.Value) *HTMLFormElement {
@@ -471,7 +461,7 @@ func (tl *TokenList) String() string {
 	if tl.sa != "" {
 		return tl.o.Get(tl.sa).String()
 	}
-	if tl.dtl.Get("constructor") == js.Global().Get("DOMSettableTokenList") {
+	if tl.dtl.Get("constructor").Equal(js.Global().Get("DOMSettableTokenList")) {
 		return tl.dtl.Get("value").String()
 	}
 	// We could manually construct the string, but I am not aware of
@@ -496,7 +486,7 @@ func (tl *TokenList) SetString(s string) {
 		tl.o.Set(tl.sa, s)
 		return
 	}
-	if tl.dtl.Get("constructor") == js.Global().Get("DOMSettableTokenList") {
+	if tl.dtl.Get("constructor").Equal(js.Global().Get("DOMSettableTokenList")) {
 		tl.dtl.Set("value", s)
 		return
 	}
@@ -1655,7 +1645,7 @@ func (e *BasicHTMLElement) Dataset() map[string]string {
 
 // jsKeys returns the keys of the given JavaScript object.
 func jsKeys(o js.Value) []string {
-	if o == js.Null() || o == js.Undefined() {
+	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
 	a := js.Global().Get("Object").Call("keys", o)
