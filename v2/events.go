@@ -289,6 +289,8 @@ func (ev *MouseEvent) CtrlKey() bool          { return ev.Get("ctrlKey").Bool() 
 func (ev *MouseEvent) MetaKey() bool          { return ev.Get("metaKey").Bool() }
 func (ev *MouseEvent) MovementX() int         { return ev.Get("movementX").Int() }
 func (ev *MouseEvent) MovementY() int         { return ev.Get("movementY").Int() }
+func (ev *MouseEvent) OffsetX() float64       { return ev.Get("offsetX").Float() }
+func (ev *MouseEvent) OffsetY() float64       { return ev.Get("offsetY").Float() }
 func (ev *MouseEvent) ScreenX() int           { return ev.Get("screenX").Int() }
 func (ev *MouseEvent) ScreenY() int           { return ev.Get("screenY").Int() }
 func (ev *MouseEvent) ShiftKey() bool         { return ev.Get("shiftKey").Bool() }
