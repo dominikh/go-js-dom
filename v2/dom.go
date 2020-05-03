@@ -216,36 +216,44 @@ func WrapHTMLElement(o js.Value) HTMLElement {
 }
 
 func wrapDocument(o js.Value) Document {
-	if elementConstructor(o).Equal(js.Global().Get("HTMLDocument")) {
+	switch c := elementConstructor(o); {
+	case c.Equal(js.Global().Get("HTMLDocument")):
 		return &htmlDocument{&document{&BasicNode{o}}}
+	default:
+		return &document{&BasicNode{o}}
 	}
-	return &document{&BasicNode{o}}
 }
 
 func wrapDocumentFragment(o js.Value) DocumentFragment {
+	switch /*c := elementConstructor(o);*/ {
 	// TODO: do we have any other stuff we want to check
-	//if elementConstructor(o).Equal(...) {...}
-	return &documentFragment{&BasicNode{o}}
+	default:
+		return &documentFragment{&BasicNode{o}}
+	}
 }
 
 func wrapNode(o js.Value) Node {
 	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
-	if elementConstructor(o).Equal(js.Global().Get("Text")) {
-		// TODO all the non-element cases
+	switch c := elementConstructor(o); {
+	// TODO all the non-element cases
+	case c.Equal(js.Global().Get("Text")):
 		return Text{&BasicNode{o}}
+	default:
+		return wrapElement(o)
 	}
-	return wrapElement(o)
 }
 
 func wrapElement(o js.Value) Element {
 	if o.IsNull() || o.IsUndefined() {
 		return nil
 	}
+	switch /*c := elementConstructor(o);*/ {
 	// TODO all the non-HTML cases
-	//if elementConstructor(o).Equal(...) {...}
-	return wrapHTMLElement(o)
+	default:
+		return wrapHTMLElement(o)
+	}
 }
 
 func wrapHTMLElement(o js.Value) HTMLElement {
@@ -253,149 +261,151 @@ func wrapHTMLElement(o js.Value) HTMLElement {
 		return nil
 	}
 	el := &BasicHTMLElement{&BasicElement{&BasicNode{o}}}
-	ec := elementConstructor(o)
-	if ec.Equal(js.Global().Get("HTMLAnchorElement")) {
+	c := elementConstructor(o)
+	switch {
+	case c.Equal(js.Global().Get("HTMLAnchorElement")):
 		return &HTMLAnchorElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
-	} else if ec.Equal(js.Global().Get("HTMLAppletElement")) {
+	case c.Equal(js.Global().Get("HTMLAppletElement")):
 		return &HTMLAppletElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLAreaElement")) {
+	case c.Equal(js.Global().Get("HTMLAreaElement")):
 		return &HTMLAreaElement{BasicHTMLElement: el, URLUtils: &URLUtils{Value: o}}
-	} else if ec.Equal(js.Global().Get("HTMLAudioElement")) {
+	case c.Equal(js.Global().Get("HTMLAudioElement")):
 		return &HTMLAudioElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	} else if ec.Equal(js.Global().Get("HTMLBaseElement")) {
+	case c.Equal(js.Global().Get("HTMLBaseElement")):
 		return &HTMLBaseElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLBodyElement")) {
+	case c.Equal(js.Global().Get("HTMLBodyElement")):
 		return &HTMLBodyElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLBRElement")) {
+	case c.Equal(js.Global().Get("HTMLBRElement")):
 		return &HTMLBRElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLButtonElement")) {
+	case c.Equal(js.Global().Get("HTMLButtonElement")):
 		return &HTMLButtonElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLCanvasElement")) {
+	case c.Equal(js.Global().Get("HTMLCanvasElement")):
 		return &HTMLCanvasElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLDataElement")) {
+	case c.Equal(js.Global().Get("HTMLDataElement")):
 		return &HTMLDataElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLDataListElement")) {
+	case c.Equal(js.Global().Get("HTMLDataListElement")):
 		return &HTMLDataListElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLDirectoryElement")) {
+	case c.Equal(js.Global().Get("HTMLDirectoryElement")):
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLDivElement")) {
+	case c.Equal(js.Global().Get("HTMLDivElement")):
 		return &HTMLDivElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLDListElement")) {
+	case c.Equal(js.Global().Get("HTMLDListElement")):
 		return &HTMLDListElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLEmbedElement")) {
+	case c.Equal(js.Global().Get("HTMLEmbedElement")):
 		return &HTMLEmbedElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLFieldSetElement")) {
+	case c.Equal(js.Global().Get("HTMLFieldSetElement")):
 		return &HTMLFieldSetElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLFontElement")) {
+	case c.Equal(js.Global().Get("HTMLFontElement")):
 		return &HTMLFontElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLFormElement")) {
+	case c.Equal(js.Global().Get("HTMLFormElement")):
 		return &HTMLFormElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLFrameElement")) {
+	case c.Equal(js.Global().Get("HTMLFrameElement")):
 		return &HTMLFrameElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLFrameSetElement")) {
+	case c.Equal(js.Global().Get("HTMLFrameSetElement")):
 		return &HTMLFrameSetElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLHeadElement")) {
+	case c.Equal(js.Global().Get("HTMLHeadElement")):
 		return &HTMLHeadElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLHeadingElement")) {
+	case c.Equal(js.Global().Get("HTMLHeadingElement")):
 		return &HTMLHeadingElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLHtmlElement")) {
+	case c.Equal(js.Global().Get("HTMLHtmlElement")):
 		return &HTMLHtmlElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLHRElement")) {
+	case c.Equal(js.Global().Get("HTMLHRElement")):
 		return &HTMLHRElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLIFrameElement")) {
+	case c.Equal(js.Global().Get("HTMLIFrameElement")):
 		return &HTMLIFrameElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLImageElement")) {
+	case c.Equal(js.Global().Get("HTMLImageElement")):
 		return &HTMLImageElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLInputElement")) {
+	case c.Equal(js.Global().Get("HTMLInputElement")):
 		return &HTMLInputElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLKeygenElement")) {
+	case c.Equal(js.Global().Get("HTMLKeygenElement")):
 		return &HTMLKeygenElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLLabelElement")) {
+	case c.Equal(js.Global().Get("HTMLLabelElement")):
 		return &HTMLLabelElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLLegendElement")) {
+	case c.Equal(js.Global().Get("HTMLLegendElement")):
 		return &HTMLLegendElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLLIElement")) {
+	case c.Equal(js.Global().Get("HTMLLIElement")):
 		return &HTMLLIElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLLinkElement")) {
+	case c.Equal(js.Global().Get("HTMLLinkElement")):
 		return &HTMLLinkElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLMapElement")) {
+	case c.Equal(js.Global().Get("HTMLMapElement")):
 		return &HTMLMapElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLMediaElement")) {
+	case c.Equal(js.Global().Get("HTMLMediaElement")):
 		return &HTMLMediaElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLMenuElement")) {
+	case c.Equal(js.Global().Get("HTMLMenuElement")):
 		return &HTMLMenuElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLMetaElement")) {
+	case c.Equal(js.Global().Get("HTMLMetaElement")):
 		return &HTMLMetaElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLMeterElement")) {
+	case c.Equal(js.Global().Get("HTMLMeterElement")):
 		return &HTMLMeterElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLModElement")) {
+	case c.Equal(js.Global().Get("HTMLModElement")):
 		return &HTMLModElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLObjectElement")) {
+	case c.Equal(js.Global().Get("HTMLObjectElement")):
 		return &HTMLObjectElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLOListElement")) {
+	case c.Equal(js.Global().Get("HTMLOListElement")):
 		return &HTMLOListElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLOptGroupElement")) {
+	case c.Equal(js.Global().Get("HTMLOptGroupElement")):
 		return &HTMLOptGroupElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLOptionElement")) {
+	case c.Equal(js.Global().Get("HTMLOptionElement")):
 		return &HTMLOptionElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLOutputElement")) {
+	case c.Equal(js.Global().Get("HTMLOutputElement")):
 		return &HTMLOutputElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLParagraphElement")) {
+	case c.Equal(js.Global().Get("HTMLParagraphElement")):
 		return &HTMLParagraphElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLParamElement")) {
+	case c.Equal(js.Global().Get("HTMLParamElement")):
 		return &HTMLParamElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLPreElement")) {
+	case c.Equal(js.Global().Get("HTMLPreElement")):
 		return &HTMLPreElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLProgressElement")) {
+	case c.Equal(js.Global().Get("HTMLProgressElement")):
 		return &HTMLProgressElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLQuoteElement")) {
+	case c.Equal(js.Global().Get("HTMLQuoteElement")):
 		return &HTMLQuoteElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLScriptElement")) {
+	case c.Equal(js.Global().Get("HTMLScriptElement")):
 		return &HTMLScriptElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLSelectElement")) {
+	case c.Equal(js.Global().Get("HTMLSelectElement")):
 		return &HTMLSelectElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLSourceElement")) {
+	case c.Equal(js.Global().Get("HTMLSourceElement")):
 		return &HTMLSourceElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLSpanElement")) {
+	case c.Equal(js.Global().Get("HTMLSpanElement")):
 		return &HTMLSpanElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLStyleElement")) {
+	case c.Equal(js.Global().Get("HTMLStyleElement")):
 		return &HTMLStyleElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableElement")) {
+	case c.Equal(js.Global().Get("HTMLTableElement")):
 		return &HTMLTableElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableCaptionElement")) {
+	case c.Equal(js.Global().Get("HTMLTableCaptionElement")):
 		return &HTMLTableCaptionElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableCellElement")) {
+	case c.Equal(js.Global().Get("HTMLTableCellElement")):
 		return &HTMLTableCellElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableDataCellElement")) {
+	case c.Equal(js.Global().Get("HTMLTableDataCellElement")):
 		return &HTMLTableDataCellElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableHeaderCellElement")) {
+	case c.Equal(js.Global().Get("HTMLTableHeaderCellElement")):
 		return &HTMLTableHeaderCellElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableColElement")) {
+	case c.Equal(js.Global().Get("HTMLTableColElement")):
 		return &HTMLTableColElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableRowElement")) {
+	case c.Equal(js.Global().Get("HTMLTableRowElement")):
 		return &HTMLTableRowElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTableSectionElement")) {
+	case c.Equal(js.Global().Get("HTMLTableSectionElement")):
 		return &HTMLTableSectionElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTemplateElement")) {
+	case c.Equal(js.Global().Get("HTMLTemplateElement")):
 		return &HTMLTemplateElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTextAreaElement")) {
+	case c.Equal(js.Global().Get("HTMLTextAreaElement")):
 		return &HTMLTextAreaElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTimeElement")) {
+	case c.Equal(js.Global().Get("HTMLTimeElement")):
 		return &HTMLTimeElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTitleElement")) {
+	case c.Equal(js.Global().Get("HTMLTitleElement")):
 		return &HTMLTitleElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLTrackElement")) {
+	case c.Equal(js.Global().Get("HTMLTrackElement")):
 		return &HTMLTrackElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLUListElement")) {
+	case c.Equal(js.Global().Get("HTMLUListElement")):
 		return &HTMLUListElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLUnknownElement")) {
+	case c.Equal(js.Global().Get("HTMLUnknownElement")):
 		return &HTMLUnknownElement{BasicHTMLElement: el}
-	} else if ec.Equal(js.Global().Get("HTMLVideoElement")) {
+	case c.Equal(js.Global().Get("HTMLVideoElement")):
 		return &HTMLVideoElement{HTMLMediaElement: &HTMLMediaElement{BasicHTMLElement: el}}
-	} else if ec.Equal(js.Global().Get("HTMLElement")) {
+	case c.Equal(js.Global().Get("HTMLElement")):
+		return el
+	default:
 		return el
 	}
-	return el
 }
 
 func getForm(o js.Value) *HTMLFormElement {

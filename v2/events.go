@@ -18,98 +18,100 @@ func wrapEvent(o js.Value) Event {
 	}
 	ev := &BasicEvent{o}
 	c := o.Get("constructor")
-	if c.Equal(js.Global().Get("AnimationEvent")) {
+	switch {
+	case c.Equal(js.Global().Get("AnimationEvent")):
 		return &AnimationEvent{ev}
-	} else if c.Equal(js.Global().Get("AudioProcessingEvent")) {
+	case c.Equal(js.Global().Get("AudioProcessingEvent")):
 		return &AudioProcessingEvent{ev}
-	} else if c.Equal(js.Global().Get("BeforeInputEvent")) {
+	case c.Equal(js.Global().Get("BeforeInputEvent")):
 		return &BeforeInputEvent{ev}
-	} else if c.Equal(js.Global().Get("BeforeUnloadEvent")) {
+	case c.Equal(js.Global().Get("BeforeUnloadEvent")):
 		return &BeforeUnloadEvent{ev}
-	} else if c.Equal(js.Global().Get("BlobEvent")) {
+	case c.Equal(js.Global().Get("BlobEvent")):
 		return &BlobEvent{ev}
-	} else if c.Equal(js.Global().Get("ClipboardEvent")) {
+	case c.Equal(js.Global().Get("ClipboardEvent")):
 		return &ClipboardEvent{ev}
-	} else if c.Equal(js.Global().Get("CloseEvent")) {
+	case c.Equal(js.Global().Get("CloseEvent")):
 		return &CloseEvent{BasicEvent: ev}
-	} else if c.Equal(js.Global().Get("CompositionEvent")) {
+	case c.Equal(js.Global().Get("CompositionEvent")):
 		return &CompositionEvent{ev}
-	} else if c.Equal(js.Global().Get("CSSFontFaceLoadEvent")) {
+	case c.Equal(js.Global().Get("CSSFontFaceLoadEvent")):
 		return &CSSFontFaceLoadEvent{ev}
-	} else if c.Equal(js.Global().Get("CustomEvent")) {
+	case c.Equal(js.Global().Get("CustomEvent")):
 		return &CustomEvent{ev}
-	} else if c.Equal(js.Global().Get("DeviceLightEvent")) {
+	case c.Equal(js.Global().Get("DeviceLightEvent")):
 		return &DeviceLightEvent{ev}
-	} else if c.Equal(js.Global().Get("DeviceMotionEvent")) {
+	case c.Equal(js.Global().Get("DeviceMotionEvent")):
 		return &DeviceMotionEvent{ev}
-	} else if c.Equal(js.Global().Get("DeviceOrientationEvent")) {
+	case c.Equal(js.Global().Get("DeviceOrientationEvent")):
 		return &DeviceOrientationEvent{ev}
-	} else if c.Equal(js.Global().Get("DeviceProximityEvent")) {
+	case c.Equal(js.Global().Get("DeviceProximityEvent")):
 		return &DeviceProximityEvent{ev}
-	} else if c.Equal(js.Global().Get("DOMTransactionEvent")) {
+	case c.Equal(js.Global().Get("DOMTransactionEvent")):
 		return &DOMTransactionEvent{ev}
-	} else if c.Equal(js.Global().Get("DragEvent")) {
+	case c.Equal(js.Global().Get("DragEvent")):
 		return &DragEvent{ev}
-	} else if c.Equal(js.Global().Get("EditingBeforeInputEvent")) {
+	case c.Equal(js.Global().Get("EditingBeforeInputEvent")):
 		return &EditingBeforeInputEvent{ev}
-	} else if c.Equal(js.Global().Get("ErrorEvent")) {
+	case c.Equal(js.Global().Get("ErrorEvent")):
 		return &ErrorEvent{ev}
-	} else if c.Equal(js.Global().Get("FocusEvent")) {
+	case c.Equal(js.Global().Get("FocusEvent")):
 		return &FocusEvent{ev}
-	} else if c.Equal(js.Global().Get("GamepadEvent")) {
+	case c.Equal(js.Global().Get("GamepadEvent")):
 		return &GamepadEvent{ev}
-	} else if c.Equal(js.Global().Get("HashChangeEvent")) {
+	case c.Equal(js.Global().Get("HashChangeEvent")):
 		return &HashChangeEvent{ev}
-	} else if c.Equal(js.Global().Get("IDBVersionChangeEvent")) {
+	case c.Equal(js.Global().Get("IDBVersionChangeEvent")):
 		return &IDBVersionChangeEvent{ev}
-	} else if c.Equal(js.Global().Get("KeyboardEvent")) {
+	case c.Equal(js.Global().Get("KeyboardEvent")):
 		return &KeyboardEvent{BasicEvent: ev}
-	} else if c.Equal(js.Global().Get("MediaStreamEvent")) {
+	case c.Equal(js.Global().Get("MediaStreamEvent")):
 		return &MediaStreamEvent{ev}
-	} else if c.Equal(js.Global().Get("MessageEvent")) {
+	case c.Equal(js.Global().Get("MessageEvent")):
 		return &MessageEvent{BasicEvent: ev}
-	} else if c.Equal(js.Global().Get("MouseEvent")) {
+	case c.Equal(js.Global().Get("MouseEvent")):
 		return &MouseEvent{UIEvent: &UIEvent{ev}}
-	} else if c.Equal(js.Global().Get("MutationEvent")) {
+	case c.Equal(js.Global().Get("MutationEvent")):
 		return &MutationEvent{ev}
-	} else if c.Equal(js.Global().Get("OfflineAudioCompletionEvent")) {
+	case c.Equal(js.Global().Get("OfflineAudioCompletionEvent")):
 		return &OfflineAudioCompletionEvent{ev}
-	} else if c.Equal(js.Global().Get("PageTransitionEvent")) {
+	case c.Equal(js.Global().Get("PageTransitionEvent")):
 		return &PageTransitionEvent{ev}
-	} else if c.Equal(js.Global().Get("PointerEvent")) {
+	case c.Equal(js.Global().Get("PointerEvent")):
 		return &PointerEvent{ev}
-	} else if c.Equal(js.Global().Get("PopStateEvent")) {
+	case c.Equal(js.Global().Get("PopStateEvent")):
 		return &PopStateEvent{ev}
-	} else if c.Equal(js.Global().Get("ProgressEvent")) {
+	case c.Equal(js.Global().Get("ProgressEvent")):
 		return &ProgressEvent{ev}
-	} else if c.Equal(js.Global().Get("RelatedEvent")) {
+	case c.Equal(js.Global().Get("RelatedEvent")):
 		return &RelatedEvent{ev}
-	} else if c.Equal(js.Global().Get("RTCPeerConnectionIceEvent")) {
+	case c.Equal(js.Global().Get("RTCPeerConnectionIceEvent")):
 		return &RTCPeerConnectionIceEvent{ev}
-	} else if c.Equal(js.Global().Get("SensorEvent")) {
+	case c.Equal(js.Global().Get("SensorEvent")):
 		return &SensorEvent{ev}
-	} else if c.Equal(js.Global().Get("StorageEvent")) {
+	case c.Equal(js.Global().Get("StorageEvent")):
 		return &StorageEvent{ev}
-	} else if c.Equal(js.Global().Get("SVGEvent")) {
+	case c.Equal(js.Global().Get("SVGEvent")):
 		return &SVGEvent{ev}
-	} else if c.Equal(js.Global().Get("SVGZoomEvent")) {
+	case c.Equal(js.Global().Get("SVGZoomEvent")):
 		return &SVGZoomEvent{ev}
-	} else if c.Equal(js.Global().Get("TimeEvent")) {
+	case c.Equal(js.Global().Get("TimeEvent")):
 		return &TimeEvent{ev}
-	} else if c.Equal(js.Global().Get("TouchEvent")) {
+	case c.Equal(js.Global().Get("TouchEvent")):
 		return &TouchEvent{BasicEvent: ev}
-	} else if c.Equal(js.Global().Get("TrackEvent")) {
+	case c.Equal(js.Global().Get("TrackEvent")):
 		return &TrackEvent{ev}
-	} else if c.Equal(js.Global().Get("TransitionEvent")) {
+	case c.Equal(js.Global().Get("TransitionEvent")):
 		return &TransitionEvent{ev}
-	} else if c.Equal(js.Global().Get("UIEvent")) {
+	case c.Equal(js.Global().Get("UIEvent")):
 		return &UIEvent{ev}
-	} else if c.Equal(js.Global().Get("UserProximityEvent")) {
+	case c.Equal(js.Global().Get("UserProximityEvent")):
 		return &UserProximityEvent{ev}
-	} else if c.Equal(js.Global().Get("WheelEvent")) {
+	case c.Equal(js.Global().Get("WheelEvent")):
 		return &WheelEvent{BasicEvent: ev}
+	default:
+		return ev
 	}
-	return ev
 }
 
 const (
