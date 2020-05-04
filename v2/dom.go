@@ -2006,7 +2006,9 @@ func (e *HTMLButtonElement) Value() string               { return e.Get("value")
 func (e *HTMLButtonElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
 func (e *HTMLButtonElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
 func (e *HTMLButtonElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
-func (e *HTMLButtonElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLButtonElement) Validity() *ValidityState {
+	return &ValidityState{Value: e.Get("validity")}
+}
 
 func (e *HTMLButtonElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
 func (e *HTMLButtonElement) SetAutoFocus(v bool)        { e.Set("autofocus", v) }
@@ -2175,11 +2177,15 @@ type TextMetrics struct {
 	js.Value
 }
 
-func (m *TextMetrics) Width() float64                  { return m.Get("width").Float() }
-func (m *TextMetrics) ActualBoundingBoxLeft() float64  { return m.Get("actualBoundingBoxLeft").Float() }
-func (m *TextMetrics) ActualBoundingBoxRight() float64 { return m.Get("actualBoundingBoxRight").Float() }
-func (m *TextMetrics) FontBoundingBoxAscent() float64  { return m.Get("fontBoundingBoxAscent").Float() }
-func (m *TextMetrics) FontBoundingBoxDescent() float64 { return m.Get("fontBoundingBoxDescent").Float() }
+func (m *TextMetrics) Width() float64                 { return m.Get("width").Float() }
+func (m *TextMetrics) ActualBoundingBoxLeft() float64 { return m.Get("actualBoundingBoxLeft").Float() }
+func (m *TextMetrics) ActualBoundingBoxRight() float64 {
+	return m.Get("actualBoundingBoxRight").Float()
+}
+func (m *TextMetrics) FontBoundingBoxAscent() float64 { return m.Get("fontBoundingBoxAscent").Float() }
+func (m *TextMetrics) FontBoundingBoxDescent() float64 {
+	return m.Get("fontBoundingBoxDescent").Float()
+}
 func (m *TextMetrics) ActualBoundingBoxAscent() float64 {
 	return m.Get("actualBoundingBoxAscent").Float()
 }
@@ -2717,8 +2723,10 @@ func (e *HTMLKeygenElement) Labels() []*HTMLLabelElement { return getLabels(e.Va
 func (e *HTMLKeygenElement) Name() string                { return e.Get("name").String() }
 func (e *HTMLKeygenElement) Type() string                { return e.Get("type").String() }
 func (e *HTMLKeygenElement) ValidationMessage() string   { return e.Get("validationMessage").String() }
-func (e *HTMLKeygenElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
-func (e *HTMLKeygenElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
+func (e *HTMLKeygenElement) Validity() *ValidityState {
+	return &ValidityState{Value: e.Get("validity")}
+}
+func (e *HTMLKeygenElement) WillValidate() bool { return e.Get("willValidate").Bool() }
 
 func (e *HTMLKeygenElement) SetAutofocus(v bool)        { e.Set("autofocus", v) }
 func (e *HTMLKeygenElement) SetChallenge(v string)      { e.Set("challenge", v) }
@@ -2877,9 +2885,11 @@ func (e *HTMLObjectElement) Type() string              { return e.Get("type").St
 func (e *HTMLObjectElement) TypeMustMatch() bool       { return e.Get("typeMustMatch").Bool() }
 func (e *HTMLObjectElement) UseMap() string            { return e.Get("useMap").String() }
 func (e *HTMLObjectElement) ValidationMessage() string { return e.Get("validationMessage").String() }
-func (e *HTMLObjectElement) Validity() *ValidityState  { return &ValidityState{Value: e.Get("validity")} }
-func (e *HTMLObjectElement) WillValidate() bool        { return e.Get("willValidate").Bool() }
-func (e *HTMLObjectElement) With() string              { return e.Get("with").String() }
+func (e *HTMLObjectElement) Validity() *ValidityState {
+	return &ValidityState{Value: e.Get("validity")}
+}
+func (e *HTMLObjectElement) WillValidate() bool { return e.Get("willValidate").Bool() }
+func (e *HTMLObjectElement) With() string       { return e.Get("with").String() }
 
 func (e *HTMLObjectElement) SetCustomValidity(s string) { e.Call("setCustomValidity", s) }
 func (e *HTMLObjectElement) SetData(v string)           { e.Set("data", v) }
@@ -2933,7 +2943,9 @@ func (e *HTMLOutputElement) Value() string               { return e.Get("value")
 func (e *HTMLOutputElement) WillValidate() bool          { return e.Get("willValidate").Bool() }
 func (e *HTMLOutputElement) Form() *HTMLFormElement      { return getForm(e.Underlying()) }
 func (e *HTMLOutputElement) Labels() []*HTMLLabelElement { return getLabels(e.Underlying()) }
-func (e *HTMLOutputElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLOutputElement) Validity() *ValidityState {
+	return &ValidityState{Value: e.Get("validity")}
+}
 func (e *HTMLOutputElement) For() *TokenList {
 	return &TokenList{dtl: e.Get("htmlFor"), o: e.Underlying()}
 }
@@ -2998,7 +3010,9 @@ type HTMLSelectElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLSelectElement) Validity() *ValidityState    { return &ValidityState{Value: e.Get("validity")} }
+func (e *HTMLSelectElement) Validity() *ValidityState {
+	return &ValidityState{Value: e.Get("validity")}
+}
 func (e *HTMLSelectElement) Autofocus() bool             { return e.Get("autofocus").Bool() }
 func (e *HTMLSelectElement) Disabled() bool              { return e.Get("disabled").Bool() }
 func (e *HTMLSelectElement) Length() int                 { return e.Get("length").Int() }
@@ -3155,19 +3169,21 @@ type HTMLTextAreaElement struct {
 	*BasicHTMLElement
 }
 
-func (e *HTMLTextAreaElement) Autocomplete() string        { return e.Get("autocomplete").String() }
-func (e *HTMLTextAreaElement) Autofocus() bool             { return e.Get("autofocus").Bool() }
-func (e *HTMLTextAreaElement) Cols() int                   { return e.Get("cols").Int() }
-func (e *HTMLTextAreaElement) DefaultValue() string        { return e.Get("defaultValue").String() }
-func (e *HTMLTextAreaElement) DirName() string             { return e.Get("dirName").String() }
-func (e *HTMLTextAreaElement) Disabled() bool              { return e.Get("disabled").Bool() }
-func (e *HTMLTextAreaElement) MaxLength() int              { return e.Get("maxLength").Int() }
-func (e *HTMLTextAreaElement) Name() string                { return e.Get("name").String() }
-func (e *HTMLTextAreaElement) Placeholder() string         { return e.Get("placeholder").String() }
-func (e *HTMLTextAreaElement) ReadOnly() bool              { return e.Get("readOnly").Bool() }
-func (e *HTMLTextAreaElement) Required() bool              { return e.Get("required").Bool() }
-func (e *HTMLTextAreaElement) Rows() int                   { return e.Get("rows").Int() }
-func (e *HTMLTextAreaElement) SelectionDirection() string  { return e.Get("selectionDirection").String() }
+func (e *HTMLTextAreaElement) Autocomplete() string { return e.Get("autocomplete").String() }
+func (e *HTMLTextAreaElement) Autofocus() bool      { return e.Get("autofocus").Bool() }
+func (e *HTMLTextAreaElement) Cols() int            { return e.Get("cols").Int() }
+func (e *HTMLTextAreaElement) DefaultValue() string { return e.Get("defaultValue").String() }
+func (e *HTMLTextAreaElement) DirName() string      { return e.Get("dirName").String() }
+func (e *HTMLTextAreaElement) Disabled() bool       { return e.Get("disabled").Bool() }
+func (e *HTMLTextAreaElement) MaxLength() int       { return e.Get("maxLength").Int() }
+func (e *HTMLTextAreaElement) Name() string         { return e.Get("name").String() }
+func (e *HTMLTextAreaElement) Placeholder() string  { return e.Get("placeholder").String() }
+func (e *HTMLTextAreaElement) ReadOnly() bool       { return e.Get("readOnly").Bool() }
+func (e *HTMLTextAreaElement) Required() bool       { return e.Get("required").Bool() }
+func (e *HTMLTextAreaElement) Rows() int            { return e.Get("rows").Int() }
+func (e *HTMLTextAreaElement) SelectionDirection() string {
+	return e.Get("selectionDirection").String()
+}
 func (e *HTMLTextAreaElement) SelectionStart() int         { return e.Get("selectionStart").Int() }
 func (e *HTMLTextAreaElement) SelectionEnd() int           { return e.Get("selectionEnd").Int() }
 func (e *HTMLTextAreaElement) TabIndex() int               { return e.Get("tabIndex").Int() }
