@@ -239,7 +239,7 @@ func wrapNode(o js.Value) Node {
 	switch elementConstructor(o) {
 	// TODO all the non-element cases
 	case js.Global().Get("Text"):
-		return Text{&BasicNode{o}}
+		return &Text{&BasicNode{o}}
 	default:
 		return wrapElement(o)
 	}
