@@ -106,7 +106,7 @@ func wrapEvent(o *js.Object) Event {
 	case js.Global.Get("UserProximityEvent"):
 		return &UserProximityEvent{ev}
 	case js.Global.Get("WheelEvent"):
-		return &WheelEvent{BasicEvent: ev}
+		return &WheelEvent{MouseEvent: &MouseEvent{UIEvent: &UIEvent{ev}}}
 	default:
 		return ev
 	}
@@ -395,7 +395,7 @@ const (
 )
 
 type WheelEvent struct {
-	*BasicEvent
+	*MouseEvent
 	DeltaX    float64 `js:"deltaX"`
 	DeltaY    float64 `js:"deltaY"`
 	DeltaZ    float64 `js:"deltaZ"`
