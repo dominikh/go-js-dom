@@ -1,5 +1,5 @@
-// +build js
-// +build go1.14
+//go:build js && go1.14
+// +build js,go1.14
 
 package dom
 
@@ -78,7 +78,7 @@ func wrapEvent(o js.Value) Event {
 	case c.Equal(js.Global().Get("PageTransitionEvent")):
 		return &PageTransitionEvent{ev}
 	case c.Equal(js.Global().Get("PointerEvent")):
-		return &PointerEvent{ev}
+		return &PointerEvent{&MouseEvent{&UIEvent{ev}}}
 	case c.Equal(js.Global().Get("PopStateEvent")):
 		return &PopStateEvent{ev}
 	case c.Equal(js.Global().Get("ProgressEvent")):
@@ -301,7 +301,7 @@ func (ev *MouseEvent) ModifierState(mod string) bool {
 type MutationEvent struct{ *BasicEvent }
 type OfflineAudioCompletionEvent struct{ *BasicEvent }
 type PageTransitionEvent struct{ *BasicEvent }
-type PointerEvent struct{ *BasicEvent }
+type PointerEvent struct{ *MouseEvent }
 type PopStateEvent struct{ *BasicEvent }
 type ProgressEvent struct{ *BasicEvent }
 type RelatedEvent struct{ *BasicEvent }
