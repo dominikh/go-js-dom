@@ -76,7 +76,7 @@ func wrapEvent(o *js.Object) Event {
 	case js.Global.Get("PageTransitionEvent"):
 		return &PageTransitionEvent{ev}
 	case js.Global.Get("PointerEvent"):
-		return &PointerEvent{ev}
+		return &PointerEvent{&MouseEvent{UIEvent: &UIEvent{ev}}}
 	case js.Global.Get("PopStateEvent"):
 		return &PopStateEvent{ev}
 	case js.Global.Get("ProgressEvent"):
@@ -298,7 +298,7 @@ func (ev *MouseEvent) ModifierState(mod string) bool {
 type MutationEvent struct{ *BasicEvent }
 type OfflineAudioCompletionEvent struct{ *BasicEvent }
 type PageTransitionEvent struct{ *BasicEvent }
-type PointerEvent struct{ *BasicEvent }
+type PointerEvent struct{ *MouseEvent }
 type PopStateEvent struct{ *BasicEvent }
 type ProgressEvent struct{ *BasicEvent }
 type RelatedEvent struct{ *BasicEvent }

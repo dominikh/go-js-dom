@@ -1,5 +1,5 @@
-// +build js
-// +build !go1.14
+//go:build js && !go1.14
+// +build js,!go1.14
 
 // Package dom provides Go bindings for the JavaScript DOM APIs.
 //
