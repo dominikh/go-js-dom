@@ -1533,6 +1533,7 @@ type Element interface {
 	Matches(string) bool
 	QuerySelector(string) Element
 	QuerySelectorAll(string) []Element
+	Remove()
 	RemoveAttribute(string)
 	RemoveAttributeNS(ns string, name string)
 	SetAttribute(name string, value string)
@@ -1777,6 +1778,10 @@ func (e *BasicElement) QuerySelector(s string) Element {
 
 func (e *BasicElement) QuerySelectorAll(s string) []Element {
 	return nodeListToElements(e.Call("querySelectorAll", s))
+}
+
+func (e *BasicElement) Remove() {
+	e.Call("remove")
 }
 
 func (e *BasicElement) RemoveAttribute(s string) {
