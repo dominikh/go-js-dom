@@ -290,6 +290,8 @@ func wrapHTMLElement(o *js.Object) HTMLElement {
 		return &HTMLDataElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDataListElement"):
 		return &HTMLDataListElement{BasicHTMLElement: el}
+	case js.Global.Get("HTMLDetailsElement"):
+		return &HTMLDetailsElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDirectoryElement"):
 		return &HTMLDirectoryElement{BasicHTMLElement: el}
 	case js.Global.Get("HTMLDivElement"):
@@ -2309,6 +2311,11 @@ type HTMLDataListElement struct{ *BasicHTMLElement }
 
 func (e *HTMLDataListElement) Options() []*HTMLOptionElement {
 	return getOptions(e.Object, "options")
+}
+
+type HTMLDetailsElement struct {
+	*BasicHTMLElement
+	Open bool `js:"open"`
 }
 
 type HTMLDirectoryElement struct{ *BasicHTMLElement }
