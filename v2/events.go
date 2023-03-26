@@ -1,5 +1,5 @@
-//go:build js && go1.14
-// +build js,go1.14
+//go:build js
+// +build js
 
 package dom
 
