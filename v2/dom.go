@@ -25,15 +25,13 @@
 // MDN Web Docs by Mozilla Contributors (https://developer.mozilla.org/en-US/docs/Web/API),
 // licensed under CC-BY-SA 2.5 (https://creativecommons.org/licenses/by-sa/2.5/).
 //
-//
-// Getting started
+// # Getting started
 //
 // The usual entry point of using the dom package is by using the
 // GetWindow() function which will return a Window, from which you can
 // get things such as the current Document.
 //
-//
-// Interfaces
+// # Interfaces
 //
 // The DOM has a big amount of different element and event types, but
 // they all follow three interfaces. All functions that work on or
@@ -45,12 +43,12 @@
 // type assertions can be used.
 //
 // Example:
-//     el := dom.GetWindow().Document().QuerySelector(".some-element")
-//     htmlEl := el.(dom.HTMLElement)
-//     pEl := el.(*dom.HTMLParagraphElement)
 //
+//	el := dom.GetWindow().Document().QuerySelector(".some-element")
+//	htmlEl := el.(dom.HTMLElement)
+//	pEl := el.(*dom.HTMLParagraphElement)
 //
-// Live collections
+// # Live collections
 //
 // Several functions in the JavaScript DOM return "live"
 // collections of elements, that is collections that will be
@@ -70,17 +68,16 @@
 // pointers to make the semantics clear. Consider the following
 // example:
 //
-//     d := dom.GetWindow().Document()
-//     e1 := d.GetElementByID("my-element")
-//     e2 := d.GetElementByID("my-element")
+//	d := dom.GetWindow().Document()
+//	e1 := d.GetElementByID("my-element")
+//	e2 := d.GetElementByID("my-element")
 //
-//     e1.Class().SetString("some-class")
-//     println(e1.Class().String() == e2.Class().String())
+//	e1.Class().SetString("some-class")
+//	println(e1.Class().String() == e2.Class().String())
 //
 // The above example will print `true`.
 //
-//
-// DOMTokenList
+// # DOMTokenList
 //
 // Some objects in the JS API have two versions of attributes, one
 // that returns a string and one that returns a DOMTokenList to ease
@@ -93,8 +90,7 @@
 // which will be able to accomplish the same. Additionally, our
 // TokenList will provide methods to convert it to strings and slices.
 //
-//
-// Backwards compatibility
+// # Backwards compatibility
 //
 // This package is currently in development and has an unstable API.
 // There may be backwards incompatible changes before it graduates
@@ -2395,15 +2391,15 @@ func (ctx *CanvasRenderingContext2D) ResetTransform() {
 // Drawing images
 
 func (ctx *CanvasRenderingContext2D) DrawImage(image Element, dx, dy float64) {
-	ctx.Call("drawImage", image, dx, dy)
+	ctx.Call("drawImage", image.Underlying(), dx, dy)
 }
 
 func (ctx *CanvasRenderingContext2D) DrawImageWithDst(image Element, dx, dy, dWidth, dHeight float64) {
-	ctx.Call("drawImage", image, dx, dy, dWidth, dHeight)
+	ctx.Call("drawImage", image.Underlying(), dx, dy, dWidth, dHeight)
 }
 
 func (ctx *CanvasRenderingContext2D) DrawImageWithSrcAndDst(image Element, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight float64) {
-	ctx.Call("drawImage", image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+	ctx.Call("drawImage", image.Underlying(), sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 }
 
 // Pixel manipulation
