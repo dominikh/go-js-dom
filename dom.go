@@ -103,9 +103,6 @@
 // semi-regular basis, as new methods are added to them. This happens
 // because the bindings aren't complete and can never really be, as
 // new features are added to the DOM.
-//
-// If you depend on none of the APIs changing unexpectedly, you're
-// advised to vendor this package.
 package dom // import "honnef.co/go/js/dom"
 
 import (

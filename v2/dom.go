@@ -92,16 +92,20 @@
 //
 // # Backwards compatibility
 //
-// This package is currently in development and has an unstable API.
-// There may be backwards incompatible changes before it graduates
-// from its current alpha status.
+// This package has a relatively stable API. However, there will be
+// backwards incompatible changes from time to time. This is because
+// the package isn't complete yet, as well as because the DOM is a
+// moving target, and APIs do change sometimes.
 //
-// There may be additional backwards incompatible changes from time to
-// time. This is because the package isn't complete yet, as well as
-// because the DOM is a moving target, and APIs do change sometimes.
+// While an attempt is made to reduce changing function signatures to
+// a minimum, it can't always be guaranteed. Sometimes mistakes in the
+// bindings are found that require changing arguments or return
+// values.
 //
-// If you depend on none of the APIs changing unexpectedly, you're
-// advised to vendor this package.
+// Interfaces defined in this package may also change on a
+// semi-regular basis, as new methods are added to them. This happens
+// because the bindings aren't complete and can never really be, as
+// new features are added to the DOM.
 package dom // import "honnef.co/go/js/dom/v2"
 
 import (
