@@ -1043,8 +1043,7 @@ func (w *window) Top() Window {
 }
 
 func (w *window) History() History {
-	// FIXME implement
-	return nil
+	return &history{w.Get("history")}
 }
 
 func (w *window) Navigator() Navigator {
@@ -3102,4 +3101,36 @@ func (css *CSSStyleDeclaration) Length() int {
 
 type Text struct {
 	*BasicNode
+}
+
+type history struct {
+	*js.Object
+}
+
+func (h *history) Length() int {
+	return h.Get("length").Int()
+}
+
+func (h *history) State() interface{} {
+	return h.Get("state")
+}
+
+func (h *history) Back() {
+	h.Call("back")
+}
+
+func (h *history) Forward() {
+	h.Call("forward")
+}
+
+func (h *history) Go(offset int) {
+	h.Call("go", offset)
+}
+
+func (h *history) PushState(state interface{}, title string, url string) {
+	h.Call("pushState", state, title, url)
+}
+
+func (h *history) ReplaceState(state interface{}, title string, url string) {
+	h.Call("replaceState", state, title, url)
 }
