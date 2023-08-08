@@ -4,9 +4,9 @@ Package dom provides Go bindings for the JavaScript DOM APIs.
 
 ## Version 2
 
-**API Status:** Alpha, more API changes may be done soon
+**API Status:** Stable, changes only due to DOM being a moving target
 
-Version 2 of package dom is implemented on top of the [`syscall/js`](https://godoc.org/syscall/js) API and supports both Go WebAssembly and GopherJS.
+Version 2 of package dom is implemented on top of the [`syscall/js`](https://go.dev/pkg/syscall/js) API and supports both Go WebAssembly and GopherJS.
 
 It provides an API that is as close as possible to v1, with the following neccessary changes:
 
@@ -20,13 +20,13 @@ It provides an API that is as close as possible to v1, with the following necces
 
 ### Documentation
 
-For documentation, see https://godoc.org/honnef.co/go/js/dom/v2.
+For documentation, see https://pkg.go.dev/honnef.co/go/js/dom/v2.
 
 ## Version 1
 
 **API Status:** Stable, changes only due to DOM being a moving target
 
-Version 1 of package dom is implemented on top of the [`github.com/gopherjs/gopherjs/js`](https://godoc.org/github.com/gopherjs/gopherjs/js) API and supports GopherJS only.
+Version 1 of package dom is implemented on top of the [`github.com/gopherjs/gopherjs/js`](https://pkg.go.dev/github.com/gopherjs/gopherjs/js) API and supports GopherJS only.
 
 ### Install
 
@@ -34,4 +34,4 @@ Version 1 of package dom is implemented on top of the [`github.com/gopherjs/goph
 
 ### Documentation
 
-For documentation, see https://godoc.org/honnef.co/go/js/dom.
+For documentation, see https://pkg.go.dev/honnef.co/go/js/dom.
