@@ -215,9 +215,9 @@ type CloseEvent struct {
 	*BasicEvent
 }
 
-func (ev *BasicEvent) Code() int      { return ev.Get("code").Int() }
-func (ev *BasicEvent) Reason() string { return ev.Get("reason").String() }
-func (ev *BasicEvent) WasClean() bool { return ev.Get("wasClean").Bool() }
+func (ev *CloseEvent) Code() int      { return ev.Get("code").Int() }
+func (ev *CloseEvent) Reason() string { return ev.Get("reason").String() }
+func (ev *CloseEvent) WasClean() bool { return ev.Get("wasClean").Bool() }
 
 type CompositionEvent struct{ *BasicEvent }
 type CSSFontFaceLoadEvent struct{ *BasicEvent }
