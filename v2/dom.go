@@ -3334,3 +3334,11 @@ func (css *CSSStyleDeclaration) Length() int {
 type Text struct {
 	*BasicNode
 }
+
+// DataTransfer holds the data that is being
+// dragged during a drag and drop operation.
+type DataTransfer struct{ js.Value }
+
+func (dt *DataTransfer) GetData(format string) string {
+	return dt.Call("getData", format).String()
+}

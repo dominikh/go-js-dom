@@ -209,7 +209,12 @@ type AudioProcessingEvent struct{ *BasicEvent }
 type BeforeInputEvent struct{ *BasicEvent }
 type BeforeUnloadEvent struct{ *BasicEvent }
 type BlobEvent struct{ *BasicEvent }
+
 type ClipboardEvent struct{ *BasicEvent }
+
+func (ev *ClipboardEvent) ClipboardData() *DataTransfer {
+	return &DataTransfer{Value: ev.Get("clipboardData")}
+}
 
 type CloseEvent struct {
 	*BasicEvent
