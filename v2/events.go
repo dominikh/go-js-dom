@@ -259,6 +259,7 @@ type KeyboardEvent struct {
 
 func (ev *KeyboardEvent) AltKey() bool          { return ev.Get("altKey").Bool() }
 func (ev *KeyboardEvent) CharCode() int         { return ev.Get("charCode").Int() }
+func (ev *KeyboardEvent) Code() string          { return ev.Get("code").String() }
 func (ev *KeyboardEvent) CtrlKey() bool         { return ev.Get("ctrlKey").Bool() }
 func (ev *KeyboardEvent) Key() string           { return ev.Get("key").String() }
 func (ev *KeyboardEvent) KeyIdentifier() string { return ev.Get("keyIdentifier").String() }

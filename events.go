@@ -254,6 +254,7 @@ type KeyboardEvent struct {
 	*BasicEvent
 	AltKey        bool   `js:"altKey"`
 	CharCode      int    `js:"charCode"`
+	Code          string `js:"code"`
 	CtrlKey       bool   `js:"ctrlKey"`
 	Key           string `js:"key"`
 	KeyIdentifier string `js:"keyIdentifier"`
