@@ -282,6 +282,7 @@ type MouseEvent struct {
 	*UIEvent
 	AltKey    bool    `js:"altKey"`
 	Button    int     `js:"button"`
+	Buttons   int     `js:"buttons"`
 	ClientX   int     `js:"clientX"`
 	ClientY   int     `js:"clientY"`
 	CtrlKey   bool    `js:"ctrlKey"`

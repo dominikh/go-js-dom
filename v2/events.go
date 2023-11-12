@@ -289,6 +289,7 @@ type MouseEvent struct {
 
 func (ev *MouseEvent) AltKey() bool           { return ev.Get("altKey").Bool() }
 func (ev *MouseEvent) Button() int            { return ev.Get("button").Int() }
+func (ev *MouseEvent) Buttons() int           { return ev.Get("buttons").Int() }
 func (ev *MouseEvent) ClientX() int           { return ev.Get("clientX").Int() }
 func (ev *MouseEvent) ClientY() int           { return ev.Get("clientY").Int() }
 func (ev *MouseEvent) CtrlKey() bool          { return ev.Get("ctrlKey").Bool() }
