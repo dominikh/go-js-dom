@@ -1275,16 +1275,37 @@ type Screen struct {
 	js.Value
 }
 
-func (s *Screen) AvailTop() int    { return s.Get("availTop").Int() }
-func (s *Screen) AvailLeft() int   { return s.Get("availLeft").Int() }
-func (s *Screen) AvailHeight() int { return s.Get("availHeight").Int() }
-func (s *Screen) AvailWidth() int  { return s.Get("availWidth").Int() }
-func (s *Screen) ColorDepth() int  { return s.Get("colorDepth").Int() }
-func (s *Screen) Height() int      { return s.Get("height").Int() }
-func (s *Screen) Left() int        { return s.Get("left").Int() }
-func (s *Screen) PixelDepth() int  { return s.Get("pixelDepth").Int() }
-func (s *Screen) Top() int         { return s.Get("top").Int() }
-func (s *Screen) Width() int       { return s.Get("width").Int() }
+func (s *Screen) AvailTop() int                   { return s.Get("availTop").Int() }
+func (s *Screen) AvailLeft() int                  { return s.Get("availLeft").Int() }
+func (s *Screen) AvailHeight() int                { return s.Get("availHeight").Int() }
+func (s *Screen) AvailWidth() int                 { return s.Get("availWidth").Int() }
+func (s *Screen) ColorDepth() int                 { return s.Get("colorDepth").Int() }
+func (s *Screen) Height() int                     { return s.Get("height").Int() }
+func (s *Screen) Left() int                       { return s.Get("left").Int() }
+func (s *Screen) Orientation() *ScreenOrientation { return &ScreenOrientation{s.Get("orientation")} }
+func (s *Screen) PixelDepth() int                 { return s.Get("pixelDepth").Int() }
+func (s *Screen) Top() int                        { return s.Get("top").Int() }
+func (s *Screen) Width() int                      { return s.Get("width").Int() }
+
+type ScreenOrientation struct{ js.Value }
+
+func (so *ScreenOrientation) AddEventListener(typ string, useCapture bool, listener func(Event)) js.Func {
+	wrapper := js.FuncOf(func(_ js.Value, args []js.Value) interface{} {
+		listener(wrapEvent(args[0]))
+		return nil
+	})
+	so.Call("addEventListener", typ, wrapper, useCapture)
+	return wrapper
+}
+
+func (so *ScreenOrientation) RemoveEventListener(typ string, useCapture bool, listener js.Func) {
+	so.Call("removeEventListener", typ, listener, useCapture)
+	listener.Release()
+}
+
+func (so *ScreenOrientation) DispatchEvent(event Event) bool {
+	return so.Call("dispatchEvent", event).Bool()
+}
 
 type Navigator interface {
 	NavigatorID

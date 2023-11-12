@@ -1230,6 +1230,24 @@ type Screen struct {
 	Width       int `js:"width"`
 }
 
+func (s *Screen) Orientation() *ScreenOrientation { return &ScreenOrientation{s.Get("orientation")} }
+
+type ScreenOrientation struct{ *js.Object }
+
+func (so *ScreenOrientation) AddEventListener(typ string, useCapture bool, listener func(Event)) func(o *js.Object) {
+	wrapper := func(o *js.Object) { listener(wrapEvent(o)) }
+	so.Call("addEventListener", typ, wrapper, useCapture)
+	return wrapper
+}
+
+func (so *ScreenOrientation) RemoveEventListener(typ string, useCapture bool, listener func(*js.Object)) {
+	so.Call("removeEventListener", typ, listener, useCapture)
+}
+
+func (so *ScreenOrientation) DispatchEvent(event Event) bool {
+	return so.Call("dispatchEvent", event).Bool()
+}
+
 type Navigator interface {
 	NavigatorID
 	NavigatorLanguage
