@@ -310,7 +310,12 @@ func (ev *MouseEvent) ModifierState(mod string) bool {
 type MutationEvent struct{ *BasicEvent }
 type OfflineAudioCompletionEvent struct{ *BasicEvent }
 type PageTransitionEvent struct{ *BasicEvent }
+
 type PointerEvent struct{ *MouseEvent }
+
+func (ev *PointerEvent) PointerID() int      { return ev.Get("pointerId").Int() }
+func (ev *PointerEvent) PointerType() string { return ev.Get("pointerType").String() }
+
 type PopStateEvent struct{ *BasicEvent }
 type ProgressEvent struct{ *BasicEvent }
 type RelatedEvent struct{ *BasicEvent }
