@@ -3363,3 +3363,7 @@ type DataTransfer struct{ js.Value }
 func (dt *DataTransfer) GetData(format string) string {
 	return dt.Call("getData", format).String()
 }
+
+func (dt *DataTransfer) SetData(format, data string) {
+	dt.Call("setData", format, data)
+}
