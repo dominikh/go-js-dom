@@ -20,7 +20,7 @@
 //
 // The documentation for some of the identifiers is based on the
 // MDN Web Docs by Mozilla Contributors (https://developer.mozilla.org/en-US/docs/Web/API),
-// licensed under CC-BY-SA 2.5 (https://creativecommons.org/licenses/by-sa/2.5/).
+// licensed under CC-BY-SA 2.5 (https://creativecommons.org/licenses/by-sa/2.5/), or any later version.
 //
 // # Getting started
 //
